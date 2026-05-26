@@ -5,7 +5,7 @@ import Link from "next/link";
 const HeroBanner: React.FC = () => {
   return (
     <section className="relative min-h-[64vh] overflow-hidden flex items-end bg-[#FAF8F4] text-[#1C1C1C] pb-0">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-8 items-end h-full w-full">
+      <div className="max-w-full mx-auto px-5 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-8 items-end h-full w-full">
         
         {/* Left Content */}
         <div className="flex flex-col justify-center pb-16 lg:pb-24 pt-16 lg:pt-0">

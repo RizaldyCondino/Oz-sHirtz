@@ -53,10 +53,11 @@ export default function FilterDrawer({
   const isShoesCategory = ["shoes", "sneakers", "footwear", "slides", "boots", "sandals"].some(
     (item) => lowerPath.includes(item)
   );
-  const isAllCategory = lowerPath.includes("/all");
-  const isMenAll = lowerPath.includes("/men/all");
-  const isWomenAll = lowerPath.includes("/women/all");
-  const showBoth = isAllCategory || isMenAll || isWomenAll;
+  // const isAllCategory = lowerPath.includes("/all");
+  // const isMenAll = lowerPath.includes("/men/all");
+  // const isWomenAll = lowerPath.includes("/women/all");
+  // const showBoth = isAllCategory || isMenAll || isWomenAll;
+  const showBoth = lowerPath.includes("/all");
 
   const apparelSizes = availableSizes
     .filter((size) => isNaN(Number(size[0])) && !size.includes("."))

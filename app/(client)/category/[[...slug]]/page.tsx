@@ -446,21 +446,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     selectedTab={subSlug || mainSlug}
     subSlug={subSlug}
   />
-          // <div className="border border-[#E7DED2] rounded-2xl bg-white px-6 py-14 text-center">
-          //   <p className="text-sm tracking-wide text-[#7A6E61]">
-          //     No products found for this selection.
-          //   </p>
-          //   {subSlug && process.env.NODE_ENV === "development" && (
-          //     <p className="text-xs text-[#aaa] mt-2">
-          //       Filtering by category slug <code>{subSlug}</code>. If this
-          //       looks wrong, visit{" "}
-          //       <a href="?debug=1" className="underline">
-          //         ?debug=1
-          //       </a>{" "}
-          //       to inspect raw Sanity slugs.
-          //     </p>
-          //   )}
-          // </div>
+         
         )}
       </div>
     </section>

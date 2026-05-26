@@ -3,13 +3,13 @@ export const menuCategories = [
     key: "men",
     label: "Men",
     items: [
+      "shoes",
       "t-shirts",
       "hoodies",
       "jackets",
       "pants",
       "shorts",
       "polos",
-      
       "jeans",
       "accessories",
     ],
@@ -18,6 +18,7 @@ export const menuCategories = [
     key: "women",
     label: "Women",
     items: [
+      "shoes",
       "t-shirts",
       "hoodies",
       "jackets",
@@ -33,6 +34,7 @@ export const menuCategories = [
     key: "kids",
     label: "Kids",
     items: [
+      "shoes",
       "t-shirts",
       "hoodies",
       "sets",
@@ -46,6 +48,7 @@ export const menuCategories = [
 
 // Matches the sub-slugs used in CategoryPage's sale filtering
 export const saleSubCategories = [
+  "shoes",
   "t-shirts",
   "hoodies",
   "jackets",
