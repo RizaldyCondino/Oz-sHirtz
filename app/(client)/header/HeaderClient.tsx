@@ -1,0 +1,226 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Search, ShoppingBag, User, Menu } from "lucide-react";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { menuCategories, collections } from "@/constants/data";
+import Logo from "@/components/Logo";
+import HeaderMenu from "@/components/HeaderMenu";
+import CartIcon from "@/components/CartIcon";
+
+interface Props {
+  products: any[];
+}
+
+function normalizeSlug(value: string): string {
+  return value.toLowerCase().trim().replaceAll(" ", "-").replaceAll("_", "-");
+}
+
+export default function HeaderClient({ products }: Props) {
+  const { isSignedIn } = useUser();
+  const pathname = usePathname();
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showHeader, setShowHeader] = useState(true);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY < lastScrollY) setShowHeader(true);
+      else if (currentScrollY > lastScrollY && currentScrollY > 80)
+        setShowHeader(false);
+      lastScrollY = currentScrollY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isSaleActive = pathname.startsWith("/category/sale");
+  const iconSize = 13;
+
+  return (
+    <>
+      <header
+        className={`
+          fixed top-0 left-0 w-full z-50
+          flex items-center justify-between
+          px-5 md:px-7 py-2
+          bg-[#FAF8F4]/90 backdrop-blur-md
+          text-[#111111] select-none
+          transition-all duration-300
+          ${showHeader ? "translate-y-0" : "-translate-y-full"}
+        `}
+      >
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="md:hidden p-1"
+          aria-label="Open menu"
+        >
+          <Menu size={16} />
+        </button>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-6 text-[10px] uppercase tracking-[0.20em] font-medium">
+          {/* Featured */}
+          <Link
+            href="/category/all"
+            className={
+              pathname === "/category/all"
+                ? "font-bold"
+                : "hover:text-black/70"
+            }
+          >
+            Featured
+          </Link>
+
+          {/* Audience dropdowns — pure CSS group-hover, no JS state needed */}
+          {menuCategories.map((group) => {
+            const isActive = pathname.startsWith(`/category/${group.key}`);
+            return (
+              <div key={group.key} className="relative group">
+                <Link
+                  href={`/category/${group.key}`}
+                  className={`py-2 block transition ${
+                    isActive ? "font-bold" : "hover:text-black/70"
+                  }`}
+                >
+                  {group.label}
+                </Link>
+
+                {/*
+                 * Dropdown — visible via CSS group-hover.
+                 * The invisible 8px bridge prevents the gap between the nav
+                 * link and the dropdown from dismissing hover before the
+                 * pointer reaches the menu.
+                 */}
+                <div
+                  className="
+                    absolute left-0 top-full pt-2
+                    invisible opacity-0 translate-y-1
+                    group-hover:visible group-hover:opacity-100 group-hover:translate-y-0
+                    transition-all duration-150
+                    z-50
+                  "
+                >
+                  <div className="w-52 bg-[#231F20] text-white shadow-xl py-2 rounded-md">
+                    {group.items.map((item) => {
+                      const itemSlug = normalizeSlug(item);
+                      const isSubActive =
+                        pathname === `/category/${group.key}/${itemSlug}`;
+                      return (
+                        <Link
+                          key={item}
+                          href={`/category/${group.key}/${itemSlug}`}
+                          className={`block px-4 py-2 text-[9px] capitalize transition hover:bg-white/10 ${
+                            isSubActive ? "bg-white/10 font-medium" : ""
+                          }`}
+                        >
+                          {item}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Collections dropdown */}
+          <div className="relative group">
+            <span
+              className={`py-2 block transition cursor-default ${
+                pathname.startsWith("/collections")
+                  ? "font-bold"
+                  : "hover:text-black/70"
+              }`}
+            >
+              Collections
+            </span>
+            <div
+              className="
+                absolute left-0 top-full pt-2
+                invisible opacity-0 translate-y-1
+                group-hover:visible group-hover:opacity-100 group-hover:translate-y-0
+                transition-all duration-150
+                z-50
+              "
+            >
+              <div className="w-56 bg-[#231F20] text-white shadow-xl py-2 rounded-md">
+                {collections.map((col) => {
+                  const isColActive = pathname === col.href;
+                  return (
+                    <Link
+                      key={col.href}
+                      href={col.href}
+                      className={`block px-4 py-2.5 text-[9px] capitalize transition hover:bg-white/10 ${
+                        isColActive ? "bg-white/10 font-medium" : ""
+                      }`}
+                    >
+                      <span className="block">{col.label}</span>
+                      {col.description && (
+                        <span className="block text-white/50 mt-0.5 text-[8px] normal-case">
+                          {col.description}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Sale */}
+          <Link
+            href="/category/sale"
+            className={`font-medium transition ${
+              isSaleActive
+                ? "font-bold text-red-600"
+                : "hover:text-black/70"
+            }`}
+          >
+            Sale
+          </Link>
+        </nav>
+
+        {/* Logo — centered absolutely so nav width doesn't shift it */}
+        <div className="absolute left-1/2 -translate-x-1/2 scale-90">
+          <Logo />
+        </div>
+
+        {/* Right icons */}
+        <div className="flex items-center gap-4">
+          <button className="hover:opacity-70" aria-label="Search">
+            <Search size={iconSize} />
+          </button>
+
+          {isSignedIn ? (
+            <UserButton
+              appearance={{ elements: { avatarBox: "!w-4 !h-4" } }}
+            />
+          ) : (
+            <SignInButton mode="modal">
+              <button className="hover:opacity-70" aria-label="Sign in">
+                <User size={iconSize} />
+              </button>
+            </SignInButton>
+          )}
+
+          <CartIcon/>
+        </div>
+      </header>
+
+      {/* Spacer so page content starts below the fixed header */}
+      <div className="h-[40px]" />
+
+      <HeaderMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        products={products}
+      />
+    </>
+  );
+}

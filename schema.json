@@ -1,0 +1,9 @@
+{
+  "path": [
+    "./src/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}"
+  ],
+  "schema": "./sanity/schemaTypes/index.ts",
+  "generates": "./src/sanity.types.ts"
+}
