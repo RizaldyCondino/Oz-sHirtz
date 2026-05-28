@@ -12,25 +12,24 @@ export interface CartItem {
 interface StoreState {
   items: CartItem[];
 
-  // Selection state
   selectedColorway: string | null;
   selectedSize: string | null;
   setSelectedColorway: (colorway: string | null) => void;
   setSelectedSize: (size: string | null) => void;
   resetSelection: () => void;
 
-  // Cart actions
-  addItem: (product: Product) => void;
+  // ✅ addItem now accepts optional colorway/size overrides
+  addItem: (product: Product, colorway?: string, size?: string) => void;
   removeItem: (productId: string, colorway: string, size: string) => void;
   deleteCartProduct: (productId: string, colorway: string, size: string) => void;
   resetCart: () => void;
 
-  // Getters
   getTotalPrice: () => number;
   getSubTotalPrice: () => number;
   getItemCount: (productId: string, colorway: string, size: string) => number;
   getGroupedItems: () => CartItem[];
-  getStockForSelection: (product: Product) => number;
+  // ✅ getStockForSelection now accepts optional colorway/size overrides
+  getStockForSelection: (product: Product, colorway?: string, size?: string) => number;
 }
 
 const useStore = create<StoreState>()(
@@ -38,7 +37,6 @@ const useStore = create<StoreState>()(
     (set, get) => ({
       items: [],
 
-      // ── SELECTION ──────────────────────────────────────
       selectedColorway: null,
       selectedSize: null,
 
@@ -50,25 +48,28 @@ const useStore = create<StoreState>()(
       resetSelection: () =>
         set({ selectedColorway: null, selectedSize: null }),
 
-      // ── CART ACTIONS ───────────────────────────────────
-      addItem: (product) => {
+      // ✅ Uses override if provided, otherwise falls back to global store
+      addItem: (product, colorwayOverride?, sizeOverride?) => {
         const { selectedColorway, selectedSize } = get();
-        if (!selectedColorway || !selectedSize) return;
+        const colorway = colorwayOverride ?? selectedColorway;
+        const size = sizeOverride ?? selectedSize;
+
+        if (!colorway || !size) return;
 
         set((state) => {
           const existingItem = state.items.find(
             (item) =>
               item.product._id === product._id &&
-              item.selectedColorway === selectedColorway &&
-              item.selectedSize === selectedSize
+              item.selectedColorway === colorway &&
+              item.selectedSize === size
           );
 
           if (existingItem) {
             return {
               items: state.items.map((item) =>
                 item.product._id === product._id &&
-                item.selectedColorway === selectedColorway &&
-                item.selectedSize === selectedSize
+                item.selectedColorway === colorway &&
+                item.selectedSize === size
                   ? { ...item, quantity: item.quantity + 1 }
                   : item
               ),
@@ -78,7 +79,7 @@ const useStore = create<StoreState>()(
           return {
             items: [
               ...state.items,
-              { product, quantity: 1, selectedColorway, selectedSize },
+              { product, quantity: 1, selectedColorway: colorway, selectedSize: size },
             ],
           };
         });
@@ -117,7 +118,6 @@ const useStore = create<StoreState>()(
 
       resetCart: () => set({ items: [] }),
 
-      // ── GETTERS ────────────────────────────────────────
       getTotalPrice: () =>
         get().items.reduce(
           (total, item) => total + (item.product.price ?? 0) * item.quantity,
@@ -143,18 +143,18 @@ const useStore = create<StoreState>()(
 
       getGroupedItems: () => get().items,
 
-      getStockForSelection: (product) => {
+      // ✅ Uses override if provided, otherwise falls back to global store
+      getStockForSelection: (product, colorwayOverride?, sizeOverride?) => {
         const { selectedColorway, selectedSize } = get();
-        if (!selectedColorway || !selectedSize) return 0;
+        const colorway = colorwayOverride ?? selectedColorway;
+        const size = sizeOverride ?? selectedSize;
 
-        const colorway = product.colorways?.find(
-          (c) => c.name === selectedColorway
-        );
-        if (!colorway) return 0;
+        if (!colorway || !size) return 0;
 
-        const sizeConfig = colorway.sizes?.find(
-          (s) => s.size === selectedSize
-        );
+        const colorwayObj = product.colorways?.find((c) => c.name === colorway);
+        if (!colorwayObj) return 0;
+
+        const sizeConfig = colorwayObj.sizes?.find((s) => s.size === size);
         return sizeConfig?.stock ?? 0;
       },
     }),

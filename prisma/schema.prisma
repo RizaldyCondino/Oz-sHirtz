@@ -1,0 +1,158 @@
+datasource db {
+  provider = "postgresql"
+  // url = env("DATABASE_URL")   ← DELETE THIS LINE
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  clerkId           String  @unique
+  email             String?
+  name              String?
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  clerkId   String
+  name      String
+  address   String
+  city      String
+  state     String
+  zip       String
+  country   String   @default("Philippines")
+  isDefault Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order     Order[]
+
+  @@index([clerkId])
+  @@index([clerkId, isDefault])
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  clerkId   String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items     CartItem[]
+}
+
+model CartItem {
+  id          String   @id @default(cuid())
+  cartId      String
+  productId   String
+  name        String
+  price       Float
+  image       String?
+  colorway    String   @default("")
+  size        String   @default("")
+  quantity    Int      @default(1)
+
+  cart        Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId, colorway, size])
+  @@index([cartId])
+}
+
+model Wishlist {
+  id        String         @id @default(cuid())
+  clerkId   String         @unique
+  createdAt DateTime       @default(now())
+
+  items     WishlistItem[]
+}
+
+model WishlistItem {
+  id          String    @id @default(cuid())
+  wishlistId  String
+  productId   String
+  name        String
+  price       Float
+  image       String?
+  slug        String?
+
+  wishlist    Wishlist  @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+
+  @@unique([wishlistId, productId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  clerkId         String
+  addressId       String
+  totalAmount     Float
+  discountAmount  Float       @default(0)
+  paymentMethod   PaymentMethod
+  paymentStatus   PaymentStatus @default(UNPAID)
+  status          OrderStatus   @default(PENDING)
+  notes           String?
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  address         Address     @relation(fields: [addressId], references: [id])
+  items           OrderItem[]
+  payLater        PayLater?
+}
+
+model OrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  productId   String
+  name        String
+  price       Float
+  image       String?
+  colorway    String  @default("")
+  size        String  @default("")
+  quantity    Int
+
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model PayLater {
+  id          String      @id @default(cuid())
+  clerkId     String
+  orderId     String      @unique
+  amountDue   Float
+  amountPaid  Float       @default(0)
+  dueDate     DateTime
+  status      PayLaterStatus @default(PENDING)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentMethod {
+  ONLINE
+  COD
+  PAY_LATER
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
+  PARTIAL
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PayLaterStatus {
+  PENDING
+  PARTIAL
+  PAID
+  OVERDUE
+}

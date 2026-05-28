@@ -10,9 +10,11 @@ import { Product } from "@/sanity/lib/queries/query";
 interface Props {
   product: Product;
   className?: string;
+  colorwayOverride?: string;
+  sizeOverride?: string;
 }
 
-const QuantityButtons = ({ product, className }: Props) => {
+const QuantityButtons = ({ product, className, colorwayOverride, sizeOverride }: Props) => {
   const {
     addItem,
     removeItem,
@@ -22,11 +24,16 @@ const QuantityButtons = ({ product, className }: Props) => {
     selectedSize,
   } = useStore();
 
-  const colorway = selectedColorway ?? "";
-  const size = selectedSize ?? "";
+  // Use override (cart) or fall back to global store (product page)
+  const colorway = colorwayOverride ?? selectedColorway ?? "";
+  const size = sizeOverride ?? selectedSize ?? "";
+
   const itemCount = getItemCount(product?._id, colorway, size);
-  const currentStock = getStockForSelection(product);
-  const hasSelection = !!selectedColorway && !!selectedSize;
+
+  // ✅ Pass colorway/size so stock is checked for the correct variant
+  const currentStock = getStockForSelection(product, colorway || undefined, size || undefined);
+
+  const hasSelection = !!colorway && !!size;
   const isOutOfStock = currentStock === 0;
 
   const handleRemoveProduct = () => {
@@ -44,7 +51,8 @@ const QuantityButtons = ({ product, className }: Props) => {
       return;
     }
     if (currentStock > itemCount) {
-      addItem(product);
+      // ✅ Pass colorway and size — no longer relies on global store
+      addItem(product, colorway, size);
       toast.success("Quantity increased successfully");
     } else {
       toast.error("Cannot add more than available stock");
