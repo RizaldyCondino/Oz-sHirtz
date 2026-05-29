@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import PriceFormatter from "./PriceFormatter";
@@ -38,7 +37,6 @@ type ProductCardProps = {
   sizes?: SanitySizeObject[];
   href?: string;
   soldOut?: boolean;
-  brands?: string;
   isLoading?: boolean;
 };
 
@@ -56,11 +54,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const [activeColorIndex, setActiveColorIndex] = useState(0);
 
-  // ==================== CIRCLE LOADING STATE ====================
   if (isLoading) {
     return (
       <div className="group relative w-full bg-white/40 rounded-md backdrop-blur-md border border-white/20 overflow-hidden shadow-md">
-        {/* Image Area with Circle Loader */}
         <div className="relative w-full aspect-[4/5] bg-[#F0E6D2] flex items-center justify-center overflow-hidden">
           <motion.div
             initial={{ opacity: 0 }}
@@ -69,7 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             className="flex flex-col items-center gap-3"
           >
             <div className="relative">
-              <Loader2 className="w-12 h-12 text-[#8C6227] animate-spin" />
+              <Loader2 className="w-12 h-12 text-black animate-spin" />
               <div className="absolute inset-0 border-4 border-[#F0E6D2] border-t-transparent rounded-full animate-spin" />
             </div>
             <p className="text-xs text-[#8C6227] tracking-wide">Loading product...</p>
@@ -77,34 +73,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         <div className="p-4 flex flex-col gap-3">
-          {/* Title Skeleton */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="h-4 bg-gray-200 rounded w-4/5"
-          />
-
-          {/* Price Skeleton */}
+          <motion.div className="h-4 bg-gray-200 rounded w-4/5" />
           <div className="flex items-center gap-2">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="h-5 bg-gray-200 rounded w-24"
-            />
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.15 }}
-              className="h-4 bg-gray-200 rounded w-16"
-            />
+            <motion.div className="h-5 bg-gray-200 rounded w-24" />
+            <motion.div className="h-4 bg-gray-200 rounded w-16" />
           </div>
         </div>
       </div>
     );
   }
 
-  // ==================== NORMAL PRODUCT STATE ====================
   const activeColorway = colorways[activeColorIndex];
 
   const activePrice = activeColorway?.price ?? price;
@@ -113,13 +91,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const activeImage =
     activeColorway?.images?.[0]?.asset?.url ?? image ?? "/placeholder.jpg";
 
-  const hasStockData = activeSizes.some(
-    (size) => typeof size.stock === "number",
-  );
-  const totalStock = activeSizes.reduce(
-    (acc, curr) => acc + (curr.stock ?? 0),
-    0,
-  );
+  const hasStockData = activeSizes.some((size) => typeof size.stock === "number");
+  const totalStock = activeSizes.reduce((acc, curr) => acc + (curr.stock ?? 0), 0);
   const isColorwaySoldOut = hasStockData && totalStock <= 0;
   const isGlobalSoldOut = soldOut || isColorwaySoldOut;
 
@@ -154,9 +127,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </span>
           )}
         </Link>
-        <span className="absolute text-[8px] top-2 left-2 md:text-[9px] rounded-md font-medium uppercase tracking-[0.18em] bg-white/70 backdrop-blur px-2 py-1 text-[#8C6227] z-10">
+
+        {/* <span className="absolute text-[8px] top-2 left-2 md:text-[9px] rounded-md font-medium uppercase tracking-[0.18em] bg-white/70 backdrop-blur px-2 py-1 text-[#8C6227] z-10">
           {tag}
-        </span>
+        </span> */}
       </div>
 
       <div className="p-4 flex flex-col gap-3">
@@ -166,23 +140,28 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </h3>
         </Link>
 
-        {/* Price Display */}
-        <div className="flex items-center gap-2">
+        {/* Price Row with Discount % OFF */}
+        <div className="flex items-center gap-2 flex-wrap">
           {discountedPrice ? (
             <>
               <PriceFormatter
                 amount={discountedPrice}
-                className="text-m font-semibold rounded-xs text-[#8C6227]"
+                className="text-base font-semibold text-[#8C6227]"
               />
               <PriceFormatter
                 amount={activePrice}
                 className="line-through text-xs text-gray-500"
               />
+
+              {/* Discount % OFF - Aligned with prices, red text, no background */}
+              <span className="text-red-600 text-[10px] font-bold tracking-wide ">
+                {activeDiscount}%
+              </span>
             </>
           ) : (
             <PriceFormatter
               amount={activePrice}
-              className="text-m text-[#5C5145]"
+              className="text-base text-[#5C5145]"
             />
           )}
         </div>

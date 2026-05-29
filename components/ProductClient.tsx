@@ -394,7 +394,7 @@ export default function ProductClient({ product }: Props) {
 
                 {/* CTA BUTTONS */}
                 <div className="flex flex-row items-center gap-2 mt-3 w-full max-w-[280px]">
-                  <AddToCartButton product={product} className="w-36 rounded-full" />
+                  <AddToCartButton product={product} className="cursor-pointer w-36 rounded-full" />
                   <Button
                     type="button"
                     variant="outline"

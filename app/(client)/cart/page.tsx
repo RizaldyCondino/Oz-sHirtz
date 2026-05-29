@@ -8,7 +8,7 @@ import { getAddresses } from "@/lib/actions/address.actions";
 import { createOrder } from "@/lib/actions/order.actions";
 
 import useStore from "@/store";
-import { ShoppingBag, Trash } from "lucide-react";
+import { Heart, ShoppingBag, Trash } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
@@ -60,7 +60,6 @@ const CartPage = () => {
     setIsClient(true);
   }, []);
 
-  // Only fetch addresses when signed in
   useEffect(() => {
     if (isSignedIn) fetchAddresses();
     else {
@@ -70,7 +69,6 @@ const CartPage = () => {
   }, [isSignedIn]);
 
   const handleCheckout = async () => {
-    // ✅ If not signed in, open Clerk sign-in modal instead of blocking
     if (!isSignedIn) {
       openSignIn({ redirectUrl: "/cart" });
       return;
@@ -105,7 +103,7 @@ const CartPage = () => {
       };
 
       const order = await createOrder(orderData);
-      toast.success("Order placed successfully! 🎉");
+      toast.success("Order placed successfully!");
       resetCart();
       window.location.href = `/orders/${order.id}`;
     } catch (error: any) {
@@ -119,17 +117,17 @@ const CartPage = () => {
   if (!isClient) return null;
 
   return (
-    <div className="bg-[#FAF8F4] pb-52 md:pb-10 min-h-screen">
+    <div className="bg-[#FAF8F4] mt-10 pb-52 md:pb-10 min-h-screen">
       {groupedItems?.length > 0 ? (
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Header */}
-          <div className="flex items-center gap-3 py-6">
+          {/* <div className="flex items-center gap-3 py-6">
             <ShoppingBag className="text-[#8C6227]" size={28} />
-            <h1 className="text-3xl font-semibold">Shopping Cart</h1>
-          </div>
+            <h1 className="text-2xl md:text-3xl font-semibold">Shopping Cart</h1>
+          </div> */}
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Cart Items — always visible */}
+          <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+            {/* Cart Items */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl border border-[#8C6227]/10 overflow-hidden">
                 {groupedItems.map(({ product, selectedColorway, selectedSize }) => {
@@ -142,26 +140,32 @@ const CartPage = () => {
                   return (
                     <div
                       key={`${product._id}-${selectedColorway}-${selectedSize}`}
-                      className="flex gap-4 p-5 border-b border-[#8C6227]/10 last:border-0"
+                      className="flex gap-4 p-4 sm:p-6 border-b border-[#8C6227]/10 last:border-0"
                     >
-                      <Link href={`/product/${product.slug?.current}`}>
-                        <Image
-                          src={urlFor(displayImage).url()}
-                          alt={product.name ?? "Product"}
-                          width={140}
-                          height={140}
-                          className="rounded-lg object-cover"
-                        />
+                      {/* Product Image - Fixed larger size, no shrinking */}
+                      <Link href={`/product/${product.slug?.current}`} className="flex-shrink-0">
+                        <div className="relative w-[150px] h-[150px] sm:w-[150px] sm:h-[150px]">
+                          <Image
+                            src={urlFor(displayImage).url()}
+                            alt={product.name ?? "Product"}
+                            fill
+                            sizes="(max-width: 640px) 130px, 150px"
+                            className="rounded-xl object-cover"
+                          />
+                        </div>
                       </Link>
 
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{product.name}</h3>
-                        <p className="text-sm text-neutral-600 mt-1">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-base font-medium sm:text-lg line-clamp-2 pr-6 text-black">
+                          {product.name}
+                        </h3>
+
+                        <p className="text-sm text-neutral-600 mt-1.5">
                           Color: <span className="font-medium">{selectedColorway}</span> •{" "}
                           Size: <span className="font-medium">{selectedSize}</span>
                         </p>
 
-                        <div className="mt-3 flex items-center justify-between">
+                        <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                           <QuantityButtons
                             product={product}
                             colorwayOverride={selectedColorway}
@@ -169,19 +173,12 @@ const CartPage = () => {
                           />
                           <PriceFormatter
                             amount={(product.price ?? 0) * quantity}
-                            className="font-bold text-[#8C6227]"
+                            className="font-bold text-[#8C6227] text-lg sm:text-xl"
                           />
+                          
                         </div>
+                        
                       </div>
-
-                      <button
-                        onClick={() =>
-                          deleteCartProduct(product._id, selectedColorway, selectedSize)
-                        }
-                        className="text-neutral-400 hover:text-red-500"
-                      >
-                        <Trash size={20} />
-                      </button>
                     </div>
                   );
                 })}
@@ -190,7 +187,6 @@ const CartPage = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Order Summary */}
               <Card className="border-[#8C6227]/10">
                 <CardHeader>
                   <CardTitle className="text-[#8C6227] font-mono uppercase tracking-widest text-sm">
@@ -204,7 +200,10 @@ const CartPage = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Discount</span>
-                    <PriceFormatter amount={getSubTotalPrice() - getTotalPrice()} />
+                    <PriceFormatter 
+                      amount={getSubTotalPrice() - getTotalPrice()} 
+                      className="text-red-600"
+                    />
                   </div>
                   <Separator />
                   <div className="flex justify-between font-semibold text-lg">
@@ -215,7 +214,7 @@ const CartPage = () => {
                   <Button
                     onClick={handleCheckout}
                     disabled={loading}
-                    className="w-full bg-[#8C6227] hover:bg-[#7a5420] text-white rounded-full py-6 mt-4"
+                    className="w-full bg-[#111111] hover:bg-[#111111]/80 cursor-pointer hoverEffect text-white rounded-full py-6 mt-4 text-base"
                   >
                     {loading
                       ? "Processing Order..."
@@ -224,7 +223,6 @@ const CartPage = () => {
                         : "Sign in to Checkout"}
                   </Button>
 
-                  {/* ✅ Nudge guest users without blocking them */}
                   {!isSignedIn && (
                     <p className="text-xs text-center text-neutral-400 mt-1">
                       You'll be asked to sign in when placing your order
@@ -233,7 +231,6 @@ const CartPage = () => {
                 </CardContent>
               </Card>
 
-              {/* Delivery Address — only shown when signed in */}
               {isSignedIn && (
                 <Card className="border-[#8C6227]/10">
                   <CardHeader>
@@ -256,9 +253,9 @@ const CartPage = () => {
                           >
                             <div className="flex items-start gap-3">
                               <RadioGroupItem value={addr.id} className="mt-1" />
-                              <div>
+                              <div className="text-sm">
                                 <p className="font-semibold">{addr.name}</p>
-                                <p className="text-sm text-neutral-600 mt-1">
+                                <p className="text-neutral-600 mt-1 leading-tight">
                                   {addr.address}, {addr.city}, {addr.state} {addr.zip}
                                 </p>
                                 {addr.isDefault && (

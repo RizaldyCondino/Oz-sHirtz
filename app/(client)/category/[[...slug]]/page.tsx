@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { getProducts, type Product } from "@/sanity/lib/queries/query";
+import { getProductsForCategory, type Product } from "@/sanity/lib/queries/query";
 import FilterControl from "@/components/FilterControl";
 import PaginationWrapper from "@/components/PaginationWrapper";
 import ProductCard from "@/components/ProductCardProps";
@@ -24,11 +24,6 @@ function toArray(param: string | string[] | undefined): string[] {
   return Array.isArray(param) ? param : [param];
 }
 
-/**
- * Normalize any slug value to a plain lowercase hyphenated string.
- * Handles: Sanity slug objects { current }, plain strings, titles with spaces.
- */
-// ── Helpers ────────────────────────────────────────────────
 function normalizeSlug(
   slug: { _type?: string; current: string } | string | undefined | null
 ): string {
@@ -37,14 +32,15 @@ function normalizeSlug(
   return raw.toLowerCase().trim().replaceAll(" ", "-").replaceAll("_", "-");
 }
 
-
-
 function getProductAudience(product: Product): string {
-  // Prefer slug, fall back to title — both normalized
   const slug = product.audience?.slug;
   if (slug) return normalizeSlug(slug);
-  // title fallback: "Men's" → "men-s", not ideal — better to fix Sanity data
-  return (product.audience?.title || "").toLowerCase().trim().replaceAll(" ", "-").replaceAll("'", "").replaceAll("_", "-");
+  return (product.audience?.title || "")
+    .toLowerCase()
+    .trim()
+    .replaceAll(" ", "-")
+    .replaceAll("'", "")
+    .replaceAll("_", "-");
 }
 
 function getProductBrandTitle(product: Product): string {
@@ -53,7 +49,6 @@ function getProductBrandTitle(product: Product): string {
     : product.brand?.title || "";
 }
 
-// Normalize brand the same way everywhere
 function getProductBrandSlug(product: Product): string {
   if (typeof product.brand === "object" && product.brand?.slug) {
     return normalizeSlug(product.brand.slug);
@@ -62,14 +57,14 @@ function getProductBrandSlug(product: Product): string {
 }
 
 function getProductCategories(product: Product): string[] {
-  // categories[] resolves to { _id, title, slug } where slug is { _type, current }
-  return (product.categories || []).map((cat) => {
-    if (!cat?.slug) return "";
-    // Handle both slug object { current } and plain string
-    return normalizeSlug(
-      typeof cat.slug === "object" ? cat.slug.current : cat.slug
-    );
-  }).filter(Boolean);
+  return (product.categories || [])
+    .map((cat) => {
+      if (!cat?.slug) return "";
+      return normalizeSlug(
+        typeof cat.slug === "object" ? cat.slug.current : cat.slug
+      );
+    })
+    .filter(Boolean);
 }
 
 const CATEGORY_EQUIVALENTS: Record<string, string[]> = {
@@ -112,7 +107,6 @@ function getProductSizes(product: Product): Set<string> {
   const sizes = new Set<string>();
   (product.colorways || []).forEach((cw) =>
     (cw.sizes || []).forEach((s) => {
-      // Schema only has `stock`, not `quantity` — fixed
       if (s?.size && s.stock > 0) {
         sizes.add(s.size.toLowerCase().trim());
       }
@@ -137,36 +131,25 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const isSalePage = mainSlug === "sale";
   const isAllPage = mainSlug === "all";
 
-  const activeSizes = toArray(resolvedSearch.size).map((s) =>
-    s.toLowerCase().trim()
-  );
-  const activeGenders = toArray(resolvedSearch.gender).map((g) =>
-    g.toLowerCase().trim()
-  );
-  const activeBrands = toArray(resolvedSearch.brand).map((b) =>
-    b.toLowerCase().trim()
-  );
-  const activeTypes = toArray(resolvedSearch.type).map((t) =>
-    t.toLowerCase().trim()
-  );
-  const sortBy =
-    typeof resolvedSearch.sort === "string" ? resolvedSearch.sort : "";
+  const activeSizes = toArray(resolvedSearch.size).map((s) => s.toLowerCase().trim());
+  const activeGenders = toArray(resolvedSearch.gender).map((g) => g.toLowerCase().trim());
+  const activeBrands = toArray(resolvedSearch.brand).map((b) => b.toLowerCase().trim());
+  const activeTypes = toArray(resolvedSearch.type).map((t) => t.toLowerCase().trim());
+  const sortBy = typeof resolvedSearch.sort === "string" ? resolvedSearch.sort : "";
   const currentPage = Number(resolvedSearch.page || 1);
   const minPrice = Number(resolvedSearch.minPrice || 0);
   const maxPrice = Number(resolvedSearch.maxPrice || 999999999);
 
-  // Debug mode — visit any category URL with ?debug=1 to see raw Sanity data
   const isDebug = resolvedSearch.debug === "1";
 
-  const products = (await getProducts()) ?? [];
+  // ── Targeted fetch — only loads products relevant to this page ──
+  const products = await getProductsForCategory(mainSlug, subSlug);
+
   // ── Available Filters ─────────────────────────────────────
-    const availableBrands = Array.from(
-    new Set(
-      products.map((p: Product) => getProductBrandSlug(p)).filter(Boolean)
-    )
+  const availableBrands = Array.from(
+    new Set(products.map((p: Product) => getProductBrandSlug(p)).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
-  // Collect all sizes that have stock > 0 across all products
   const availableSizesWithStock = Array.from(
     new Set(
       products.flatMap((product: Product) =>
@@ -181,78 +164,30 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
   );
 
-  // ── Core Filtering Logic ──────────────────────────────────
-  const matchesSlug = (product: Product): boolean => {
-    const audience = getProductAudience(product);
-    const categories = getProductCategories(product);
-    
-    // 1. Handle "All" page
-    if (isAllPage) return true;
-
-    // 2. Handle "Sale" page
-    if (isSalePage) {
-      const status = (product.status || "").toLowerCase().trim();
-      const discount = Number(product.discount || 0);
-      const isOnSale = Boolean(product.isOnSale);
-      const onSale = status === "sale" || discount > 0 || isOnSale;
-      
-      if (!onSale) return false;
-      if (subSlug) {
-        return hasCategoryMatch(categories, getCategoryAliases("", subSlug));
-      }
-      return true;
-    }
-
-    // 3. Handle specific Audience (e.g., /men or /women)
-    // Check if the product audience matches the main URL segment
-    const isCorrectAudience = audience === mainSlug;
-
-    if (!isCorrectAudience) return false;
-
-    // 4. If there's a subSlug (e.g., /men/pants-and-tights), 
-    // strictly check if the product has that category.
-    if (subSlug) {
-      return hasCategoryMatch(categories, getCategoryAliases(mainSlug, subSlug));
-    }
-
-    // 5. If no subSlug (e.g., just /men), show all products for this audience
-    return true;
-  };
-
-  let filteredProducts = products.filter(matchesSlug);
-
-  // ── Additional Filters ────────────────────────────────────
-  filteredProducts = filteredProducts.filter((product: Product) => {
+  // ── Client-side filters (brand, size, price, type, gender) ──
+  let filteredProducts = products.filter((product: Product) => {
     const audience = getProductAudience(product);
     const brand = getProductBrandSlug(product);
-    if (activeBrands.length > 0 && !activeBrands.includes(brand))
-      return false;
     const categories = getProductCategories(product);
 
-    // Gender filter
     if (activeGenders.length > 0 && !activeGenders.includes(audience))
       return false;
 
-    // Brand filter — compare normalized slugs
     if (activeBrands.length > 0 && !activeBrands.includes(brand))
       return false;
 
-    // Type/category filter
     if (activeTypes.length > 0) {
       const activeTypeAliases = activeTypes.flatMap((type) =>
         Array.from(getCategoryAliases(audience, type))
       );
-
       if (!categories.some((c) => activeTypeAliases.includes(c))) return false;
     }
 
-    // Size filter — activeSizes is already lowercased, getProductSizes returns lowercase
     if (activeSizes.length > 0) {
       const sizes = getProductSizes(product);
       if (!activeSizes.some((sz) => sizes.has(sz))) return false;
     }
 
-    // Price filter
     const price = Number(product.price || 0);
     if (price < minPrice || price > maxPrice) return false;
 
@@ -282,14 +217,13 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   return (
     <section className="bg-[#FAF8F4] min-h-screen">
 
-      {/* ── Debug panel (dev only — visit ?debug=1) ────────── */}
+      {/* ── Debug panel ────────── */}
       {isDebug && (
         <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-4 text-xs font-mono text-yellow-900 space-y-2">
           <p className="font-bold">
             DEBUG — mainSlug: <code>{mainSlug}</code> / subSlug:{" "}
-            <code>{subSlug}</code> / total
-            products: {products.length} / matched before extra filters:{" "}
-            {products.filter(matchesSlug).length}
+            <code>{subSlug}</code> / fetched: {products.length} / after
+            filters: {filteredProducts.length}
           </p>
           <details>
             <summary className="cursor-pointer font-semibold">
@@ -300,10 +234,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
                 <li key={p._id}>
                   <span className="font-semibold">{p.name}</span> — audience:{" "}
                   {getProductAudience(p)} — categories:{" "}
-                  {JSON.stringify(getProductCategories(p))} — raw cats:{" "}
-                  {JSON.stringify(
-                    (p.categories || []).map((category) => category?.slug)
-                  )}
+                  {JSON.stringify(getProductCategories(p))}
                 </li>
               ))}
             </ul>
@@ -316,22 +247,15 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         <StickyNavBar>
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 text-[9px] sm:text-[10px] uppercase tracking-[0.18em]">
-              <Link
-                href="/category/sale"
-                className="font-semibold mr-2 text-[#8C6227]"
-              >
+              <Link href="/category/sale" className="font-semibold mr-2 text-[#8C6227]">
                 SALE
               </Link>
               <Link href="/category/sale">
-                <Badge className={!subSlug ? activeBadge : inactiveBadge}>
-                  ALL
-                </Badge>
+                <Badge className={!subSlug ? activeBadge : inactiveBadge}>ALL</Badge>
               </Link>
               {saleSubCategories.map((cat) => (
                 <Link key={cat} href={`/category/sale/${cat}`}>
-                  <Badge
-                    className={subSlug === cat ? activeBadge : inactiveBadge}
-                  >
+                  <Badge className={subSlug === cat ? activeBadge : inactiveBadge}>
                     {cat.replace("-", " ").toUpperCase()}
                   </Badge>
                 </Link>
@@ -350,7 +274,6 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         !isAllPage &&
         menuCategories.map((group) => {
           if (mainSlug !== group.key) return null;
-
           return (
             <StickyNavBar key={group.key}>
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
@@ -360,25 +283,14 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
                       {group.label}
                     </span>
                   </Link>
-
                   <Link href={`/category/${group.key}`}>
-                    <Badge className={!subSlug ? activeBadge : inactiveBadge}>
-                      ALL
-                    </Badge>
+                    <Badge className={!subSlug ? activeBadge : inactiveBadge}>ALL</Badge>
                   </Link>
-
                   {group.items.map((item) => {
                     const itemSlug = normalizeSlug(item);
                     return (
-                      <Link
-                        key={item}
-                        href={`/category/${group.key}/${itemSlug}`}
-                      >
-                        <Badge
-                          className={
-                            itemSlug === subSlug ? activeBadge : inactiveBadge
-                          }
-                        >
+                      <Link key={item} href={`/category/${group.key}/${itemSlug}`}>
+                        <Badge className={itemSlug === subSlug ? activeBadge : inactiveBadge}>
                           {item.toUpperCase()}
                         </Badge>
                       </Link>
@@ -413,7 +325,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 sm:gap-x-6 gap-y-10 sm:gap-y-14">
               {paginatedProducts.map((product: Product) => (
                 <ProductCard
-                isLoading={false}
+                  isLoading={false}
                   key={product._id}
                   title={product.name || ""}
                   price={product.price || 0}
@@ -433,20 +345,12 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
             {totalPages > 1 && (
               <div className="mt-16">
-                <PaginationWrapper
-                  currentPage={safePage}
-                  totalPages={totalPages}
-                />
+                <PaginationWrapper currentPage={safePage} totalPages={totalPages} />
               </div>
             )}
           </>
         ) : (
-
-          <NoProductAvailable
-    selectedTab={subSlug || mainSlug}
-    subSlug={subSlug}
-  />
-         
+          <NoProductAvailable selectedTab={subSlug || mainSlug} subSlug={subSlug} />
         )}
       </div>
     </section>

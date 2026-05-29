@@ -66,9 +66,9 @@ const QuantityButtons = ({ product, className, colorwayOverride, sizeOverride }:
         variant="outline"
         size="icon"
         disabled={itemCount === 0 || isOutOfStock}
-        className="w-6 h-6 border-neutral-800 bg-black text-white hover:bg-neutral-800 hover:text-white"
+        className="w-6 h-6 border-neutral-800 cursor-pointer bg-black text-white hover:bg-neutral-800 hover:text-white"
       >
-        <Minus size={12} />
+        <Minus size={12} className="cursor-pointer" />
       </Button>
 
       <span className="font-semibold text-sm w-4 text-center text-black">
@@ -80,9 +80,9 @@ const QuantityButtons = ({ product, className, colorwayOverride, sizeOverride }:
         variant="outline"
         size="icon"
         disabled={isOutOfStock || !hasSelection}
-        className="w-6 h-6 border-neutral-800 bg-black text-white hover:bg-neutral-800 hover:text-white"
+        className="cursor-pointer w-6 h-6 border-neutral-800 bg-black text-white hover:bg-neutral-800 hover:text-white"
       >
-        <Plus size={12} />
+        <Plus size={12} className="cursor-pointer"/>
       </Button>
     </div>
   );

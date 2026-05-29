@@ -4,14 +4,9 @@ import {
   getProducts,
   type Product,
 } from "@/sanity/lib/queries";
+import { getNavCategories } from "@/sanity/lib/queries/query";
 
 export default async function Header() {
-  const products: Product[] =
-    (await getProducts()) ?? [];
-
-  return (
-    <HeaderClient
-      products={products}
-    />
-  );
+  const navCategories = (await getNavCategories()) ?? [];
+  return <HeaderClient navCategories={navCategories} />;
 }

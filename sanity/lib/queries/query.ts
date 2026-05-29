@@ -1,5 +1,6 @@
 import { groq } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
+import { cache } from "react";
 
 /* =============================================================
    PRODUCT TYPE
@@ -212,6 +213,77 @@ export async function getProducts(): Promise<Product[]> {
   return (result?.data ?? []) as Product[];
 }
 
+// Cached version for the /all page
+const fetchAllProductsCached = cache(async (): Promise<Product[]> => {
+  const result = await sanityFetch({ query: ALL_PRODUCTS_QUERY });
+  return (result?.data ?? []) as Product[];
+});
+
+export async function getProductsForCategory(
+  mainSlug: string,
+  subSlug: string
+): Promise<Product[]> {
+  const isSale = mainSlug === "sale";
+  const isAll = mainSlug === "all";
+
+  if (isAll) {
+    return fetchAllProductsCached();
+  }
+
+  if (isSale) {
+    if (subSlug) {
+      const result = await sanityFetch({
+        query: SALE_BY_CATEGORY_QUERY,
+        params: { categorySlug: subSlug },
+      });
+      return (result?.data ?? []) as Product[];
+    }
+    const result = await sanityFetch({ query: SALE_PRODUCTS_QUERY });
+    return (result?.data ?? []) as Product[];
+  }
+
+  // Audience page (men / women / kids / etc.)
+  if (subSlug) {
+    const result = await sanityFetch({
+      query: PRODUCTS_BY_AUDIENCE_AND_CATEGORY_QUERY,
+      params: { audience: mainSlug, categorySlug: subSlug },
+    });
+    return (result?.data ?? []) as Product[];
+  }
+
+  const result = await sanityFetch({
+    query: PRODUCTS_BY_AUDIENCE_QUERY,
+    params: { audience: mainSlug },
+  });
+  return (result?.data ?? []) as Product[];
+}
+
+// query.ts — add these
+
+export interface NavCategory {
+  _id: string;
+  title: string;
+  slug: string;
+  audience: string; // audience slug e.g. "men"
+}
+
+export const NAV_CATEGORIES_QUERY = groq`
+  *[_type == "category"] | order(order asc) {
+    _id,
+    title,
+    "slug": slug.current,
+    "audience": audience->slug.current
+  }
+`;
+
+export async function getNavCategories(): Promise<NavCategory[]> {
+  try {
+    const result = await sanityFetch({ query: NAV_CATEGORIES_QUERY });
+    return (result?.data ?? []) as NavCategory[];
+  } catch {
+    return [];
+  }
+}
 /* =============================================================
    SALE QUERIES
    ============================================================= */

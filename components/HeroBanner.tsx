@@ -25,9 +25,9 @@ const HeroBanner: React.FC = () => {
 
           {/* Responsive Button Container */}
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <button className="w-full sm:w-auto bg-[#1C1C1C] hover:bg-black text-white px-8 py-3.5 text-base font-medium rounded-xs transition-all">
+            <Link href="/category/all" className=" cursor-pointer w-full sm:w-auto bg-[#1C1C1C] hover:bg-black text-white px-8 py-3.5 text-base font-medium rounded-xs transition-all">
               Explore Now
-            </button>
+            </Link>
             
             <Link 
               href="/category/men" 
