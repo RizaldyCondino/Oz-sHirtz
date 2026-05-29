@@ -5,21 +5,22 @@ import { Search, Menu } from "lucide-react";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { menuCategories, collections } from "@/constants/data";
+import { menuCategories } from "@/constants/data";
 import Logo from "@/components/Logo";
 import HeaderMenu from "@/components/HeaderMenu";
 import CartIcon from "@/components/CartIcon";
-import type { NavCategory } from "@/sanity/lib/queries/query";
+import type { CollectionNavItem, NavCategory } from "@/sanity/lib/queries/query";
 
 interface Props {
   navCategories: NavCategory[];
+  collections: CollectionNavItem[];
 }
 
 function normalizeSlug(value: string): string {
   return value.toLowerCase().trim().replaceAll(" ", "-").replaceAll("_", "-");
 }
 
-export default function HeaderClient({ navCategories = [] }: Props) {
+export default function HeaderClient({ navCategories = [], collections = []}: Props) {
   const { isSignedIn } = useUser();
   const pathname = usePathname();
 
@@ -40,7 +41,7 @@ export default function HeaderClient({ navCategories = [] }: Props) {
   }, []);
 
   const isSaleActive = pathname.startsWith("/category/sale");
-  const iconSize = 13;
+  const iconSize = 17;
 
   return (
     <>
@@ -58,15 +59,40 @@ export default function HeaderClient({ navCategories = [] }: Props) {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMobileMenuOpen(true)}
-          className="md:hidden p-1"
+          className="lg:hidden p-1"
           aria-label="Open menu"
         >
           <Menu size={16} />
         </button>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6 text-[10px] uppercase tracking-[0.20em] font-medium">
-          <Link
+        <nav className="hidden lg:flex items-center gap-6 text-[10px] uppercase tracking-[0.20em] font-medium">
+
+          {/* Collections dropdown */}
+          <div className="relative group">
+            <span className={`py-2 block transition cursor-default ${pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70"}`}>
+              Collections
+            </span>
+            <div className="absolute left-0 top-full pt-2 invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-150 z-50">
+              <div className="w-56 bg-[#231F20] text-white shadow-xl py-2 rounded-md">
+                {collections.map((col) => (
+                  <Link
+                    key={col.href}
+                    href={col.href}
+                    className={`block px-4 py-2.5 text-[9px] capitalize transition hover:bg-white/10 ${pathname === col.href ? "bg-white/10 font-medium" : ""}`}
+                  >
+                    <span className="block">{col.label}</span>
+                    {col.description && (
+                      <span className="block text-white/50 mt-0.5 text-[8px] normal-case">
+                        {col.description}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+          <Link 
             href="/category/all"
             className={pathname === "/category/all" ? "font-bold" : "hover:text-black/70"}
           >
@@ -104,30 +130,7 @@ export default function HeaderClient({ navCategories = [] }: Props) {
             );
           })}
 
-          {/* Collections dropdown */}
-          <div className="relative group">
-            <span className={`py-2 block transition cursor-default ${pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70"}`}>
-              Collections
-            </span>
-            <div className="absolute left-0 top-full pt-2 invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-150 z-50">
-              <div className="w-56 bg-[#231F20] text-white shadow-xl py-2 rounded-md">
-                {collections.map((col) => (
-                  <Link
-                    key={col.href}
-                    href={col.href}
-                    className={`block px-4 py-2.5 text-[9px] capitalize transition hover:bg-white/10 ${pathname === col.href ? "bg-white/10 font-medium" : ""}`}
-                  >
-                    <span className="block">{col.label}</span>
-                    {col.description && (
-                      <span className="block text-white/50 mt-0.5 text-[8px] normal-case">
-                        {col.description}
-                      </span>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
+          
 
           <Link
             href="/category/sale"
@@ -151,14 +154,14 @@ export default function HeaderClient({ navCategories = [] }: Props) {
           {isSignedIn ? (
             <UserButton appearance={{ elements: { avatarBox: "!w-4 !h-4" } }} />
           ) : (
-            <SignInButton mode="modal">
+            <SignInButton mode="modal" >
               <button className="hover:opacity-70" aria-label="Sign in">
                 <p className="text-xs font-medium cursor-pointer">Login</p>
               </button>
             </SignInButton>
           )}
 
-          <CartIcon />
+          <CartIcon/>
         </div>
       </header>
 

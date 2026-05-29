@@ -396,7 +396,10 @@ export const PRODUCTS_BY_AUDIENCE_AND_CATEGORY_QUERY = groq`
   *[
     _type == "product" &&
     audience->slug.current == $audience &&
-    $categorySlug in categories[]->slug.current
+    (
+      $categorySlug in categories[]->slug.current ||
+      ($audience + "-" + $categorySlug) in categories[]->slug.current
+    )
   ] | order(publishedAt desc) {
     ${PRODUCT_CARD_FIELDS}
   }
@@ -540,3 +543,24 @@ export const HOMEPAGE_QUERY = groq`
     }
   }
 `;
+
+export async function getCollectionsForNav(): Promise<CollectionNavItem[]> {
+  const result = await sanityFetch({ query: ALL_COLLECTIONS_QUERY });
+  return ((result?.data ?? []) as any[]).map((col) => ({
+    label: col.title,
+    href: `/collections/${col.slug?.current}`,
+    description: col.description,
+    isSnkrs: col.isSnkrs,
+    season: col.season,
+    year: col.year,
+  }));
+}
+
+export interface CollectionNavItem {
+  label: string;
+  href: string;
+  description?: string;
+  isSnkrs?: boolean;
+  season?: string;
+  year?: number;
+}

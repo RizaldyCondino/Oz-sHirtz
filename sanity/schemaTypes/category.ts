@@ -23,13 +23,7 @@ export const categoryType = defineType({
       title: "Description",
       type: "text",
     }),
-    defineField({
-      name: "audience",
-      title: "Audience",
-      type: "reference",
-      to: [{ type: "audience" }],
-      validation: (Rule) => Rule.required(),
-    }),
+    
     defineField({
       name: "image",
       title: "Category Image",

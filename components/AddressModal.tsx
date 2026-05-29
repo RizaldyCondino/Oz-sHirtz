@@ -73,22 +73,23 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || (
-          <Button 
-            variant="outline" 
-            className="w-full rounded-full border-[#8C6227]/30 text-[#8C6227] hover:bg-[#8C6227]/10 hover:text-[#8C6227] transition-colors"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add New Address
-          </Button>
-        )}
-      </DialogTrigger>
+  {trigger || (
+    <Button 
+      variant="outline" 
+      // Changed from border-[#8C6227] to black borders and text
+      className="w-full rounded-full border-black text-black hover:bg-black hover:text-white transition-colors"
+    >
+      <Plus className="mr-2 h-4 w-4" />
+      Add New Address
+    </Button>
+  )}
+</DialogTrigger>
 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#8C6227]/10 flex items-center justify-center">
-              <MapPin className="text-[#8C6227]" size={22} />
+              <MapPin className="text-black" size={22} />
             </div>
             <div>
               <DialogTitle className="text-xl">Add New Delivery Address</DialogTitle>
@@ -197,12 +198,13 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
 
           {/* Submit Button */}
           <Button 
-            type="submit" 
-            className="w-full h-12 bg-[#8C6227] hover:bg-[#7a5420] text-white rounded-full text-base font-medium"
-            disabled={loading}
-          >
-            {loading ? "Saving Address..." : "Save & Continue"}
-          </Button>
+  type="submit" 
+  // Changed from bg-[#8C6227] to black
+  className="w-full h-12 bg-black hover:bg-neutral-800 text-white rounded-full text-base font-medium"
+  disabled={loading}
+>
+  {loading ? "Saving Address..." : "Save & Continue"}
+</Button>
         </form>
       </DialogContent>
     </Dialog>

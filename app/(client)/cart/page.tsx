@@ -144,7 +144,7 @@ const CartPage = () => {
                     >
                       {/* Product Image - Fixed larger size, no shrinking */}
                       <Link href={`/product/${product.slug?.current}`} className="flex-shrink-0">
-                        <div className="relative w-[150px] h-[150px] sm:w-[150px] sm:h-[150px]">
+                        <div className="relative w-[160px] h-[210px] sm:w-[160px] sm:h-[210px]">
                           <Image
                             src={urlFor(displayImage).url()}
                             alt={product.name ?? "Product"}

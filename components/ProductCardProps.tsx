@@ -56,8 +56,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   if (isLoading) {
     return (
-      <div className="group relative w-full bg-white/40 rounded-md backdrop-blur-md border border-white/20 overflow-hidden shadow-md">
-        <div className="relative w-full aspect-[4/5] bg-[#F0E6D2] flex items-center justify-center overflow-hidden">
+      <div className="group relative w-full bg-white rounded-md border border-gray-100 overflow-hidden shadow-md">
+        <div className="relative w-full aspect-[4/5] bg-white flex items-center justify-center overflow-hidden">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -66,9 +66,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           >
             <div className="relative">
               <Loader2 className="w-12 h-12 text-black animate-spin" />
-              <div className="absolute inset-0 border-4 border-[#F0E6D2] border-t-transparent rounded-full animate-spin" />
+              <div className="absolute inset-0 border-4 border-gray-200 border-t-transparent rounded-full animate-spin" />
             </div>
-            <p className="text-xs text-[#8C6227] tracking-wide">Loading product...</p>
+            <p className="text-xs text-black tracking-wide">Loading product...</p>
           </motion.div>
         </div>
 
@@ -106,10 +106,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`group relative w-full bg-white/40 rounded-md backdrop-blur-md border border-white/20 overflow-hidden shadow-md hover:shadow-xs transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
+      className={`group relative w-full bg-white rounded-md border border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
     >
-      {/* Image Area */}
-      <div className="relative w-full aspect-[4/5] bg-[#F0E6D2] overflow-hidden">
+      {/* Image Area - Updated background to white */}
+      <div className="relative w-full aspect-[4/5] bg-white overflow-hidden">
         <Link
           href={isGlobalSoldOut ? "#" : href}
           className="block w-full h-full relative cursor-pointer"
@@ -127,10 +127,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </span>
           )}
         </Link>
-
-        {/* <span className="absolute text-[8px] top-2 left-2 md:text-[9px] rounded-md font-medium uppercase tracking-[0.18em] bg-white/70 backdrop-blur px-2 py-1 text-[#8C6227] z-10">
-          {tag}
-        </span> */}
       </div>
 
       <div className="p-4 flex flex-col gap-3">
@@ -140,7 +136,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </h3>
         </Link>
 
-        {/* Price Row with Discount % OFF */}
+        {/* Price Row */}
         <div className="flex items-center gap-2 flex-wrap">
           {discountedPrice ? (
             <>
@@ -152,8 +148,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 amount={activePrice}
                 className="line-through text-xs text-gray-500"
               />
-
-              {/* Discount % OFF - Aligned with prices, red text, no background */}
               <span className="text-red-600 text-[10px] font-bold tracking-wide ">
                 {activeDiscount}%
               </span>
