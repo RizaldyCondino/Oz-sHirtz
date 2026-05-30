@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
  
 export async function getAddresses() {
   const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  if (!userId) return []; // ← return empty array instead of throwing
  
   return prisma.address.findMany({
     where: { clerkId: userId },
@@ -77,7 +77,19 @@ export async function updateAddress(
 export async function deleteAddress(id: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
- 
-  await prisma.address.delete({ where: { id, clerkId: userId } });
-  revalidatePath("/cart");
+
+  // Check if this address is used in any orders
+  const orderCount = await prisma.order.count({
+    where: { addressId: id, clerkId: userId },
+  });
+
+  if (orderCount > 0) {
+    throw new Error(
+      `This address can't be deleted because it's linked to ${orderCount} order${orderCount > 1 ? "s" : ""}.`
+    );
+  }
+
+  await prisma.address.delete({
+    where: { id, clerkId: userId },
+  });
 }

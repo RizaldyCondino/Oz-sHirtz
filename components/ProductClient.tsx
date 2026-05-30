@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AddToCartButton from "./AddToCartButton";
 import useStore from "@/store"; // 👈 added
+import FavoriteButton from "./Favoritebutton";
 
 interface Size {
   size: string;
@@ -395,14 +396,12 @@ export default function ProductClient({ product }: Props) {
                 {/* CTA BUTTONS */}
                 <div className="flex flex-row items-center gap-2 mt-3 w-full max-w-[280px]">
                   <AddToCartButton product={product} className="cursor-pointer w-36 rounded-full" />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={isOutOfStock}
-                    className="flex-1 gap-1.5 text-[10px] uppercase font-semibold rounded-full h-9 border-neutral-300 dark:border-neutral-700 bg-background text-foreground whitespace-nowrap cursor-pointer"
-                  >
-                    <Heart size={12} /> Favorite
-                  </Button>
+                  <FavoriteButton
+                    product={product}
+                    variant="full"
+                    size={12}
+                    className="flex-1 text-[10px] dark:border-neutral-700"
+                  />
                 </div>
 
                 {/* MOBILE DESCRIPTION */}

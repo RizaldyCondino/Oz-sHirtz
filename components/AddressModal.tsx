@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { addAddress } from "@/lib/actions/address.actions";
+import React, { useEffect, useState } from "react";
+import { addAddress, updateAddress } from "@/lib/actions/address.actions";
 import toast from "react-hot-toast";
 
 import {
@@ -21,45 +21,78 @@ import { Plus, MapPin } from "lucide-react";
 interface AddressModalProps {
   onAddressAdded: () => void;
   trigger?: React.ReactNode;
+  editAddress?: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+    isDefault: boolean;
+  } | null;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+const EMPTY_FORM = {
+  name: "",
+  address: "",
+  city: "",
+  state: "",
+  zip: "",
+  country: "Philippines",
+  isDefault: false,
+};
 
-  const [formData, setFormData] = useState({
-    name: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    country: "Philippines",
-    isDefault: false,
-  });
+const AddressModal = ({
+  onAddressAdded,
+  trigger,
+  editAddress,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: AddressModalProps) => {
+  const isEditMode = !!editAddress;
+
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange ?? setInternalOpen;
+
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState(EMPTY_FORM);
+
+  useEffect(() => {
+    if (editAddress) {
+      setFormData({
+        name: editAddress.name,
+        address: editAddress.address,
+        city: editAddress.city,
+        state: editAddress.state,
+        zip: editAddress.zip,
+        country: editAddress.country || "Philippines",
+        isDefault: editAddress.isDefault,
+      });
+    } else {
+      setFormData(EMPTY_FORM);
+    }
+  }, [editAddress, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      await addAddress(formData);
-      toast.success("Address added successfully! ✓");
-      
-      // Reset form
-      setFormData({
-        name: "",
-        address: "",
-        city: "",
-        state: "",
-        zip: "",
-        country: "Philippines",
-        isDefault: false,
-      });
-      
+      if (isEditMode && editAddress) {
+        await updateAddress(editAddress.id, formData);
+        toast.success("Address updated successfully! ✓");
+      } else {
+        await addAddress(formData);
+        toast.success("Address added successfully! ✓");
+        setFormData(EMPTY_FORM);
+      }
       setOpen(false);
       onAddressAdded();
     } catch (error: any) {
-      toast.error(error.message || "Failed to add address");
+      toast.error(error.message || "Failed to save address");
     } finally {
       setLoading(false);
     }
@@ -72,18 +105,21 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-  {trigger || (
-    <Button 
-      variant="outline" 
-      // Changed from border-[#8C6227] to black borders and text
-      className="w-full rounded-full border-black text-black hover:bg-black hover:text-white transition-colors"
-    >
-      <Plus className="mr-2 h-4 w-4" />
-      Add New Address
-    </Button>
-  )}
-</DialogTrigger>
+      {!isEditMode && (
+        <DialogTrigger asChild>
+          {trigger || (
+            // Compact "+" icon button — fits neatly in the card header
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-7 w-7 rounded-full cursor-pointer border-black text-black hover:bg-black hover:text-white shrink-0"
+              title="Add new address"
+            >
+              <Plus size={14} />
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
@@ -92,7 +128,9 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
               <MapPin className="text-black" size={22} />
             </div>
             <div>
-              <DialogTitle className="text-xl">Add New Delivery Address</DialogTitle>
+              <DialogTitle className="text-xl">
+                {isEditMode ? "Edit Delivery Address" : "Add New Delivery Address"}
+              </DialogTitle>
               <DialogDescription>
                 Please provide accurate delivery information
               </DialogDescription>
@@ -101,7 +139,6 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 mt-2">
-          {/* Address Label */}
           <div className="space-y-2">
             <Label htmlFor="name" className="text-sm font-medium">
               Address Label
@@ -117,7 +154,6 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
             />
           </div>
 
-          {/* Street Address */}
           <div className="space-y-2">
             <Label htmlFor="address">Street Address</Label>
             <Input
@@ -131,7 +167,6 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
             />
           </div>
 
-          {/* City & State */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="city">City / Municipality</Label>
@@ -157,7 +192,6 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
             </div>
           </div>
 
-          {/* ZIP & Country */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="zip">ZIP Code</Label>
@@ -182,9 +216,9 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
             </div>
           </div>
 
-          {/* Default Address Checkbox */}
           <div className="flex items-center space-x-3 bg-neutral-50 p-3 rounded-lg">
             <Checkbox
+              className="cursor-pointer"
               id="isDefault"
               checked={formData.isDefault}
               onCheckedChange={(checked) =>
@@ -196,15 +230,19 @@ const AddressModal = ({ onAddressAdded, trigger }: AddressModalProps) => {
             </Label>
           </div>
 
-          {/* Submit Button */}
-          <Button 
-  type="submit" 
-  // Changed from bg-[#8C6227] to black
-  className="w-full h-12 bg-black hover:bg-neutral-800 text-white rounded-full text-base font-medium"
-  disabled={loading}
->
-  {loading ? "Saving Address..." : "Save & Continue"}
-</Button>
+          <Button
+            type="submit"
+            className="w-full h-12 bg-black hover:bg-neutral-800 text-white rounded-full text-base font-medium"
+            disabled={loading}
+          >
+            {loading
+              ? isEditMode
+                ? "Saving Changes..."
+                : "Saving Address..."
+              : isEditMode
+              ? "Save Changes"
+              : "Save & Continue"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

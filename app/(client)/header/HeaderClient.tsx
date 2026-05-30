@@ -9,7 +9,11 @@ import { menuCategories } from "@/constants/data";
 import Logo from "@/components/Logo";
 import HeaderMenu from "@/components/HeaderMenu";
 import CartIcon from "@/components/CartIcon";
-import type { CollectionNavItem, NavCategory } from "@/sanity/lib/queries/query";
+import type {
+  CollectionNavItem,
+  NavCategory,
+} from "@/sanity/lib/queries/query";
+import WishlistIcon from "@/components/WishlistIcon";
 
 interface Props {
   navCategories: NavCategory[];
@@ -20,7 +24,10 @@ function normalizeSlug(value: string): string {
   return value.toLowerCase().trim().replaceAll(" ", "-").replaceAll("_", "-");
 }
 
-export default function HeaderClient({ navCategories = [], collections = []}: Props) {
+export default function HeaderClient({
+  navCategories = [],
+  collections = [],
+}: Props) {
   const { isSignedIn } = useUser();
   const pathname = usePathname();
 
@@ -67,10 +74,11 @@ export default function HeaderClient({ navCategories = [], collections = []}: Pr
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-6 text-[10px] uppercase tracking-[0.20em] font-medium">
-
           {/* Collections dropdown */}
           <div className="relative group">
-            <span className={`py-2 block transition cursor-default ${pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70"}`}>
+            <span
+              className={`py-2 block transition cursor-default ${pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70"}`}
+            >
               Collections
             </span>
             <div className="absolute left-0 top-full pt-2 invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-150 z-50">
@@ -92,9 +100,11 @@ export default function HeaderClient({ navCategories = [], collections = []}: Pr
               </div>
             </div>
           </div>
-          <Link 
+          <Link
             href="/category/all"
-            className={pathname === "/category/all" ? "font-bold" : "hover:text-black/70"}
+            className={
+              pathname === "/category/all" ? "font-bold" : "hover:text-black/70"
+            }
           >
             Featured
           </Link>
@@ -113,7 +123,8 @@ export default function HeaderClient({ navCategories = [], collections = []}: Pr
                   <div className="w-52 bg-[#231F20] text-white shadow-xl py-2 rounded-md">
                     {group.items.map((item) => {
                       const itemSlug = normalizeSlug(item);
-                      const isSubActive = pathname === `/category/${group.key}/${itemSlug}`;
+                      const isSubActive =
+                        pathname === `/category/${group.key}/${itemSlug}`;
                       return (
                         <Link
                           key={item}
@@ -129,8 +140,6 @@ export default function HeaderClient({ navCategories = [], collections = []}: Pr
               </div>
             );
           })}
-
-          
 
           <Link
             href="/category/sale"
@@ -150,18 +159,19 @@ export default function HeaderClient({ navCategories = [], collections = []}: Pr
           <button className="hover:opacity-70" aria-label="Search">
             <Search size={iconSize} />
           </button>
+          <WishlistIcon/>
+          <CartIcon />
 
           {isSignedIn ? (
             <UserButton appearance={{ elements: { avatarBox: "!w-4 !h-4" } }} />
           ) : (
-            <SignInButton mode="modal" >
+            <SignInButton mode="modal">
               <button className="hover:opacity-70" aria-label="Sign in">
                 <p className="text-xs font-medium cursor-pointer">Login</p>
               </button>
             </SignInButton>
           )}
-
-          <CartIcon/>
+          
         </div>
       </header>
 

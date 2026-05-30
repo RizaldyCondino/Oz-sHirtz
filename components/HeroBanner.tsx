@@ -4,7 +4,8 @@ import Link from "next/link";
 
 const HeroBanner: React.FC = () => {
   return (
-    <section className="relative min-h-[64vh] overflow-hidden flex items-end bg-[#FAF8F4] text-[#1C1C1C] pb-0">
+    <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative min-h-[64vh] overflow-hidden flex items-end bg-[#FAF8F4] text-[#1C1C1C] pb-0">
       <div className="max-w-full mx-auto px-5 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-8 items-end h-full w-full">
         
         {/* Left Content */}
@@ -63,6 +64,9 @@ const HeroBanner: React.FC = () => {
         </div>
       </div>
     </section>
+
+    </div>
+    
   );
 };
 

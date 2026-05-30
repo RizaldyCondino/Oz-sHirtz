@@ -7,8 +7,8 @@ import { revalidatePath } from "next/cache";
 
 export async function getWishlist() {
   const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
+  if (!userId) return null; // ← not throw
+  
   return prisma.wishlist.findUnique({
     where: { clerkId: userId },
     include: { items: true },
