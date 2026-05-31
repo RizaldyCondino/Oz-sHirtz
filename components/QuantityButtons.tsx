@@ -60,7 +60,7 @@ const QuantityButtons = ({ product, className, colorwayOverride, sizeOverride }:
   };
 
   return (
-    <div className={cn("flex items-center gap-2 pb-1 text-base", className)}>
+    <div className={cn("flex items-center gap-1 pb-1 text-base", className)}>
       <Button
         onClick={handleRemoveProduct}
         variant="outline"

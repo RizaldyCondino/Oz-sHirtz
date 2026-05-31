@@ -28,7 +28,7 @@ export default function HeaderClient({
   navCategories = [],
   collections = [],
 }: Props) {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const pathname = usePathname();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -155,23 +155,32 @@ export default function HeaderClient({
         </div>
 
         {/* Right icons */}
+        {/* Right icons */}
         <div className="flex items-center gap-4">
           <button className="hover:opacity-70" aria-label="Search">
             <Search size={iconSize} />
           </button>
-          <WishlistIcon/>
-          <CartIcon />
 
-          {isSignedIn ? (
-            <UserButton appearance={{ elements: { avatarBox: "!w-4 !h-4" } }} />
+         <WishlistIcon isSignedIn={isSignedIn} />
+
+
+            <CartIcon />
+
+          {isLoaded ? (
+            isSignedIn ? (
+              <UserButton
+                appearance={{ elements: { avatarBox: "!w-4 !h-4" } }}
+              />
+            ) : (
+              <SignInButton mode="modal">
+                <button className="hover:opacity-70" aria-label="Sign in">
+                  <p className="text-xs font-medium cursor-pointer">Login</p>
+                </button>
+              </SignInButton>
+            )
           ) : (
-            <SignInButton mode="modal">
-              <button className="hover:opacity-70" aria-label="Sign in">
-                <p className="text-xs font-medium cursor-pointer">Login</p>
-              </button>
-            </SignInButton>
+            <div className="w-4 h-4" /> // ← placeholder while Clerk loads
           )}
-          
         </div>
       </header>
 

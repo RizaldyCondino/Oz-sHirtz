@@ -1,18 +1,21 @@
-// actions/wishlist.actions.ts
 "use server";
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_noStore as noStore } from "next/cache";
 
 export async function getWishlist() {
+  noStore(); // Prevents caching of the initial empty result
   const { userId } = await auth();
-  if (!userId) return null; // ← not throw
   
-  return prisma.wishlist.findUnique({
+  if (!userId) return [];
+
+  const wishlist = await prisma.wishlist.findUnique({
     where: { clerkId: userId },
     include: { items: true },
   });
+
+  return wishlist?.items ?? [];
 }
 
 export async function addToWishlist(item: {
@@ -30,6 +33,11 @@ export async function addToWishlist(item: {
     wishlist = await prisma.wishlist.create({ data: { clerkId: userId } });
   }
 
+  const cleanImage = item.image && typeof item.image === 'string' && item.image.trim() !== ''
+    && item.image.trim() !== 'null' && item.image.trim() !== 'undefined'
+    ? item.image.trim()
+    : null;
+
   await prisma.wishlistItem.upsert({
     where: {
       wishlistId_productId: {
@@ -37,13 +45,18 @@ export async function addToWishlist(item: {
         productId: item.productId,
       },
     },
-    update: {}, // already exists, no update needed
+    update: {
+      name: item.name,
+      price: item.price,
+      image: cleanImage,
+      slug: item.slug,
+    },
     create: {
       wishlistId: wishlist.id,
       productId: item.productId,
       name: item.name,
       price: item.price,
-      image: item.image,
+      image: cleanImage,
       slug: item.slug,
     },
   });
@@ -71,20 +84,31 @@ export async function removeFromWishlist(productId: string) {
 }
 
 export async function isInWishlist(productId: string): Promise<boolean> {
+  noStore();
   const { userId } = await auth();
   if (!userId) return false;
 
-  const wishlist = await prisma.wishlist.findUnique({ where: { clerkId: userId } });
-  if (!wishlist) return false;
-
-  const item = await prisma.wishlistItem.findUnique({
+  const item = await prisma.wishlistItem.findFirst({
     where: {
-      wishlistId_productId: {
-        wishlistId: wishlist.id,
-        productId,
-      },
+      wishlist: { clerkId: userId },
+      productId,
     },
   });
 
   return !!item;
+}
+
+export async function getWishlistCount(): Promise<number> {
+  noStore();
+  const { userId } = await auth();
+  if (!userId) return 0;
+
+  const wishlist = await prisma.wishlist.findUnique({
+    where: { clerkId: userId },
+    select: {
+      _count: { select: { items: true } },
+    },
+  });
+
+  return wishlist?._count.items ?? 0;
 }

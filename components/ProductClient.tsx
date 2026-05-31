@@ -12,7 +12,8 @@ import SizeGuideModal from "./SizeGuideModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AddToCartButton from "./AddToCartButton";
-import useStore from "@/store"; // 👈 added
+import useStore from "@/store"; // 👈 addedw
+import { urlFor } from "@/sanity/lib/image";
 import FavoriteButton from "./Favoritebutton";
 
 interface Size {
@@ -159,11 +160,15 @@ export default function ProductClient({ product }: Props) {
   const audienceSlug = resolveSlug(product.audience?.slug);
   const firstCategorySlug = resolveSlug(product.categories?.[0]?.slug);
 
+  const displayImage = activeColorway?.images?.[0] || product.images?.[0];
+  const resolvedImageUrl = displayImage
+    ? urlFor(displayImage).url()
+    : undefined; // ← add
+
   return (
     <section className="relative bg-[#FAF8F4] min-h-screen py-4 sm:py-6 lg:py-4">
       <div className="relative z-10 max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
         <div className="grid lg:grid-cols-[0.75fr_1.25fr] gap-8 lg:gap-16 items-start">
-
           {/* LEFT SIDE DETAILS */}
           <div className="flex flex-col items-start text-left pt-2 lg:sticky lg:top-6">
             <nav
@@ -179,11 +184,16 @@ export default function ProductClient({ product }: Props) {
                 <ArrowLeft size={12} /> Back
               </Button>
               <span>/</span>
-              <Link href="/" className="hover:text-foreground">Home</Link>
+              <Link href="/" className="hover:text-foreground">
+                Home
+              </Link>
               {audienceSlug && (
                 <>
                   <span>/</span>
-                  <Link href={`/category/${audienceSlug}`} className="hover:text-foreground">
+                  <Link
+                    href={`/category/${audienceSlug}`}
+                    className="hover:text-foreground"
+                  >
                     {product.audience?.title}
                   </Link>
                 </>
@@ -192,7 +202,11 @@ export default function ProductClient({ product }: Props) {
                 <>
                   <span>/</span>
                   <Link
-                    href={audienceSlug ? `/category/${audienceSlug}/${firstCategorySlug}` : `/category/${firstCategorySlug}`}
+                    href={
+                      audienceSlug
+                        ? `/category/${audienceSlug}/${firstCategorySlug}`
+                        : `/category/${firstCategorySlug}`
+                    }
                     className="hover:text-foreground"
                   >
                     {product.categories?.[0]?.title}
@@ -218,7 +232,8 @@ export default function ProductClient({ product }: Props) {
               )}
 
               <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                {product.audience?.title} &bull; {product.categories?.[0]?.title || "Apparel"}
+                {product.audience?.title} &bull;{" "}
+                {product.categories?.[0]?.title || "Apparel"}
               </span>
 
               <h1 className="text-2xl font-semibold leading-tight text-foreground">
@@ -240,17 +255,26 @@ export default function ProductClient({ product }: Props) {
                 {discountedPrice ? (
                   <>
                     <span className="font-bold text-[#8C6227]">
-                      <PriceFormatter amount={discountedPrice} className="text-2xl" />
+                      <PriceFormatter
+                        amount={discountedPrice}
+                        className="text-2xl"
+                      />
                     </span>
                     <div className="flex items-center gap-2">
-                      <PriceFormatter amount={effectivePrice} className="text-[11px] line-through text-muted-foreground" />
+                      <PriceFormatter
+                        amount={effectivePrice}
+                        className="text-[11px] line-through text-muted-foreground"
+                      />
                       <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[10px] px-2 py-0.5 font-medium rounded-full border-none shadow-none">
                         -{activeDiscount}%
                       </Badge>
                     </div>
                   </>
                 ) : (
-                  <PriceFormatter amount={effectivePrice} className="text-2xl font-semibold text-[#8C6227]" />
+                  <PriceFormatter
+                    amount={effectivePrice}
+                    className="text-2xl font-semibold text-[#8C6227]"
+                  />
                 )}
               </div>
 
@@ -294,17 +318,26 @@ export default function ProductClient({ product }: Props) {
                     {discountedPrice ? (
                       <>
                         <span className="font-bold text-[#8C6227]">
-                          <PriceFormatter amount={discountedPrice} className="text-xl" />
+                          <PriceFormatter
+                            amount={discountedPrice}
+                            className="text-xl"
+                          />
                         </span>
                         <div className="flex items-center gap-1.5">
-                          <PriceFormatter amount={effectivePrice} className="text-[10px] line-through text-muted-foreground" />
+                          <PriceFormatter
+                            amount={effectivePrice}
+                            className="text-[10px] line-through text-muted-foreground"
+                          />
                           <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[9px] px-1.5 py-0.5 font-medium rounded-full border-none shadow-none">
                             -{activeDiscount}%
                           </Badge>
                         </div>
                       </>
                     ) : (
-                      <PriceFormatter amount={effectivePrice} className="text-xl font-semibold text-[#8C6227]" />
+                      <PriceFormatter
+                        amount={effectivePrice}
+                        className="text-xl font-semibold text-[#8C6227]"
+                      />
                     )}
                   </div>
                 </div>
@@ -313,7 +346,9 @@ export default function ProductClient({ product }: Props) {
                 {product.colorways && product.colorways.length > 0 && (
                   <div className="mb-6">
                     <div className="mb-2.5">
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#8C6227]">Colors</h3>
+                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#8C6227]">
+                        Colors
+                      </h3>
                       <p className="text-[11px] font-medium text-foreground transition-all duration-150 mt-0.5">
                         {displayColorName}
                       </p>
@@ -342,7 +377,9 @@ export default function ProductClient({ product }: Props) {
                 {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-3 max-w-xs">
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#8C6227]">Select Size</h3>
+                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#8C6227]">
+                        Select Size
+                      </h3>
                       <Button
                         variant="link"
                         onClick={() => setIsSizeGuideOpen(true)}
@@ -362,7 +399,9 @@ export default function ProductClient({ product }: Props) {
                           type="button"
                           disabled={item.stock <= 0}
                           onClick={() => handleSizeSelect(item.size)}
-                          variant={selectedSize === item.size ? "default" : "outline"}
+                          variant={
+                            selectedSize === item.size ? "default" : "outline"
+                          }
                           className={`h-auto px-3 py-1.5 text-[11px] font-medium rounded-full shadow-sm min-w-[36px] cursor-pointer ${
                             selectedSize === item.size
                               ? ""
@@ -394,13 +433,17 @@ export default function ProductClient({ product }: Props) {
                 </div>
 
                 {/* CTA BUTTONS */}
-                <div className="flex flex-row items-center gap-2 mt-3 w-full max-w-[280px]">
-                  <AddToCartButton product={product} className="cursor-pointer w-36 rounded-full" />
+                <div className="flex flex-row items-center mt-3 w-full max-w-[280px] px-2">
+                  <AddToCartButton
+                    product={product}
+                    className="cursor-pointer w-36 rounded-full"
+                  />
                   <FavoriteButton
+                    resolvedImage={resolvedImageUrl}
                     product={product}
                     variant="full"
                     size={12}
-                    className="flex-1 text-[10px] dark:border-neutral-700"
+                    className="flex-1 text-[10px] ml-2 dark:border-neutral-700"
                   />
                 </div>
 
@@ -415,7 +458,6 @@ export default function ProductClient({ product }: Props) {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </section>

@@ -115,18 +115,24 @@ const CartPage = () => {
         discountAmount: getSubTotalPrice() - getTotalPrice(),
         paymentMethod: "COD" as const,
         notes: "",
-        items: groupedItems.map(({ product, selectedColorway, selectedSize }) => {
-          const quantity = getItemCount(product._id, selectedColorway, selectedSize);
-          return {
-            productId: product._id,
-            name: product.name ?? "",
-            price: product.price ?? 0,
-            image: product.images?.[0] ? urlFor(product.images[0]).url() : "",
-            colorway: selectedColorway || "",
-            size: selectedSize || "",
-            quantity,
-          };
-        }),
+        items: groupedItems.map(
+          ({ product, selectedColorway, selectedSize }) => {
+            const quantity = getItemCount(
+              product._id,
+              selectedColorway,
+              selectedSize,
+            );
+            return {
+              productId: product._id,
+              name: product.name ?? "",
+              price: product.price ?? 0,
+              image: product.images?.[0] ? urlFor(product.images[0]).url() : "",
+              colorway: selectedColorway || "",
+              size: selectedSize || "",
+              quantity,
+            };
+          },
+        ),
       };
 
       const order = await createOrder(orderData);
@@ -149,81 +155,94 @@ const CartPage = () => {
       {groupedItems?.length > 0 ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-
             {/* ── Cart Items ───────────────────────────────────── */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl border border-[#8C6227]/10 overflow-hidden">
-                {groupedItems.map(({ product, selectedColorway, selectedSize }) => {
-                  const quantity = getItemCount(product._id, selectedColorway, selectedSize);
-                  const activeColorway = product.colorways?.find(
-                    (c: any) => c.name === selectedColorway
-                  );
-                  const displayImage = activeColorway?.images?.[0] || product.images?.[0];
+                {groupedItems.map(
+                  ({ product, selectedColorway, selectedSize }) => {
+                    const quantity = getItemCount(
+                      product._id,
+                      selectedColorway,
+                      selectedSize,
+                    );
+                    const activeColorway = product.colorways?.find(
+                      (c: any) => c.name === selectedColorway,
+                    );
+                    const displayImage =
+                      activeColorway?.images?.[0] || product.images?.[0];
+                    const resolvedImageUrl = displayImage
+                      ? urlFor(displayImage).url()
+                      : undefined; // ← add
 
-                  return (
-                    <div
-                      key={`${product._id}-${selectedColorway}-${selectedSize}`}
-                      className="flex gap-4 p-4 sm:p-6 border-b border-[#8C6227]/10 last:border-0"
-                    >
-                      {/* Product Image */}
-                      <Link
-                        href={`/product/${product.slug?.current}`}
-                        className="flex-shrink-0"
+                    return (
+                      <div
+                        key={`${product._id}-${selectedColorway}-${selectedSize}`}
+                        className="flex gap-4 p-4 sm:p-6 border-b border-[#8C6227]/10 last:border-0"
                       >
-                        <div className="relative w-[130px] h-[170px] sm:w-[140px] sm:h-[160px]">
-                          <Image
-                            src={urlFor(displayImage).url()}
-                            alt={product.name ?? "Product"}
-                            fill
-                            sizes="(max-width: 640px) 100px, 140px"
-                            className="rounded-xl object-cover"
-                          />
-                        </div>
-                      </Link>
-
-                      <div className="flex-1 min-w-0 flex flex-col">
-                        {/* Title + Favorite */}
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-semibold text-base sm:text-lg line-clamp-2 pr-3 text-black flex-1">
-                            {product.name}
-                          </h3>
-                          <FavoriteButton product={product} />
-                        </div>
-
-                        {/* Color & Size */}
-                        <p className="text-sm text-neutral-600 mt-1">
-                          Color:{" "}
-                          <span className="font-medium">{selectedColorway}</span>
-                        </p>
-                        <p className="text-sm text-neutral-600 mt-0.5">
-                          Size:{" "}
-                          <span className="font-medium">{selectedSize}</span>
-                        </p>
-
-                        {/* Quantity + Price */}
-                        <div className="mt-auto pt-4 flex flex-col sm:flex-row sm:items-center gap-4">
-                          <div className="flex-1">
-                            <QuantityButtons
-                              product={product}
-                              colorwayOverride={selectedColorway}
-                              sizeOverride={selectedSize}
+                        {/* Product Image */}
+                        <Link
+                          href={`/product/${product.slug?.current}`}
+                          className="flex-shrink-0"
+                        >
+                          <div className="relative w-[130px] h-[170px] sm:w-[140px] sm:h-[160px]">
+                            <Image
+                              src={urlFor(displayImage).url()}
+                              alt={product.name ?? "Product"}
+                              fill
+                              sizes="(max-width: 640px) 100px, 140px"
+                              className="rounded-xl object-cover"
                             />
                           </div>
-                          <PriceFormatter
-                            amount={(product.price ?? 0) * quantity}
-                            className="font-bold text-[#8C6227] text-lg sm:text-xl"
-                          />
+                        </Link>
+
+                        <div className="flex-1 min-w-0 flex flex-col">
+                          {/* Title + Favorite */}
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-semibold text-base sm:text-lg line-clamp-2 pr-3 text-black flex-1">
+                              {product.name}
+                            </h3>
+                            <FavoriteButton
+                              product={product}
+                              resolvedImage={resolvedImageUrl} // ← add
+                            />
+                          </div>
+
+                          {/* Color & Size */}
+                          <p className="text-sm text-neutral-600 mt-1">
+                            Color:{" "}
+                            <span className="font-medium">
+                              {selectedColorway}
+                            </span>
+                          </p>
+                          <p className="text-sm text-neutral-600 mt-0.5">
+                            Size:{" "}
+                            <span className="font-medium">{selectedSize}</span>
+                          </p>
+
+                          {/* Quantity + Price */}
+                          <div className="mt-auto pt-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div className="flex-1">
+                              <QuantityButtons
+                                product={product}
+                                colorwayOverride={selectedColorway}
+                                sizeOverride={selectedSize}
+                              />
+                            </div>
+                            <PriceFormatter
+                              amount={(product.price ?? 0) * quantity}
+                              className="font-bold text-[#8C6227] text-lg sm:text-xl"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  },
+                )}
               </div>
             </div>
 
             {/* ── Sidebar ──────────────────────────────────────── */}
             <div className="space-y-6">
-
               {/* Order Summary */}
               <Card className="border-[#8C6227]/10">
                 <CardHeader>
@@ -260,8 +279,8 @@ const CartPage = () => {
                     {loading
                       ? "Processing Order..."
                       : isSignedIn
-                      ? "Place Order"
-                      : "Sign in to Checkout"}
+                        ? "Place Order"
+                        : "Sign in to Checkout"}
                   </Button>
 
                   {!isSignedIn && (
@@ -295,7 +314,10 @@ const CartPage = () => {
                             }`}
                           >
                             <div className="flex items-start gap-3">
-                              <RadioGroupItem value={addr.id} className="mt-1" />
+                              <RadioGroupItem
+                                value={addr.id}
+                                className="mt-1"
+                              />
                               <div className="text-sm flex-1 min-w-0">
                                 <p className="font-semibold">{addr.name}</p>
                                 <p className="text-neutral-600 mt-1 leading-tight">
