@@ -67,7 +67,7 @@ export default async function Home() {
       <div className="max-w-7xl mx-auto px-6 md:px-20">
         <Divider className="opacity-20" />
       </div>
-      {/* <DriftClothingSection/> */}
+
     </div>
   );
 }

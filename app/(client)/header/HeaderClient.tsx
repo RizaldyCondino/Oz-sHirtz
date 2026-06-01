@@ -158,6 +158,7 @@ export default function HeaderClient({
         </div>
 
        {/* Right icons */}
+{/* Right icons */}
 <div className="flex items-center gap-4">
   <button className="hover:opacity-70" aria-label="Search">
     <Search size={iconSize} />
@@ -167,20 +168,26 @@ export default function HeaderClient({
     <WishlistIcon isSignedIn={isSignedIn} />
   )}
 
-  {/* Orders icon — only show when signed in */}
-  {isLoaded && isSignedIn && (
-    <Link href="/orders" aria-label="My Orders">
-      <Package size={iconSize} className="hover:opacity-70" />
-    </Link>
-  )}
-
   <CartIcon />
 
   {isLoaded ? (
     isSignedIn ? (
       <UserButton
-        appearance={{ elements: { avatarBox: "!w-4 !h-4" } }}
-      />
+        appearance={{ 
+          elements: { 
+            avatarBox: "!w-4 !h-4" 
+          } 
+        }}
+      >
+        {/* Add Orders here */}
+        <UserButton.MenuItems>
+          <UserButton.Link
+            label="My Orders"
+            href="/orders"
+            labelIcon={<Package size={16} />}
+          />
+        </UserButton.MenuItems>
+      </UserButton>
     ) : (
       <SignInButton mode="modal">
         <button className="hover:opacity-70" aria-label="Sign in">

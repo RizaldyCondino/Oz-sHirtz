@@ -8,7 +8,7 @@ const isProtectedRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   // "/api/webhook(.*)",
-  // "/wishlist(.*)",
+  "/wishlist(.*)",
 
 ]);
 

@@ -23,7 +23,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+  appearance={{
+    layout: {
+      unsafe_disableDevelopmentModeWarnings: true,
+    },
+    elements: {
+      footer: "hidden",                    // This hides the Secured by Clerk footer
+      developmentModeNotice: "hidden",    // This hides dev mode notice
+    },
+  }}
+  unsafe_disableDevelopmentModeConsoleWarning={true}
+>
       <div className="min-h-screen flex flex-col">
         {/* HEADER */}
         <Header />
