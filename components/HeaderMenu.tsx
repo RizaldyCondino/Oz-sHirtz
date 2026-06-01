@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { useOutsideClick } from "@/hooks";
 import { collections } from "@/constants/data";
 import type { NavCategory } from "@/sanity/lib/queries/query";
+import { AnimatePresence, motion } from "motion/react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ const AUDIENCE_GROUPS = [
   { key: "kids", label: "Kids" },
 ];
 
-const HeaderMenu: FC<SidebarProps> = ({ isOpen, onClose, navCategories = []}) => {
+const HeaderMenu: FC<SidebarProps> = ({ isOpen, onClose, navCategories = [] }) => {
   const pathname = usePathname();
   const sidebarRef = useOutsideClick<HTMLDivElement>(onClose);
   const [openSection, setOpenSection] = useState<string | null>(null);
@@ -30,7 +31,6 @@ const HeaderMenu: FC<SidebarProps> = ({ isOpen, onClose, navCategories = []}) =>
     setOpenSection(openSection === key ? null : key);
   };
 
-  // Group the lightweight NavCategory objects by audience slug
   const audienceGroups = useMemo(() => {
     return AUDIENCE_GROUPS.map((group) => ({
       ...group,
@@ -39,125 +39,158 @@ const HeaderMenu: FC<SidebarProps> = ({ isOpen, onClose, navCategories = []}) =>
   }, [navCategories]);
 
   return (
-    <div
-      className={`fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
-        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-      }`}
-    >
-      <div
-        ref={sidebarRef}
-        className={`absolute left-0 top-0 h-full w-[85%] max-w-sm bg-black text-white/80
-          transform transition-transform duration-300 ease-out flex flex-col ${
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
-          <Logo className="text-white" />
-          <button onClick={onClose} className="hover:opacity-70 transition">
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex flex-col px-6 py-6 space-y-5 overflow-y-auto">
-          <Link
-            href="/category/all"
-            onClick={onClose}
-            className={`text-sm transition ${
-              pathname === "/category/all" ? "text-white" : "text-white/60 hover:text-white"
-            }`}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="sidebar-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+        >
+          <motion.div
+            ref={sidebarRef}
+            key="sidebar-panel"
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", stiffness: 350, damping: 35 }}
+            className="absolute left-0 top-0 h-full w-[85%] max-w-sm bg-black text-white/80 flex flex-col"
           >
-            All Products
-          </Link>
-
-          {/* Collections */}
-          <div>
-            <button
-              onClick={() => toggle("collections")}
-              className="flex justify-between items-center w-full text-sm"
-            >
-              Collections
-              <ChevronDown
-                size={16}
-                className={`transition-transform ${openSection === "collections" ? "rotate-180" : ""}`}
-              />
-            </button>
-            <div
-              className={`ml-3 mt-2 flex flex-col gap-3 text-xs overflow-hidden transition-all duration-300 ${
-                openSection === "collections" ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-              }`}
-            >
-              {collections.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  className="text-white/60 hover:text-white transition"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Audience Groups */}
-          {audienceGroups.map((group) => (
-            <div key={group.key}>
-              <button
-                onClick={() => toggle(group.key)}
-                className="flex justify-between items-center w-full text-sm"
-              >
-                {group.label}
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform ${openSection === group.key ? "rotate-180" : ""}`}
-                />
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+              <Logo className="text-white" />
+              <button onClick={onClose} className="hover:opacity-70 transition">
+                <X size={20} />
               </button>
-              <div
-                className={`ml-3 mt-2 flex flex-col gap-3 text-xs overflow-hidden transition-all duration-300 ${
-                  openSection === group.key ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            </div>
+
+            {/* Nav */}
+            <nav className="flex flex-col px-6 py-6 space-y-5 overflow-y-auto">
+              <Link
+                href="/category/all"
+                onClick={onClose}
+                className={`text-sm transition ${
+                  pathname === "/category/all" ? "text-white" : "text-white/60 hover:text-white"
                 }`}
               >
-                <Link
-                  href={`/category/${group.key}`}
-                  onClick={onClose}
-                  className="font-medium text-white/80 hover:text-white transition"
+                All Products
+              </Link>
+
+              {/* Collections */}
+              <div>
+                <button
+                  onClick={() => toggle("collections")}
+                  className="flex justify-between items-center w-full text-sm"
                 >
-                  All {group.label}
-                </Link>
+                  Collections
+                  <motion.span
+                    animate={{ rotate: openSection === "collections" ? 180 : 0 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    style={{ display: "flex" }}
+                  >
+                    <ChevronDown size={16} />
+                  </motion.span>
+                </button>
 
-                {group.categories.length > 0 ? (
-                  group.categories.map((cat) => (
-                    <Link
-                      key={cat._id}
-                      href={`/category/${group.key}/${cat.slug}`}
-                      onClick={onClose}
-                      className="text-white/60 hover:text-white capitalize transition"
+                <AnimatePresence initial={false}>
+                  {openSection === "collections" && (
+                    <motion.div
+                      key="collections-items"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      style={{ overflow: "hidden" }}
+                      className="ml-3 mt-2 flex flex-col gap-3 text-xs"
                     >
-                      {cat.title}
-                    </Link>
-                  ))
-                ) : (
-                  <p className="text-white/40 text-xs">No categories</p>
-                )}
+                      {collections.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={onClose}
+                          className="text-white/60 hover:text-white transition"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </div>
-          ))}
 
-          {/* Sale */}
-          <Link
-            href="/category/sale"
-            onClick={onClose}
-            className={`text-sm transition ${
-              pathname === "/category/sale" ? "text-white" : "text-white/60 hover:text-white"
-            }`}
-          >
-            Sale
-          </Link>
-        </nav>
-      </div>
-    </div>
+              {/* Audience Groups */}
+              {audienceGroups.map((group) => (
+                <div key={group.key}>
+                  <button
+                    onClick={() => toggle(group.key)}
+                    className="flex justify-between items-center w-full text-sm"
+                  >
+                    {group.label}
+                    <motion.span
+                      animate={{ rotate: openSection === group.key ? 180 : 0 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      style={{ display: "flex" }}
+                    >
+                      <ChevronDown size={16} />
+                    </motion.span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {openSection === group.key && (
+                      <motion.div
+                        key={`${group.key}-items`}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                        style={{ overflow: "hidden" }}
+                        className="ml-3 mt-2 flex flex-col gap-3 text-xs"
+                      >
+                        <Link
+                          href={`/category/${group.key}`}
+                          onClick={onClose}
+                          className="font-medium text-white/80 hover:text-white transition"
+                        >
+                          All {group.label}
+                        </Link>
+
+                        {group.categories.length > 0 ? (
+                          group.categories.map((cat) => (
+                            <Link
+                              key={cat._id}
+                              href={`/category/${group.key}/${cat.slug}`}
+                              onClick={onClose}
+                              className="text-white/60 hover:text-white capitalize transition"
+                            >
+                              {cat.title}
+                            </Link>
+                          ))
+                        ) : (
+                          <p className="text-white/40 text-xs">No categories</p>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+
+              {/* Sale */}
+              <Link
+                href="/category/sale"
+                onClick={onClose}
+                className={`text-sm transition ${
+                  pathname === "/category/sale" ? "text-white" : "text-white/60 hover:text-white"
+                }`}
+              >
+                Sale
+              </Link>
+            </nav>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
