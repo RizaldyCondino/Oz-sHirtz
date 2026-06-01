@@ -443,7 +443,7 @@ export default function ProductClient({ product }: Props) {
                     product={product}
                     variant="full"
                     size={12}
-                    className="flex-1 text-[10px] ml-2 dark:border-neutral-700"
+                    className="flex-1  text-[10px] ml-6 dark:border-neutral-700"
                   />
                 </div>
 

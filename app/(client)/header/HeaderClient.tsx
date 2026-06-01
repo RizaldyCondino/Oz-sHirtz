@@ -1,23 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, Package } from "lucide-react";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { menuCategories } from "@/constants/data";
 import Logo from "@/components/Logo";
-import HeaderMenu from "@/components/HeaderMenu";
+import SideMenu from "@/components/SideMenu";
 import CartIcon from "@/components/CartIcon";
-import type {
-  CollectionNavItem,
-  NavCategory,
-} from "@/sanity/lib/queries/query";
 import WishlistIcon from "@/components/WishlistIcon";
+import type { NavCategory } from "@/sanity/lib/queries/query";
 
 interface Props {
   navCategories: NavCategory[];
-  collections: CollectionNavItem[];
+  collections: { label: string; href: string; description?: string }[];
 }
 
 function normalizeSlug(value: string): string {
@@ -77,7 +74,9 @@ export default function HeaderClient({
           {/* Collections dropdown */}
           <div className="relative group">
             <span
-              className={`py-2 block transition cursor-default ${pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70"}`}
+              className={`py-2 block transition cursor-default ${
+                pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70"
+              }`}
             >
               Collections
             </span>
@@ -87,7 +86,9 @@ export default function HeaderClient({
                   <Link
                     key={col.href}
                     href={col.href}
-                    className={`block px-4 py-2.5 text-[9px] capitalize transition hover:bg-white/10 ${pathname === col.href ? "bg-white/10 font-medium" : ""}`}
+                    className={`block px-4 py-2.5 text-[9px] capitalize transition hover:bg-white/10 ${
+                      pathname === col.href ? "bg-white/10 font-medium" : ""
+                    }`}
                   >
                     <span className="block">{col.label}</span>
                     {col.description && (
@@ -100,11 +101,10 @@ export default function HeaderClient({
               </div>
             </div>
           </div>
+
           <Link
             href="/category/all"
-            className={
-              pathname === "/category/all" ? "font-bold" : "hover:text-black/70"
-            }
+            className={pathname === "/category/all" ? "font-bold" : "hover:text-black/70"}
           >
             Featured
           </Link>
@@ -123,13 +123,14 @@ export default function HeaderClient({
                   <div className="w-52 bg-[#231F20] text-white shadow-xl py-2 rounded-md">
                     {group.items.map((item) => {
                       const itemSlug = normalizeSlug(item);
-                      const isSubActive =
-                        pathname === `/category/${group.key}/${itemSlug}`;
+                      const isSubActive = pathname === `/category/${group.key}/${itemSlug}`;
                       return (
                         <Link
                           key={item}
                           href={`/category/${group.key}/${itemSlug}`}
-                          className={`block px-4 py-2 text-[9px] capitalize transition hover:bg-white/10 ${isSubActive ? "bg-white/10 font-medium" : ""}`}
+                          className={`block px-4 py-2 text-[9px] capitalize transition hover:bg-white/10 ${
+                            isSubActive ? "bg-white/10 font-medium" : ""
+                          }`}
                         >
                           {item}
                         </Link>
@@ -143,7 +144,9 @@ export default function HeaderClient({
 
           <Link
             href="/category/sale"
-            className={`font-medium transition ${isSaleActive ? "font-bold text-red-600" : "hover:text-black/70"}`}
+            className={`font-medium transition ${
+              isSaleActive ? "font-bold text-red-600" : "hover:text-black/70"
+            }`}
           >
             Sale
           </Link>
@@ -154,42 +157,48 @@ export default function HeaderClient({
           <Logo />
         </div>
 
-        {/* Right icons */}
-        {/* Right icons */}
-        <div className="flex items-center gap-4">
-          <button className="hover:opacity-70" aria-label="Search">
-            <Search size={iconSize} />
-          </button>
+       {/* Right icons */}
+<div className="flex items-center gap-4">
+  <button className="hover:opacity-70" aria-label="Search">
+    <Search size={iconSize} />
+  </button>
 
-         <WishlistIcon isSignedIn={isSignedIn} />
+  {isLoaded && (
+    <WishlistIcon isSignedIn={isSignedIn} />
+  )}
 
+  {/* Orders icon — only show when signed in */}
+  {isLoaded && isSignedIn && (
+    <Link href="/orders" aria-label="My Orders">
+      <Package size={iconSize} className="hover:opacity-70" />
+    </Link>
+  )}
 
-            <CartIcon />
+  <CartIcon />
 
-          {isLoaded ? (
-            isSignedIn ? (
-              <UserButton
-                appearance={{ elements: { avatarBox: "!w-4 !h-4" } }}
-              />
-            ) : (
-              <SignInButton mode="modal">
-                <button className="hover:opacity-70" aria-label="Sign in">
-                  <p className="text-xs font-medium cursor-pointer">Login</p>
-                </button>
-              </SignInButton>
-            )
-          ) : (
-            <div className="w-4 h-4" /> // ← placeholder while Clerk loads
-          )}
-        </div>
+  {isLoaded ? (
+    isSignedIn ? (
+      <UserButton
+        appearance={{ elements: { avatarBox: "!w-4 !h-4" } }}
+      />
+    ) : (
+      <SignInButton mode="modal">
+        <button className="hover:opacity-70" aria-label="Sign in">
+          <p className="text-xs font-medium cursor-pointer">Login</p>
+        </button>
+      </SignInButton>
+    )
+  ) : (
+    <div className="w-4 h-4" />
+  )}
+</div>
       </header>
 
       <div className="h-[40px]" />
 
-      <HeaderMenu
+      <SideMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
-        navCategories={navCategories}
       />
     </>
   );

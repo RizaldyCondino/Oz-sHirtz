@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { SignInButton } from "@clerk/nextjs";
 import { getWishlistCount } from "@/lib/actions/wishlist.actions";
 import { cn } from "@/lib/utils";
 
@@ -14,11 +15,15 @@ interface WishlistIconProps {
   isSignedIn?: boolean;
 }
 
-const WishlistIcon = ({ className, isSignedIn }: WishlistIconProps) => {
-  // Always 0 on server — no hydration mismatch
+const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
   const [count, setCount] = useState(0);
 
   const fetchAndCache = async () => {
+    if (!isSignedIn) {
+      setCount(0);
+      return;
+    }
+
     try {
       const c = await getWishlistCount();
       setCount(c);
@@ -28,35 +33,44 @@ const WishlistIcon = ({ className, isSignedIn }: WishlistIconProps) => {
         localStorage.removeItem(CACHE_KEY);
       }
     } catch {
-      // keep current value
+      // keep current value on error
     }
   };
 
   useEffect(() => {
-    // Read localStorage AFTER hydration to avoid SSR mismatch
     const cached = Number(localStorage.getItem(CACHE_KEY) ?? 0);
     if (cached > 0) setCount(cached);
 
-    // Then fetch the real value from server
     fetchAndCache();
 
     window.addEventListener("wishlist:updated", fetchAndCache);
     return () => window.removeEventListener("wishlist:updated", fetchAndCache);
-  }, []);
-
-  useEffect(() => {
-    if (isSignedIn === false) {
-      setCount(0);
-      localStorage.removeItem(CACHE_KEY);
-    }
   }, [isSignedIn]);
 
+  // If user is not signed in → Show icon that triggers login
+  if (!isSignedIn) {
+    return (
+      <SignInButton mode="modal">
+        <button
+          aria-label="Wishlist (Login required)"
+          className={cn(
+            "relative inline-flex items-center justify-center w-4.5 h-4.5 rounded-full hoverEffect transition-colors duration-200 cursor-pointer",
+            className
+          )}
+        >
+          <Heart className="w-5 h-5 text-[#231F20]" />
+        </button>
+      </SignInButton>
+    );
+  }
+
+  // Signed-in user → Normal behavior
   return (
     <Link
       href="/wishlist"
       aria-label={`Wishlist${count > 0 ? ` (${count} items)` : ""}`}
       className={cn(
-        "relative inline-flex items-center justify-center w-9 h-9 rounded-full hover:bg-[#F0EAE0] transition-colors duration-200",
+        "relative inline-flex items-center justify-center w-4.5 h-4.5 rounded-full hoverEffect transition-colors duration-200",
         className
       )}
     >

@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { useAuth, useClerk, useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 
 import { getAddresses, deleteAddress } from "@/lib/actions/address.actions";
-import { createOrder } from "@/lib/actions/order.actions";
+import { createCheckoutSession } from "@/actions/createCheckoutSession";
 
 import useStore from "@/store";
 import Link from "next/link";
@@ -23,20 +23,15 @@ import PriceFormatter from "@/components/PriceFormatter";
 import QuantityButtons from "@/components/QuantityButtons";
 import AddressModal from "@/components/AddressModal";
 import FavoriteButton from "@/components/Favoritebutton";
+import { generateOrderNumber } from "@/lib/utils";
 
 const CartPage = () => {
   const { isSignedIn, isLoaded } = useAuth();
   const { openSignIn } = useClerk();
+  const { user } = useUser();
 
-  const {
-    getTotalPrice,
-    getSubTotalPrice,
-    resetCart,
-    getGroupedItems,
-    getItemCount,
-  } = useStore();
-
-  const groupedItems = getGroupedItems();
+  const { getTotalPrice, getSubTotalPrice, getGroupedItems, getItemCount } =
+    useStore();
 
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
@@ -46,12 +41,10 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
-  // ── Hydration guard (fixes Zustand/localStorage mismatch)
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // ── Fetch addresses once Clerk is ready
   const fetchAddresses = async () => {
     try {
       const data = await getAddresses();
@@ -66,16 +59,15 @@ const CartPage = () => {
   };
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isClient || !isLoaded) return;
     if (isSignedIn) {
       fetchAddresses();
     } else {
       setAddresses([]);
       setSelectedAddress(null);
     }
-  }, [isSignedIn, isLoaded]);
+  }, [isClient, isSignedIn, isLoaded]);
 
-  // ── Handlers
   const handleEditAddress = (addr: any) => {
     setEditingAddress(addr);
     setEditModalOpen(true);
@@ -109,36 +101,51 @@ const CartPage = () => {
     setLoading(true);
 
     try {
-      const orderData = {
-        addressId: selectedAddress.id,
-        totalAmount: getTotalPrice(),
-        discountAmount: getSubTotalPrice() - getTotalPrice(),
-        paymentMethod: "COD" as const,
-        notes: "",
-        items: groupedItems.map(
-          ({ product, selectedColorway, selectedSize }) => {
-            const quantity = getItemCount(
-              product._id,
-              selectedColorway,
-              selectedSize,
-            );
-            return {
-              productId: product._id,
-              name: product.name ?? "",
-              price: product.price ?? 0,
-              image: product.images?.[0] ? urlFor(product.images[0]).url() : "",
-              colorway: selectedColorway || "",
-              size: selectedSize || "",
-              quantity,
-            };
-          },
-        ),
-      };
+      const groupedItems = getGroupedItems();
 
-      const order = await createOrder(orderData);
-      toast.success("Order placed successfully!");
-      resetCart();
-      window.location.href = `/orders/${order.id}`;
+      // Map grouped cart items to the shape createCheckoutSession expects
+      const lineItems = groupedItems.map(
+        ({ product, selectedColorway, selectedSize }) => {
+          const quantity = getItemCount(
+            product._id,
+            selectedColorway,
+            selectedSize,
+          );
+
+          // resolve colorway-specific image, fall back to product image
+          const activeColorway = product.colorways?.find(
+            (c: any) => c.name === selectedColorway,
+          );
+          const displayImage =
+            activeColorway?.images?.[0] || product.images?.[0];
+          const selectedImage = displayImage
+            ? urlFor(displayImage).url()
+            : undefined;
+
+          return {
+            product,
+            quantity,
+            selectedColorway,
+            selectedSize,
+            selectedImage, // ← add
+          };
+        },
+      );
+
+      const url = await createCheckoutSession(lineItems, {
+        orderNumber: generateOrderNumber(),
+        customerName: user?.fullName ?? user?.firstName ?? "Customer",
+        customerEmail: user?.emailAddresses[0]?.emailAddress ?? "",
+        clerkUserId: user?.id,
+        address: selectedAddress,
+      });
+      console.log("Checkout URL:", url); // ← add this
+
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast.error("Failed to create checkout session");
+      }
     } catch (error: any) {
       console.error(error);
       toast.error(error.message || "Something went wrong");
@@ -147,15 +154,16 @@ const CartPage = () => {
     }
   };
 
-  // ── Guard: wait for client hydration AND Clerk to load
-  if (!isClient || !isLoaded) return null;
+  if (!isLoaded) return null;
+
+  const groupedItems = isClient ? getGroupedItems() : [];
 
   return (
     <div className="bg-[#FAF8F4] mt-10 pb-52 md:pb-10 min-h-screen">
       {groupedItems?.length > 0 ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-            {/* ── Cart Items ───────────────────────────────────── */}
+            {/* Cart Items */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl border border-[#8C6227]/10 overflow-hidden">
                 {groupedItems.map(
@@ -172,14 +180,13 @@ const CartPage = () => {
                       activeColorway?.images?.[0] || product.images?.[0];
                     const resolvedImageUrl = displayImage
                       ? urlFor(displayImage).url()
-                      : undefined; // ← add
+                      : undefined;
 
                     return (
                       <div
                         key={`${product._id}-${selectedColorway}-${selectedSize}`}
                         className="flex gap-4 p-4 sm:p-6 border-b border-[#8C6227]/10 last:border-0"
                       >
-                        {/* Product Image */}
                         <Link
                           href={`/product/${product.slug?.current}`}
                           className="flex-shrink-0"
@@ -196,18 +203,16 @@ const CartPage = () => {
                         </Link>
 
                         <div className="flex-1 min-w-0 flex flex-col">
-                          {/* Title + Favorite */}
                           <div className="flex justify-between items-start">
                             <h3 className="font-semibold text-base sm:text-lg line-clamp-2 pr-3 text-black flex-1">
                               {product.name}
                             </h3>
                             <FavoriteButton
                               product={product}
-                              resolvedImage={resolvedImageUrl} // ← add
+                              resolvedImage={resolvedImageUrl}
                             />
                           </div>
 
-                          {/* Color & Size */}
                           <p className="text-sm text-neutral-600 mt-1">
                             Color:{" "}
                             <span className="font-medium">
@@ -219,7 +224,6 @@ const CartPage = () => {
                             <span className="font-medium">{selectedSize}</span>
                           </p>
 
-                          {/* Quantity + Price */}
                           <div className="mt-auto pt-4 flex flex-col sm:flex-row sm:items-center gap-4">
                             <div className="flex-1">
                               <QuantityButtons
@@ -241,9 +245,8 @@ const CartPage = () => {
               </div>
             </div>
 
-            {/* ── Sidebar ──────────────────────────────────────── */}
+            {/* Sidebar */}
             <div className="space-y-6">
-              {/* Order Summary */}
               <Card className="border-[#8C6227]/10">
                 <CardHeader>
                   <CardTitle className="text-[#8C6227] uppercase tracking-wider text-sm">
@@ -277,9 +280,9 @@ const CartPage = () => {
                     className="w-full bg-[#111111] hover:bg-[#111111]/80 text-white font-medium hoverEffect rounded-full py-4 sm:py-6 mt-4 text-sm sm:text-xs cursor-pointer"
                   >
                     {loading
-                      ? "Processing Order..."
+                      ? "Redirecting to checkout..."
                       : isSignedIn
-                        ? "Place Order"
+                        ? "Checkout"
                         : "Sign in to Checkout"}
                   </Button>
 
@@ -291,7 +294,6 @@ const CartPage = () => {
                 </CardContent>
               </Card>
 
-              {/* Delivery Address */}
               {isSignedIn && (
                 <Card className="border-[#8C6227]/10">
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -302,7 +304,14 @@ const CartPage = () => {
                   </CardHeader>
                   <CardContent>
                     {addresses.length > 0 ? (
-                      <RadioGroup value={selectedAddress?.id}>
+                      <RadioGroup
+                        value={selectedAddress?.id}
+                        onValueChange={(val) =>
+                          setSelectedAddress(
+                            addresses.find((a) => a.id === val),
+                          )
+                        }
+                      >
                         {addresses.map((addr) => (
                           <div
                             key={addr.id}
@@ -331,7 +340,6 @@ const CartPage = () => {
                                 )}
                               </div>
 
-                              {/* Edit & Delete */}
                               <div
                                 className="flex gap-1 shrink-0"
                                 onClick={(e) => e.stopPropagation()}
@@ -375,7 +383,6 @@ const CartPage = () => {
         <EmptyCart />
       )}
 
-      {/* Edit Address Modal */}
       {editingAddress && (
         <AddressModal
           onAddressAdded={() => {

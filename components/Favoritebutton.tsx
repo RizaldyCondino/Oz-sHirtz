@@ -129,7 +129,7 @@ const FavoriteButton = ({
           size={size}
           className={cn("transition-all", favorited ? "fill-red-500 text-red-500" : "text-black")}
         />
-        <span className="ml-1">{favorited ? "Saved" : "Save"}</span>
+        <span className="ml-1">{favorited ? "Saved" : "Add to Favorite"}</span>
       </Button>
     );
   }

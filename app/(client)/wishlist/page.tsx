@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Heart, Trash2, ShoppingBag, ArrowLeft, PackageOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 import { getWishlist, removeFromWishlist } from "@/lib/actions/wishlist.actions";
 import { Button } from "@/components/ui/button";
@@ -24,8 +25,9 @@ type WishlistItem = {
 const WishlistPage = () => {
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [removingIds, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [pendingRemove, setPendingRemove] = useState<Set<string>>(new Set());
+  const router = useRouter();
 
   useEffect(() => {
     const fetchWishlist = async () => {
@@ -70,14 +72,11 @@ const WishlistPage = () => {
   return (
     <div className="min-h-screen bg-[#F9F7F4]">
       {/* Header */}
-      <div className="bg-white border-b border-[#E8E0D5]">
+      <div className="">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center gap-3 mb-2">
             <Heart className="w-6 h-6 text-red-400 fill-red-400" />
-            <h1
-              className="text-2xl font-bold tracking-tight text-[#231F20]"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            >
+            <h1 className="text-2xl font-bold tracking-tight text-[#231F20]">
               My Wishlist
             </h1>
           </div>
@@ -92,14 +91,14 @@ const WishlistPage = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Back link */}
-        <Link
-          href="/shop"
-          className="inline-flex items-center gap-2 text-sm text-[#7A6F65] hover:text-[#231F20] transition-colors mb-8 group"
+        {/* Back button */}
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 text-sm text-[#7A6F65] hover:text-[#231F20] transition-colors mb-8 group cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Continue Shopping
-        </Link>
+        </button>
 
         {/* Loading skeleton */}
         {loading && (
@@ -130,17 +129,14 @@ const WishlistPage = () => {
             <div className="w-20 h-20 rounded-full bg-[#F0EAE0] flex items-center justify-center mb-6">
               <PackageOpen className="w-9 h-9 text-[#B8A898]" />
             </div>
-            <h2
-              className="text-xl font-semibold text-[#231F20] mb-2"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-            >
+            <h2 className="text-xl font-semibold text-[#231F20] mb-2">
               Your wishlist is empty
             </h2>
             <p className="text-sm text-[#7A6F65] max-w-xs mb-8">
               Save items you love by tapping the heart icon on any product.
             </p>
-            <Link href="/shop">
-              <Button className="bg-[#231F20] text-white hover:bg-[#3D3635] rounded-full px-8 py-2 text-sm font-medium transition-colors">
+            <Link href="/category/all">
+              <Button className="bg-[#231F20] text-white hover:bg-[#3D3635] cursor-pointer rounded-full px-8 py-2 text-sm font-medium transition-colors">
                 <ShoppingBag className="w-4 h-4 mr-2" />
                 Browse Products
               </Button>
@@ -179,7 +175,7 @@ const WishlistPage = () => {
                         isRemoving && "opacity-100 cursor-not-allowed"
                       )}
                     >
-                      <Trash2 className="w-3.5 h-3.5 text-[#9B6B6B] hover:text-red-500 transition-colors" />
+                      <Trash2 className="w-3.5 h-3.5 text-[#9B6B6B] hover:text-red-500 transition-colors cursor-pointer" />
                     </button>
 
                     {/* Image */}
@@ -214,7 +210,7 @@ const WishlistPage = () => {
                         <Link href={href}>
                           <Button
                             size="sm"
-                            className="h-7 text-[10px] px-3 rounded-full bg-[#231F20] text-white hover:bg-[#3D3635] transition-colors font-medium"
+                            className="h-7 text-[10px] px-3 rounded-full cursor-pointer bg-[#231F20] text-white hover:bg-[#3D3635] transition-colors font-medium"
                           >
                             View
                           </Button>

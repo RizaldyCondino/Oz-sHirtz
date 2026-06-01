@@ -1,20 +1,11 @@
 "use client";
 
-import React, {
-  FC,
-  useEffect,
-} from "react";
-
+import React, { FC, useEffect, useState } from "react";
 import Logo from "./Logo";
-
-import { X } from "lucide-react";
-
-import { menuCategories } from "@/constants/data";
-
+import { X, ChevronDown } from "lucide-react";
+import { menuCategories, collections } from "@/constants/data";
 import Link from "next/link";
-
 import { usePathname } from "next/navigation";
-
 import { useOutsideClick } from "@/hooks";
 
 interface SidebarProps {
@@ -22,139 +13,192 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-interface MenuCategory {
-  _id?: string;
-  id?: string;
-  title?: string;
-  label?: string;
-  href?: string;
-  slug?: string | { current: string }; // Safely type check object properties
+function normalizeSlug(value: string): string {
+  return value.toLowerCase().trim().replaceAll(" ", "-").replaceAll("_", "-");
 }
 
-const SideMenu: FC<
-  SidebarProps
-> = ({
-  isOpen,
-  onClose,
-}) => {
-  const pathname =
-    usePathname();
-
-  const sidebarRef =
-    useOutsideClick<HTMLDivElement>(
-      onClose
-    );
-
-  // ======================================================
-  // LOCK BODY SCROLL
-  // ======================================================
+const SideMenu: FC<SidebarProps> = ({ isOpen, onClose }) => {
+  const pathname = usePathname();
+  const sidebarRef = useOutsideClick<HTMLDivElement>(onClose);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow =
-        "hidden";
-    } else {
-      document.body.style.overflow =
-        "";
-    }
-
-    return () => {
-      document.body.style.overflow =
-        "";
-    };
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
+
+  // Auto-open the active group when menu opens
+  useEffect(() => {
+    if (!isOpen) return;
+    const active = menuCategories.find((g) => pathname.startsWith(`/category/${g.key}`));
+    if (active) setOpenGroup(active.key);
+    else if (pathname.startsWith("/collections")) setOpenGroup("collections");
+    else setOpenGroup(null);
+  }, [isOpen, pathname]);
+
+  const toggleGroup = (key: string) =>
+    setOpenGroup((prev) => (prev === key ? null : key));
+
+  const isSaleActive = pathname.startsWith("/category/sale");
 
   return (
     <div
       className={`fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
-        isOpen
-          ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
+        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       aria-hidden={!isOpen}
     >
       <div
         ref={sidebarRef}
-        className={`absolute left-0 top-0 h-full w-[300px] bg-bg-main border-r border-white/10 p-6 flex flex-col gap-6 transform transition-transform duration-300 ease-out ${
-          isOpen
-            ? "translate-x-0"
-            : "-translate-x-full"
+        className={`absolute left-0 top-0 h-full w-[300px] bg-[#1A1714] border-r border-white/10 flex flex-col transform transition-transform duration-300 ease-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* HEADER */}
-        <div className="flex items-center justify-between shrink-0">
-          <Logo
-            className="text-white"
-            spanDesign="group-hover:text-white"
-          />
-
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 shrink-0 border-b border-white/10">
+          <Logo className="text-white" spanDesign="group-hover:text-white" />
           <button
             onClick={onClose}
             aria-label="Close Menu"
-            className="text-text-dark-mode-hint hover:text-white transition"
+            className="text-white/50 hover:text-white transition"
           >
-            <X size={22} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* NAVIGATION WITH CONTAINER SCROLL WRAPPING */}
-        <nav className="flex flex-col gap-4 text-xs uppercase tracking-[0.2em] font-semibold overflow-y-auto pr-2 pb-6">
-          {menuCategories?.map(
-            (
-              item: MenuCategory,
-              index: number
-            ) => {
-              // Extract the string variant safely out of potential CMS object bindings
-              const parsedSlug = typeof item.slug === "object"
-                ? item.slug?.current
-                : item.slug;
+        {/* Nav */}
+        <nav className="flex flex-col overflow-y-auto flex-1 py-4">
 
-              const slug =
-                parsedSlug ||
-                item.title
-                  ?.toLowerCase()
-                  ?.replace(
-                    /\s+/g,
-                    "-"
-                  );
+          {/* Collections accordion */}
+          <div>
+            <button
+              onClick={() => toggleGroup("collections")}
+              className={`w-full flex items-center justify-between px-6 py-3 text-[10px] uppercase tracking-[0.2em] font-semibold transition ${
+                openGroup === "collections" || pathname.startsWith("/collections")
+                  ? "text-white"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              Collections
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-200 ${
+                  openGroup === "collections" ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
-              const targetHref =
-                item.href ||
-                `/category/${slug}`;
+            {openGroup === "collections" && (
+              <div className="flex flex-col pb-1">
+                {collections.map((col) => (
+                  <Link
+                    key={col.href}
+                    href={col.href}
+                    onClick={onClose}
+                    className={`px-8 py-2.5 text-[9px] uppercase tracking-[0.15em] transition ${
+                      pathname === col.href
+                        ? "text-white font-semibold"
+                        : "text-white/50 hover:text-white"
+                    }`}
+                  >
+                    {col.label}
+                    {"description" in col && col.description && (
+                      <span className="block text-white/30 text-[8px] normal-case mt-0.5">
+                        {col.description}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
 
-              const uniqueKey =
-                item._id ||
-                item.id ||
-                slug ||
-                `menu-item-${index}`;
+          {/* Featured */}
+          <Link
+            href="/category/all"
+            onClick={onClose}
+            className={`px-6 py-3 text-[10px] uppercase tracking-[0.2em] font-semibold transition ${
+              pathname === "/category/all"
+                ? "text-white"
+                : "text-white/60 hover:text-white"
+            }`}
+          >
+            Featured
+          </Link>
 
-              const isActive =
-                pathname ===
-                targetHref;
+          <div className="mx-6 my-2 border-t border-white/10" />
 
-              return (
-                <Link
-                  key={
-                    uniqueKey
-                  }
-                  href={
-                    targetHref
-                  }
-                  onClick={
-                    onClose
-                  }
-                  className={`transition py-1 ${
-                    isActive
-                      ? "text-white"
-                      : "text-text-dark-mode-hint hover:text-white"
+          {/* Menu Categories */}
+          {menuCategories.map((group) => {
+            const isGroupActive = pathname.startsWith(`/category/${group.key}`);
+            const isExpanded = openGroup === group.key;
+
+            return (
+              <div key={group.key}>
+                <button
+                  onClick={() => toggleGroup(group.key)}
+                  className={`w-full flex items-center justify-between px-6 py-3 text-[10px] uppercase tracking-[0.2em] font-semibold transition ${
+                    isGroupActive ? "text-white" : "text-white/60 hover:text-white"
                   }`}
                 >
-                  {item.title ||
-                    item.label}
-                </Link>
-              );
-            }
-          )}
+                  {group.label}
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${
+                      isExpanded ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {isExpanded && (
+                  <div className="flex flex-col pb-1">
+                    <Link
+                      href={`/category/${group.key}`}
+                      onClick={onClose}
+                      className={`px-8 py-2 text-[9px] uppercase tracking-[0.15em] transition ${
+                        pathname === `/category/${group.key}`
+                          ? "text-white font-semibold"
+                          : "text-white/50 hover:text-white"
+                      }`}
+                    >
+                      All {group.label}
+                    </Link>
+                    {group.items.map((item) => {
+                      const itemSlug = normalizeSlug(item);
+                      const href = `/category/${group.key}/${itemSlug}`;
+                      return (
+                        <Link
+                          key={item}
+                          href={href}
+                          onClick={onClose}
+                          className={`px-8 py-2 text-[9px] uppercase tracking-[0.15em] transition capitalize ${
+                            pathname === href
+                              ? "text-white font-semibold"
+                              : "text-white/50 hover:text-white"
+                          }`}
+                        >
+                          {item}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          <div className="mx-6 my-2 border-t border-white/10" />
+
+          {/* Sale */}
+          <Link
+            href="/category/sale"
+            onClick={onClose}
+            className={`px-6 py-3 text-[10px] uppercase tracking-[0.2em] font-semibold transition ${
+              isSaleActive ? "text-red-400" : "text-white/60 hover:text-red-400"
+            }`}
+          >
+            Sale
+          </Link>
         </nav>
       </div>
     </div>
