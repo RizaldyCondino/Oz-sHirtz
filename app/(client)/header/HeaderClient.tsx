@@ -168,7 +168,7 @@ export default function HeaderClient({
     <WishlistIcon isSignedIn={isSignedIn} />
   )}
 
-  <CartIcon />
+  <CartIcon size={iconSize}/>
 
   {isLoaded ? (
     isSignedIn ? (

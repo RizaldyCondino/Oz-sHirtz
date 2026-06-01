@@ -30,6 +30,9 @@ interface StoreState {
   getGroupedItems: () => CartItem[];
   // ✅ getStockForSelection now accepts optional colorway/size overrides
   getStockForSelection: (product: Product, colorway?: string, size?: string) => number;
+
+  cartOpen: boolean;
+setCartOpen: (open: boolean) => void;
 }
 
 const useStore = create<StoreState>()(
@@ -65,23 +68,25 @@ const useStore = create<StoreState>()(
           );
 
           if (existingItem) {
-            return {
-              items: state.items.map((item) =>
-                item.product._id === product._id &&
-                item.selectedColorway === colorway &&
-                item.selectedSize === size
-                  ? { ...item, quantity: item.quantity + 1 }
-                  : item
-              ),
-            };
-          }
+  return {
+    cartOpen: true,
+    items: state.items.map((item) =>
+      item.product._id === product._id &&
+      item.selectedColorway === colorway &&
+      item.selectedSize === size
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    ),
+  };
+}
 
-          return {
-            items: [
-              ...state.items,
-              { product, quantity: 1, selectedColorway: colorway, selectedSize: size },
-            ],
-          };
+return {
+  cartOpen: true,
+  items: [
+    ...state.items,
+    { product, quantity: 1, selectedColorway: colorway, selectedSize: size },
+  ],
+};
         });
       },
 
@@ -159,9 +164,17 @@ getTotalPrice: () =>
         const sizeConfig = colorwayObj.sizes?.find((s) => s.size === size);
         return sizeConfig?.stock ?? 0;
       },
+
+      cartOpen: false,
+setCartOpen: (open) => set({ cartOpen: open }),
+
     }),
+
+    
     { name: "cart-store" }
   )
 );
+
+
 
 export default useStore;

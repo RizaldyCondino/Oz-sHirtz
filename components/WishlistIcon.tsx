@@ -27,18 +27,19 @@ const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
     try {
       const c = await getWishlistCount();
       setCount(c);
+
       if (c > 0) {
         localStorage.setItem(CACHE_KEY, String(c));
       } else {
         localStorage.removeItem(CACHE_KEY);
       }
     } catch {
-      // keep current value on error
+      // Keep current value on error
     }
   };
 
   useEffect(() => {
-    const cached = Number(localStorage.getItem(CACHE_KEY) ?? 0);
+    const cached = Number(localStorage.getItem(CACHE_KEY) ?? "0");
     if (cached > 0) setCount(cached);
 
     fetchAndCache();
@@ -47,7 +48,7 @@ const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
     return () => window.removeEventListener("wishlist:updated", fetchAndCache);
   }, [isSignedIn]);
 
-  // If user is not signed in → Show icon that triggers login
+  // Not signed in → Show login trigger
   if (!isSignedIn) {
     return (
       <SignInButton mode="modal">
@@ -58,13 +59,13 @@ const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
             className
           )}
         >
-          <Heart className="w-5 h-5 text-[#231F20]" />
+          <Heart className="w-4.5 h-4.5 text-[#231F20]" />
         </button>
       </SignInButton>
     );
   }
 
-  // Signed-in user → Normal behavior
+  // Signed in → Normal wishlist link with badge
   return (
     <Link
       href="/wishlist"
@@ -76,7 +77,7 @@ const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
     >
       <Heart
         className={cn(
-          "w-5 h-5 transition-colors duration-200",
+          "w-4.5 h-4.5 transition-colors duration-200",
           count > 0 ? "fill-red-400 text-red-400" : "text-[#231F20]"
         )}
       />
@@ -85,11 +86,11 @@ const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
         {count > 0 && (
           <motion.span
             key={count}
-            initial={{ scale: 0, opacity: 0 }}
+            initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none"
+            exit={{ scale: 0.5, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 500, damping: 25 }}
+            className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm"
           >
             {count > 99 ? "99+" : count}
           </motion.span>
