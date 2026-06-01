@@ -433,7 +433,7 @@ export default function ProductClient({ product }: Props) {
                 </div>
 
                 {/* CTA BUTTONS */}
-                <div className="flex flex-row items-center mt-3 w-full max-w-[280px] px-2">
+                <div className="flex flex-row items-center mt-3 w-full max-w-[350px] px-2">
                   <AddToCartButton
                     product={product}
                     className="cursor-pointer w-36 rounded-full"

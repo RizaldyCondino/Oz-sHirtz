@@ -55,11 +55,11 @@ const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
         <button
           aria-label="Wishlist (Login required)"
           className={cn(
-            "relative inline-flex items-center justify-center w-4.5 h-4.5 rounded-full hoverEffect transition-colors duration-200 cursor-pointer",
+            "relative inline-flex items-center justify-center w-4 h-4 rounded-full hoverEffect transition-colors duration-200 cursor-pointer",
             className
           )}
         >
-          <Heart className="w-4.5 h-4.5 text-[#231F20]" />
+          <Heart className="w-4 h-4 text-[#231F20]" />
         </button>
       </SignInButton>
     );

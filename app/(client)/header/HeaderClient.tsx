@@ -168,7 +168,7 @@ export default function HeaderClient({
     <WishlistIcon isSignedIn={isSignedIn} />
   )}
 
-  <CartIcon size={iconSize}/>
+  <CartIcon />
 
   {isLoaded ? (
     isSignedIn ? (
@@ -184,7 +184,7 @@ export default function HeaderClient({
           <UserButton.Link
             label="My Orders"
             href="/orders"
-            labelIcon={<Package size={16} />}
+            labelIcon={<Package size={20} />}
           />
         </UserButton.MenuItems>
       </UserButton>

@@ -32,7 +32,7 @@ const CartIcon = () => {
         className="relative group"
         aria-label="Cart"
       >
-        <ShoppingBag className="w-4.5 h-4.5 mt-2 hover:text-[#111111] cursor-pointer" />
+        <ShoppingBag className="w-4 h-4 mt-2 hover:text-[#111111] cursor-pointer" />
         {totalCount > 0 && (
           <span className="absolute -top-1 -right-1 mt-2 bg-[#111111] text-white text-[9px] font-bold rounded-full flex items-center justify-center h-3 w-3">
             {totalCount > 99 ? "99+" : totalCount}
