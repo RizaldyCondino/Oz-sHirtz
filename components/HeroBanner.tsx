@@ -15,7 +15,7 @@ const HeroBanner: React.FC = () => {
             <span className="text-sm tracking-[3px] font-medium uppercase">Premium Collection</span>
           </div>
 
-          <h1 className="text-[58px] sm:text-[72px] lg:text-[75px] leading-[1.05] font-bold tracking-wider">
+          <h1 className="text-[58px] sm:text-[72px] text-[#b8502e] lg:text-[75px] leading-[1.05] font-bold tracking-wider">
             OzCrtz
           </h1>
           

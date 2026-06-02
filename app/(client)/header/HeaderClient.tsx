@@ -77,7 +77,7 @@ export default function HeaderClient({
             <div className="relative group">
               <span
                 className={`py-2 block transition cursor-default ${
-                  pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70"
+                  pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70  "
                 }`}
               >
                 Collections
@@ -106,7 +106,7 @@ export default function HeaderClient({
 
             <Link
               href="/category/all"
-              className={pathname === "/category/all" ? "font-bold" : "hover:text-black/70"}
+              className={pathname === "/category/all" ? "font-bold " : "hover:text-black/70"}
             >
               Featured
             </Link>
@@ -117,7 +117,7 @@ export default function HeaderClient({
                 <div key={group.key} className="relative group">
                   <Link
                     href={`/category/${group.key}`}
-                    className={`py-2 block transition ${isActive ? "font-bold" : "hover:text-black/70"}`}
+                    className={`py-2 block transition ${isActive ? "font-bold " : "hover:text-black/70"}`}
                   >
                     {group.label}
                   </Link>

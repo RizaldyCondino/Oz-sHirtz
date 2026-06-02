@@ -67,18 +67,18 @@ const AddToCartButton = ({ product, className }: Props) => {
       {itemCount ? (
         <div className="text-sm w-full">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-[#111111]/80 font-mono uppercase tracking-wider">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#111111]">
               Quantity
             </span>
             <QuantityButtons product={product} />
           </div>
           <div className="flex justify-between border-t border-[#111111]/20 pt-1">
-            <span className="text-xs font-semibold text-[#111111] uppercase tracking-wider font-mono">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#111111] ">
               Subtotal
             </span>
             <PriceFormatter
               amount={unitPrice * itemCount}
-              className="text-xs font-bold text-[#111111]"
+              className="text-xs font-bold text-[#b8502e]"
             />
           </div>
         </div>

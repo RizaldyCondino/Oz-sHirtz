@@ -279,7 +279,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2 text-[9px] sm:text-[10px] uppercase tracking-[0.18em]">
                   <Link href={`/category/${group.key}`}>
-                    <span className="font-semibold mr-2 text-[#8C6227] hover:text-[#111111]">
+                    <span className="font-semibold mr-2 text-[#b8502e] hover:text-[#111111]">
                       {group.label}
                     </span>
                   </Link>

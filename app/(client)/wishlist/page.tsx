@@ -75,7 +75,7 @@ const WishlistPage = () => {
       <div className="">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center gap-3 mb-2">
-            <Heart className="w-6 h-6 text-red-400 fill-red-400" />
+            <Heart className="w-6 h-6 text-[#b8502e] fill-[#b8502e]" />
             <h1 className="text-2xl font-bold tracking-tight text-[#231F20]">
               My Wishlist
             </h1>

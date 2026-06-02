@@ -99,6 +99,7 @@ model Order {
   address         Address     @relation(fields: [addressId], references: [id])
   items           OrderItem[]
   payLater        PayLater?
+  stripeReceiptUrl  String?
 }
 
 model OrderItem {

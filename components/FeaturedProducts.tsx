@@ -38,7 +38,7 @@ export default function FeaturedProducts({
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-xl font-semibold tracking-tight text-neutral-900">
+          <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
             {title}
           </h2>
 
@@ -96,7 +96,7 @@ export default function FeaturedProducts({
 
                     {/* Brand Name - Top Right */}
                     {brandName && (
-                      <div className="absolute top-2 right-2 text-orange-900 text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded z-10">
+                      <div className="absolute top-2 right-2 text-[#b8502e] text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded z-10">
                         {brandName}
                       </div>
                     )}
@@ -108,28 +108,13 @@ export default function FeaturedProducts({
                   </h3>
                 </Link>
 
-                {/* Color Swatches */}
-                {/* {product.colorways && product.colorways.length > 0 && (
-                  <div className="flex gap-1.5 mt-2">
-                    {product.colorways.map((color) => (
-                      <Link
-                        key={color.name}
-                        href={`/product/${product.slug?.current}?color=${encodeURIComponent(
-                          color.name
-                        )}`}
-                        className="w-3 h-3 rounded-full border border-neutral-200 hover:border-neutral-400 transition-all"
-                        style={{ backgroundColor: color.hex }}
-                        title={color.name}
-                      />
-                    ))}
-                  </div>
-                )} */}
+               
 
                 {/* Price */}
                 <div className="mt-2 flex items-center gap-2">
                   <PriceFormatter
                     amount={discountedPrice}
-                    className="text-[12px] font-bold text-[#8C6227]"
+                    className="text-[12px] font-bold text-[#b8502e]"
                   />
 
                   {hasDiscount && (

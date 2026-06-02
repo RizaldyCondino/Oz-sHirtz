@@ -234,7 +234,7 @@ const CartPage = () => {
                             </div>
                             <PriceFormatter
                               amount={(product.price ?? 0) * quantity}
-                              className="font-bold text-[#8C6227] text-lg sm:text-xl"
+                              className="font-bold text-[#b8502e] text-lg sm:text-xl"
                             />
                           </div>
                         </div>
@@ -247,9 +247,9 @@ const CartPage = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              <Card className="border-[#8C6227]/10">
+              <Card className="border-[#b8502e]/10">
                 <CardHeader>
-                  <CardTitle className="text-[#8C6227] uppercase tracking-wider text-sm">
+                  <CardTitle className="text-[#b8502e] uppercase tracking-wider text-sm">
                     Order Summary
                   </CardTitle>
                 </CardHeader>
@@ -270,14 +270,14 @@ const CartPage = () => {
                     <span>Total</span>
                     <PriceFormatter
                       amount={getTotalPrice()}
-                      className="text-[#8C6227]"
+                      className="text-[#b8502e]"
                     />
                   </div>
 
                   <Button
                     onClick={handleCheckout}
                     disabled={loading}
-                    className="w-full bg-[#111111] hover:bg-[#111111]/80 text-white font-medium hoverEffect rounded-full py-4 sm:py-6 mt-4 text-sm sm:text-xs cursor-pointer"
+                    className="w-full bg-[#111111] hover:bg-[#111111]/80 text-white font-medium hoverEffect lg:text-[14px] rounded-full py-4 sm:py-6 mt-4 text-sm sm:text-xs cursor-pointer"
                   >
                     {loading
                       ? "Redirecting to checkout..."

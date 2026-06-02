@@ -8,12 +8,15 @@ import PriceFormatter from "./PriceFormatter";
 import QuantityButtons from "./QuantityButtons";
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { usePathname } from "next/navigation";
 
 const CartIcon = () => {
   const { items, cartOpen, setCartOpen, getTotalPrice } = useStore();
   const ref = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const isCartPage = pathname === "/cart";
 
   // close on outside click
   useEffect(() => {
@@ -29,7 +32,7 @@ const CartIcon = () => {
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setCartOpen(!cartOpen)}
+        onClick={() => { if (!isCartPage) setCartOpen(!cartOpen); }}
         className="relative group"
         aria-label="Cart"
       >
@@ -51,7 +54,7 @@ const CartIcon = () => {
       </button>
 
       <AnimatePresence>
-        {cartOpen && (
+        {cartOpen && !isCartPage && (
           <motion.div
             key="cart-dropdown"
             initial={{ opacity: 0, scale: 0.95, y: -8 }}
@@ -63,7 +66,7 @@ const CartIcon = () => {
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e1da]">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#111]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#b8502e]">
                 Your Bag
                 <span className="ml-2 bg-[#111] text-white text-[8px] px-2 py-0.5 rounded-full font-medium">
                   {totalCount} {totalCount === 1 ? "item" : "items"}
@@ -102,15 +105,19 @@ const CartIcon = () => {
                         className="flex gap-3 px-4 py-3"
                       >
                         {displayImage && (
-                          <div className="relative w-[46px] h-[56px] flex-shrink-0 rounded-md overflow-hidden bg-neutral-100">
+                          <Link
+                            href={`/product/${item.product.slug?.current ?? item.product._id}`}
+                            onClick={() => setCartOpen(false)}
+                            className="relative w-[46px] h-[56px] flex-shrink-0 rounded-md overflow-hidden bg-neutral-100 block"
+                          >
                             <Image
                               src={urlFor(displayImage).url()}
                               alt={item.product.name ?? ""}
                               fill
-                              className="object-cover"
+                              className="object-cover hover:scale-105 transition-transform duration-200"
                               sizes="46px"
                             />
-                          </div>
+                          </Link>
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-[11px] font-medium text-[#111] truncate">
@@ -121,7 +128,7 @@ const CartIcon = () => {
                           </p>
                           <PriceFormatter
                             amount={(item.product.price ?? 0) * item.quantity}
-                            className="text-[11px] font-semibold text-[#8C6227] mt-1 block"
+                            className="text-[11px] font-semibold text-[#b8502e] mt-1 block"
                           />
                           <div className="mt-1.5">
                             <QuantityButtons
@@ -148,12 +155,12 @@ const CartIcon = () => {
                   </p>
                 )}
                 <div className="flex justify-between items-center mb-3">
-                  <span className="text-[10px] text-neutral-500 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">
                     Total
                   </span>
                   <PriceFormatter
                     amount={getTotalPrice()}
-                    className="text-sm font-semibold text-[#111]"
+                    className="text-sm font-semibold text-[#b8502e]"
                   />
                 </div>
                 <Link

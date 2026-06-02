@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Metadata } from "@/actions/createCheckoutSession";
 import { parseLineItems } from "./parseLineItems";
 import Stripe from "stripe";
+import stripe from "@/lib/stripe";
 import type { Address } from "@prisma/client";
 
 export async function createOrderInPrisma(session: Stripe.Checkout.Session) {
@@ -23,6 +24,14 @@ export async function createOrderInPrisma(session: Stripe.Checkout.Session) {
   if (!addressExists) {
     throw new Error(`Address ${parsedAddress.id} not found in database`);
   }
+
+  // Expand payment_intent to get the charge and receipt URL
+  const expandedSession = await stripe.checkout.sessions.retrieve(id, {
+    expand: ["payment_intent.latest_charge"],
+  });
+  const charge = (expandedSession.payment_intent as Stripe.PaymentIntent)
+    ?.latest_charge as Stripe.Charge | null;
+  const stripeReceiptUrl = charge?.receipt_url ?? null;
 
   const orderItems = await parseLineItems(id);
 
@@ -51,6 +60,7 @@ export async function createOrderInPrisma(session: Stripe.Checkout.Session) {
       paymentStatus: "PAID",
       status: "CONFIRMED",
       notes: orderNumber,
+      stripeReceiptUrl, 
       items: {
         create: orderItems,
       },

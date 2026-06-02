@@ -86,7 +86,7 @@ export default function SuccessPage() {
         <div className="flex flex-col gap-3">
           <Button
             asChild
-            className="w-full bg-[#111111] hover:bg-[#111111]/80 text-white rounded-full"
+            className="w-full bg-[#111111] hover:bg-[#111111]/80 hoverEffect   text-white rounded-full"
           >
             <Link href="/orders">
               View My Orders <ArrowRight size={16} className="ml-2" />
@@ -95,7 +95,7 @@ export default function SuccessPage() {
           <Button
             asChild
             variant="outline"
-            className="w-full rounded-full border-[#8C6227]/20 text-[#8C6227] hover:bg-[#8C6227]/5"
+            className="w-full rounded-full border-[#8C6227]/20 hoverEffect text-[#8C6227] hover:bg-[#8C6227]/5"
           >
             <Link href="/">Continue Shopping</Link>
           </Button>

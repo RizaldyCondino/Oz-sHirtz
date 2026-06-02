@@ -27,7 +27,7 @@ export default function FilterControl({ availableBrands, availableSizes }: Filte
       <Button
         variant="ghost"
         onClick={() => setIsOpen(true)}
-        className="flex cursor-pointer items-center gap-2 text-[9px] font-medium tracking-widest uppercase border-none"
+        className="flex cursor-pointer  items-center gap-2 text-[9px] font-medium tracking-widest hoverEffect hover:text-[#b8502e] uppercase border-none"
       >
         Filter & Sort
         <SlidersHorizontal size={14} />

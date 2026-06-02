@@ -51,23 +51,27 @@ export default function BrandMarquee({
     <section className={`py-12 bg-[#FAF8F4] ${className}`}>
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-lg md:text-xl font-semibold uppercase tracking-wider text-neutral-900">
-            {title}
+          <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
+            Brands
           </h2>
-          <Link
+          {/* <Link
             href="/brands"
             className="text-[11px] uppercase tracking-widest font-semibold text-black  flex items-center gap-1 hover:text-[#111111] transition"
           >
             All Brands <ArrowRight size={14} />
-          </Link>
+          </Link> */}
         </div>
 
-        <div className="overflow-hidden mb-8 [mask-image:linear-gradient(45deg,transparent_15%,black_50%,transparent_85%)]">
+        <div className="overflow-hidden mb-5 [mask-image:linear-gradient(45deg,transparent_15%,black_50%,transparent_85%)]">
           <InfiniteMarquee items={marqueeItems} speed={speed} pauseOnHover={true} />
         </div>
 
         <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
           <InfiniteMarquee items={marqueeItems} speed={speed} pauseOnHover={true} reverse={true} />
+        </div>
+
+        <div className="overflow-hidden mt-5 [mask-image:linear-gradient(45deg,transparent_15%,black_50%,transparent_85%)]">
+          <InfiniteMarquee items={marqueeItems} speed={speed} pauseOnHover={true} />
         </div>
       </div>
     </section>

@@ -236,7 +236,7 @@ export default function ProductClient({ product }: Props) {
                 {product.categories?.[0]?.title || "Apparel"}
               </span>
 
-              <h1 className="text-2xl font-semibold leading-tight text-foreground">
+              <h1 className="text-2xl font-semibold leading-tight text-[#111111]">
                 {product.name}
               </h1>
 
@@ -273,7 +273,7 @@ export default function ProductClient({ product }: Props) {
                 ) : (
                   <PriceFormatter
                     amount={effectivePrice}
-                    className="text-2xl font-semibold text-[#8C6227]"
+                    className="text-2xl font-semibold text-[#b8502e]"
                   />
                 )}
               </div>
@@ -310,7 +310,7 @@ export default function ProductClient({ product }: Props) {
                         {product.brand.title}
                       </p>
                     )}
-                    <p className="text-[9px] text-muted-foreground tracking-wider font-mono">
+                    <p className="text-[9px]  text-muted-foreground tracking-wider font-mono">
                       SKU: {displaySku}
                     </p>
                   </div>
@@ -346,7 +346,7 @@ export default function ProductClient({ product }: Props) {
                 {product.colorways && product.colorways.length > 0 && (
                   <div className="mb-6">
                     <div className="mb-2.5">
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#8C6227]">
+                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#b8502e]">
                         Colors
                       </h3>
                       <p className="text-[11px] font-medium text-foreground transition-all duration-150 mt-0.5">
@@ -377,7 +377,7 @@ export default function ProductClient({ product }: Props) {
                 {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-3 max-w-xs">
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#8C6227]">
+                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#b8502e]">
                         Select Size
                       </h3>
                       <Button

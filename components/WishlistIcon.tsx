@@ -78,7 +78,7 @@ const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
       <Heart
         className={cn(
           "w-4.5 h-4.5 transition-colors duration-200",
-          count > 0 ? "fill-red-400 text-red-400" : "text-[#231F20]"
+          count > 0 ? "fill-[#b8502e] text-[#b8502e]" : "text-[#231F20]"
         )}
       />
 
@@ -90,7 +90,7 @@ const WishlistIcon = ({ className, isSignedIn = false }: WishlistIconProps) => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.5, opacity: 0 }}
             transition={{ type: "spring", stiffness: 500, damping: 25 }}
-            className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm"
+            className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#b8502e] text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm"
           >
             {count > 99 ? "99+" : count}
           </motion.span>

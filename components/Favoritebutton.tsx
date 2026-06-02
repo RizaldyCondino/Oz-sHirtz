@@ -120,14 +120,14 @@ const FavoriteButton = ({
         onClick={handleToggle}
         disabled={isPending}
         className={cn(
-          "text-xs uppercase font-semibold rounded-full h-9 cursor-pointer text-black border-neutral-300 hoverEffect hover:border-black/50 hover:text-black whitespace-nowrap transition-colors",
-          favorited && "border-red-400 text-red-500 hover:border-red-500 hover:text-red-600",
+          "text-xs uppercase font-semibold rounded-full h-9 cursor-pointer text-[#b8502e]/90 border-[#b8502e]/20 hover:border-[#b8502e] hoverEffect hover:text-[#b8502e] whitespace-nowrap transition-colors",
+          favorited && "border-[#b8502e] text-[#b8502e] hover:border-[#b8502e]/80 hover:text-[#b8502e]/80",
           className
         )}
       >
         <Heart
           size={size}
-          className={cn("transition-all", favorited ? "fill-red-500 text-red-500" : "text-black")}
+          className={cn("transition-all", favorited ? "fill-[#b8502e] text-[#b8502e]" : "text-[#b8502e]")}
         />
         <span className="ml-1">{favorited ? "Saved" : "Add to Favorite"}</span>
       </Button>
@@ -141,14 +141,14 @@ const FavoriteButton = ({
       onClick={handleToggle}
       disabled={isPending}
       className={cn(
-        "text-xs uppercase font-semibold rounded-full h-9 w-9 p-0 cursor-pointer border-neutral-300 hover-border-black/80 transition-colors",
-        favorited && "border-red-400 hover-border-red-500",
+        "text-xs uppercase font-semibold rounded-full h-9 w-9 p-0 cursor-pointer border-neutral-300 hover:border-black/80 transition-colors",
+        favorited && "border-[#b8502e] hover:border-[#b8502e]/80 text-[#b8502e]",
         className
       )}
     >
       <Heart
         size={size}
-        className={cn("transition-all", favorited ? "fill-red-500 text-red-500" : "text-black")}
+        className={cn("transition-all", favorited ? "fill-[#b8502e] text-[#b8502e]" : "text-black")}
       />
     </Button>
   );
