@@ -12,6 +12,7 @@ import CartIcon from "@/components/CartIcon";
 import WishlistIcon from "@/components/WishlistIcon";
 import type { NavCategory } from "@/sanity/lib/queries/query";
 import { motion } from "motion/react";
+import SearchBar from "@/components/Search";
 
 interface Props {
   navCategories: NavCategory[];
@@ -67,9 +68,9 @@ export default function HeaderClient({
           </button>
 
           {/* Search icon — left on mobile, hidden on desktop (shown in right group instead) */}
-          <button className="lg:hidden hover:opacity-70" aria-label="Search">
-            <Search size={iconSize} />
-          </button>
+          <div className="lg:hidden">
+            <SearchBar align="left" />
+          </div>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-5 text-[10px] uppercase tracking-[0.20em] font-medium">
@@ -77,7 +78,9 @@ export default function HeaderClient({
             <div className="relative group">
               <span
                 className={`py-2 block transition cursor-default ${
-                  pathname.startsWith("/collections") ? "font-bold" : "hover:text-black/70  "
+                  pathname.startsWith("/collections")
+                    ? "font-bold"
+                    : "hover:text-black/70  "
                 }`}
               >
                 Collections
@@ -106,7 +109,11 @@ export default function HeaderClient({
 
             <Link
               href="/category/all"
-              className={pathname === "/category/all" ? "font-bold " : "hover:text-black/70"}
+              className={
+                pathname === "/category/all"
+                  ? "font-bold "
+                  : "hover:text-black/70"
+              }
             >
               Featured
             </Link>
@@ -125,7 +132,8 @@ export default function HeaderClient({
                     <div className="w-52 bg-[#231F20] text-white shadow-xl py-2 rounded-md">
                       {group.items.map((item) => {
                         const itemSlug = normalizeSlug(item);
-                        const isSubActive = pathname === `/category/${group.key}/${itemSlug}`;
+                        const isSubActive =
+                          pathname === `/category/${group.key}/${itemSlug}`;
                         return (
                           <Link
                             key={item}
@@ -163,13 +171,11 @@ export default function HeaderClient({
         {/* Right icons */}
         <div className="flex items-center gap-3">
           {/* Search icon — right on desktop only */}
-          <button className="hidden lg:block hover:opacity-70" aria-label="Search">
-            <Search size={iconSize} />
-          </button>
+          <div className="hidden lg:block">
+            <SearchBar align="right" />
+          </div>
 
-          {isLoaded && (
-            <WishlistIcon isSignedIn={isSignedIn} />
-          )}
+          {isLoaded && <WishlistIcon isSignedIn={isSignedIn} />}
 
           <CartIcon />
 

@@ -151,6 +151,14 @@ export const productType = defineType({
       type: "array",
       of: [{ type: "image", options: { hotspot: true } }],
     }),
+
+    defineField({
+  name: "embedding",
+  title: "Search Embedding",
+  type: "array",
+  of: [{ type: "number" }],
+  hidden: true, // hide from studio UI
+})
   ],
 
   preview: {

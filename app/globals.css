@@ -208,15 +208,6 @@ body {
   }
 }
 
-/* header {
-  background-color: var(--color-bg-dark);
-  color: var(--color-text-dark-mode-primary);
-} */
-
-/* [data-radix-dialog-overlay] {
-  backdrop-filter: none !important;
-  background-color: rgb(0 0 0 / 0.2) !important;
-} */
 
 main {
   background-color: var(--color-bg-main);
