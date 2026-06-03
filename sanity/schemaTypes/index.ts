@@ -11,6 +11,8 @@ import {
   addressType,
   reviewType,
 } from "./others";
+import { HeroSchema } from "./HeroSchema";
+import { homePageType } from "./homePageType";
 
 export const schemaTypes = [
   audienceType,
@@ -19,9 +21,11 @@ export const schemaTypes = [
   categoryType,
   authorType,
   blogCategoryType,
-  productType, // MUST exist here
+  productType, 
   blogType,
   orderType,
   addressType,
   reviewType,
+  HeroSchema,
+  homePageType,
 ];

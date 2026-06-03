@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import InfiniteMarquee from "./InfiniteMarquee";
 
 interface Brand {
@@ -14,7 +13,7 @@ interface Brand {
 }
 
 interface BrandMarqueeProps {
-  title: string;
+  title?: string;
   brands: Brand[];
   speed?: number;
   className?: string;
@@ -31,39 +30,68 @@ export default function BrandMarquee({
   const marqueeItems = brands.map((brand) => ({
     id: brand._id,
     content: (
-      <div className="mx-4 md:mx-8 grayscale hover:grayscale-0 transition-all duration-500 ease-in-out cursor-pointer  hover:opacity-100">
-        {brand.logo ? (
-          <img
-            src={brand.logo}
-            alt={brand.title}
-            className="h-16 md:h-24 w-auto max-h-16 md:max-h-24 object-contain"
-          />
-        ) : (
-          <span className="text-sm md:text-lg font-medium text-neutral-500 whitespace-nowrap px-4 md:px-8">
-            {brand.title}
-          </span>
-        )}
-      </div>
+      <Link
+        href={`/category/all?q=${brand?.title}`}
+        className="group relative mx-6 md:mx-10 flex flex-col items-center justify-center gap-2"
+      >
+        {/* Logo / name */}
+        <div className="relative flex items-center justify-center h-12 md:h-16 transition-all duration-500">
+          {brand.logo ? (
+            <img
+              src={brand.logo}
+              alt={brand.title}
+              className="h-10 md:h-14 w-auto max-w-[120px] md:max-w-[160px] object-contain
+                         grayscale opacity-50
+                         group-hover:grayscale-0 group-hover:opacity-100
+                         transition-all duration-500 ease-out"
+            />
+          ) : (
+            <span
+              className="text-base md:text-xl font-black tracking-[3px] uppercase
+                         text-[#999] group-hover:text-[#111]
+                         transition-colors duration-300"
+            >
+              {brand.title}
+            </span>
+          )}
+        </div>
+
+       
+      </Link>
     ),
   }));
 
   return (
-    <section className={`py-12 bg-[#FAF8F4] ${className}`}>
+    <section className={`relative py-14 bg-[#FAF8F4] overflow-hidden ${className}`}>
+
+      {/* Top rule */}
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
-        <div className="flex items-center justify-between mb-8">
-          {/* <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
-            Brands
-          </h2> */}
-      
+        <div className="flex items-center gap-4 mb-10">
+          <div className="h-px flex-1 bg-[#1C1C1C]/10" />
+          {title && (
+            <span className="text-[10px] tracking-[5px] font-semibold uppercase text-[#999]">
+              {title}
+            </span>
+          )}
+          <div className="h-px flex-1 bg-[#1C1C1C]/10" />
         </div>
+      </div>
 
-        <div className="overflow-hidden mb-5 [mask-image:linear-gradient(10deg,transparent_15%,black_50%,transparent_85%)]">
-          <InfiniteMarquee items={marqueeItems} speed={speed} pauseOnHover={true} />
-        </div>
+      {/* Marquee with edge fade */}
+      <div
+        className="overflow-hidden
+          [mask-image:linear-gradient(to_right,transparent_0%,black_12%,black_88%,transparent_100%)]"
+      >
+        <InfiniteMarquee
+          items={marqueeItems}
+          speed={speed}
+          pauseOnHover={true}
+        />
+      </div>
 
-        
-
-      
+      {/* Bottom rule */}
+      <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20 mt-10">
+        <div className="h-px bg-[#1C1C1C]/10" />
       </div>
     </section>
   );

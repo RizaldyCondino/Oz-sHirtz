@@ -19,6 +19,7 @@ type WishlistItem = {
   name: string;
   price: number;
   image: string | null;
+  secondaryImage?: string | null;   // ← Added support
   slug: string | null;
 };
 
@@ -178,20 +179,39 @@ const WishlistPage = () => {
                       <Trash2 className="w-3.5 h-3.5 text-[#9B6B6B] hover:text-red-500 transition-colors cursor-pointer" />
                     </button>
 
-                    {/* Image */}
+                    {/* Image Area with Secondary Image Support */}
                     <Link href={href} className="block relative w-full aspect-[4/5] bg-[#F5F0EA] overflow-hidden">
+                      {/* Primary Image */}
                       {item.image ? (
                         <Image
                           src={item.image}
                           alt={item.name}
                           fill
                           sizes="(max-width:640px) 100vw, (max-width:1024px) 33vw, 25vw"
-                          className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                          className="object-cover object-center"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <ShoppingBag className="w-10 h-10 text-[#C9BDB0]" />
                         </div>
+                      )}
+
+                      {/* Secondary Image - Subtle 0.2s Transition */}
+                      {item.secondaryImage && (
+                        <motion.div
+                          className="absolute inset-0"
+                          initial={{ opacity: 0 }}
+                          whileHover={{ opacity: 1 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                        >
+                          <Image
+                            src={item.secondaryImage}
+                            alt={`${item.name} alternate`}
+                            fill
+                            sizes="(max-width:640px) 100vw, (max-width:1024px) 33vw, 25vw"
+                            className="object-cover object-center"
+                          />
+                        </motion.div>
                       )}
                     </Link>
 

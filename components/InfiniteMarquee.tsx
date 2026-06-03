@@ -36,7 +36,7 @@ export default function InfiniteMarquee({
           }
         >
           {/* Spread items twice to create the seamless loop */}
-          {[...items, ...items].map((item, index) => (
+          {[...items, ...items, ...items, ...items].map((item, index) => (
             <div
               key={`${item.id}-${index}`}
               className="mx-3 shrink-0 flex items-center justify-center rounded-sm border border-transparent bg-white p-2 shadow-sm ring-1 shadow-black/15 ring-black/5 dark:bg-neutral-900"

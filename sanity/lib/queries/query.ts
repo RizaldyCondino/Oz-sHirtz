@@ -543,6 +543,49 @@ export const HOMEPAGE_QUERY = groq`
     }
   }
 `;
+// sanity/lib/queries.ts
+import { defineQuery } from 'next-sanity'
+
+export const homePageQuery = defineQuery(`
+  *[_type == "homePage" && _id == "homePage"][0] {
+    hero {
+      campaignLabel,
+      headline,
+      subheadline,
+      ctas[] {
+        _key,
+        label,
+        url,
+        style,
+        openInNewTab
+      },
+      backgroundType,
+      backgroundImage {
+        asset,
+        alt,
+        hotspot,
+        mobileImage { asset, hotspot }
+      },
+      backgroundVideo {
+        videoFile { asset-> { url } },
+        posterImage { asset, alt, hotspot },
+        disableOnMobile
+      },
+      overlayOpacity,
+      productImage {
+        asset,
+        alt,
+        hotspot,
+        position
+      },
+      textPosition,
+      textTheme,
+      aspectRatio,
+      ariaLabel
+    }
+  }
+`);
+
 
 export async function getCollectionsForNav(): Promise<CollectionNavItem[]> {
   const result = await sanityFetch({ query: ALL_COLLECTIONS_QUERY });

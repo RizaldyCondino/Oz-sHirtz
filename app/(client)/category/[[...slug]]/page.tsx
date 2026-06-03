@@ -13,7 +13,7 @@ import { menuCategories, saleSubCategories } from "@/constants/data";
 import NoProductAvailable from "@/components/NoProductAvailable";
 
 // ── Constants ──────────────────────────────────────────────
-const PRODUCTS_PER_PAGE = 6;
+const PRODUCTS_PER_PAGE = 8;
 
 // ── Types ──────────────────────────────────────────────────
 interface PageProps {

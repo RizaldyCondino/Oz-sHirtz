@@ -122,12 +122,12 @@ export default function SearchBar({
             exit={{ opacity: 0, scale: 0.95, y: -8 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             style={{ originX: align === "left" ? 0 : 1, originY: 0 }}
-            className={`absolute ${align === "left" ? "left-0" : "right-0"} top-8 w-[300px] lg:w-[500px] max-w-[calc(100vw-2rem)] bg-[#FAF8F4] border border-[#e5e1da] rounded-xl z-50 overflow-hidden shadow-sm`}
+            className={`absolute ${align === "left" ? "left-0" : "right-0"} top-8 w-[300px] lg:w-[450px] max-w-[calc(100vw-2rem)] bg-[#FAF8F4] border border-[#e5e1da] rounded-xl z-50 overflow-hidden shadow-sm`}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 lg:px-5 py-3 border-b border-[#e5e1da]">
               <span className="text-[10px] lg:text-[11px] font-bold uppercase tracking-widest text-[#b8502e] flex items-center gap-1.5">
-                <TbSparkles size={11} />
+                {/* <TbSparkles size={11} /> */}
                 Search
               </span>
               <button onClick={handleClose} aria-label="Close search">

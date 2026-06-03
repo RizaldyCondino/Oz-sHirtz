@@ -88,8 +88,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const activePrice = activeColorway?.price ?? price;
   const activeDiscount = activeColorway?.discount ?? discount;
   const activeSizes = activeColorway?.sizes ?? sizes;
-  const activeImage =
+
+  const primaryImage =
     activeColorway?.images?.[0]?.asset?.url ?? image ?? "/placeholder.jpg";
+
+  const secondaryImage = activeColorway?.images?.[1]?.asset?.url;
 
   const hasStockData = activeSizes.some((size) => typeof size.stock === "number");
   const totalStock = activeSizes.reduce((acc, curr) => acc + (curr.stock ?? 0), 0);
@@ -106,21 +109,42 @@ const ProductCard: React.FC<ProductCardProps> = ({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`group relative w-full bg-[#FAF8F7] rounded-md border  border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
+      className={`group relative w-full bg-[#FAF8F7] rounded-md border border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
     >
-      {/* Image Area - Updated background to white */}
+      {/* Image Area */}
       <div className="relative w-full aspect-[4/5] bg-white overflow-hidden">
         <Link
           href={isGlobalSoldOut ? "#" : href}
           className="block w-full h-full relative cursor-pointer"
         >
+          {/* Primary Image */}
           <Image
-            src={activeImage}
+            src={primaryImage}
             alt={title}
             fill
             sizes="(max-width:768px) 50vw, 25vw"
-            className="object-cover object-center group-hover:scale-105 transition duration-500"
+            className="object-cover object-center"
+            priority={false}
           />
+
+          {/* Secondary Image - Subtle & Quick Transition */}
+          {secondaryImage && (
+            <motion.div
+              className="absolute inset-0"
+              initial={{ opacity: 0 }}
+              whileHover={{ opacity: 1 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}   // ← Short & natural
+            >
+              <Image
+                src={secondaryImage}
+                alt={`${title} alternate`}
+                fill
+                sizes="(max-width:768px) 50vw, 25vw"
+                className="object-cover object-center"
+              />
+            </motion.div>
+          )}
+
           {isGlobalSoldOut && (
             <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white uppercase tracking-[0.2em] text-sm z-10">
               Sold Out

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import PriceFormatter from "./PriceFormatter";
 
 interface ImageType {
@@ -35,100 +36,110 @@ export default function FeaturedProducts({
 }) {
   return (
     <section className="py-5 bg-[#FAF8F4] w-full">
-      <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
-            {title}
-          </h2>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 px-4 sm:px-6 lg:px-10">
+        <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
+          {title}
+        </h2>
+        <Link
+          href="/category/all"
+          className="text-[11px] uppercase tracking-widest font-semibold text-black flex items-center gap-1 hover:text-[#b8502e]"
+        >
+          View All <ArrowRight size={12} />
+        </Link>
+      </div>
 
-          <Link
-            href="/category/all"
-            className="text-[11px] uppercase tracking-widest font-semibold text-black  flex items-center gap-1 hover:text-[#111111] transition"
-          >
-            View All <ArrowRight size={12} />
-          </Link>
-        </div>
-
-        {/* Products Grid - Drops grid-cols-2 for 3-columns early on small-screens */}
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
-          {products.map((product) => {
-            const displayImage =
-              product.colorways?.[0]?.images?.[0]?.url ||
-              product.images?.[0]?.url;
-
-            const hasDiscount = !!product.discount && product.discount > 0;
-            const discountedPrice = hasDiscount
-              ? product.price * (1 - product.discount / 100)
-              : product.price;
-
-            const brandName =
-              typeof product.brand === "string"
-                ? product.brand
-                : product.brand?.title || "";
-
-            return (
-              <div key={product._id} className="block">
-                {/* Product Link */}
-                <Link
-                  href={`/product/${product.slug?.current}`}
-                  className="block"
-                >
-                  <div className="aspect-[3/4] bg-neutral-100 overflow-hidden mb-3 relative rounded-md">
-                    {displayImage ? (
-                      <img
-                        src={displayImage}
-                        alt={product.name}
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-neutral-400">
-                        No Image
-                      </div>
-                    )}
-
-                    {/* Discount Badge - Top Left */}
-                    {hasDiscount && (
-                      <div className="absolute top-2 left-2 bg-black text-white text-[10px] px-2 py-1 rounded-full font-medium z-10">
-                        -{product.discount}%
-                      </div>
-                    )}
-
-                    {/* Brand Name - Top Right */}
-                    {brandName && (
-                      <div className="absolute top-2 right-2 text-[#b8502e] text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded z-10">
-                        {brandName}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Product Name */}
-                  <h3 className="text-[12px] font-medium text-neutral-900 truncate">
-                    {product.name}
-                  </h3>
-                </Link>
-
-               
-
-                {/* Price */}
-                {/* <div className="mt-2 flex items-center gap-2">
-                  <PriceFormatter
-                    amount={discountedPrice}
-                    className="text-[12px] font-bold text-[#b8502e]"
-                  />
-
-                  {hasDiscount && (
-                    <PriceFormatter
-                      amount={product.price}
-                      className="text-[11px] text-neutral-400 line-through"
-                    />
-                  )}
-                </div> */}
-              </div>
-            );
-          })}
-        </div>
+      {/* Full-width 3-column grid */}
+      <div className="grid grid-cols-2 gap-[2px]">
+        {products.slice(0, 3).map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
       </div>
     </section>
+  );
+}
+
+function ProductCard({ product }: { product: Product }) {
+  const primaryImage =
+    product.colorways?.[0]?.images?.[0]?.url || product.images?.[0]?.url;
+  const secondaryImage =
+    product.colorways?.[0]?.images?.[1]?.url || product.images?.[1]?.url;
+
+  const hasDiscount = !!product.discount && product.discount > 0;
+  const discountedPrice = hasDiscount
+    ? product.price * (1 - (product.discount ?? 0) / 100)
+    : product.price;
+
+  const brandName =
+    typeof product.brand === "string"
+      ? product.brand
+      : product.brand?.title || "";
+
+  return (
+    <Link
+      href={`/product/${product.slug?.current}`}
+      className="group block relative bg-neutral-100 overflow-hidden"
+    >
+      {/* Image container */}
+      <div className="aspect-[3/4] relative overflow-hidden">
+        {/* Primary Image */}
+        {primaryImage ? (
+          <img
+            src={primaryImage}
+            alt={product.name}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-xs text-neutral-400">
+            No Image
+          </div>
+        )}
+
+        {/* Secondary Image - Subtle Quick Transition */}
+        {secondaryImage && (
+          <motion.img
+            src={secondaryImage}
+            alt={`${product.name} alternate`}
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0 }}
+            whileHover={{ opacity: 1 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          />
+        )}
+
+        {/* Discount badge */}
+        {hasDiscount && (
+          <div className="absolute top-2 left-2 bg-black text-white text-[9px] px-2 py-1 font-semibold tracking-widest uppercase z-10">
+            -{product.discount}%
+          </div>
+        )}
+
+        {/* Brand badge */}
+        {/* {brandName && (
+          <div className="absolute top-2 right-2 text-[#b8502e] text-[9px] uppercase tracking-widest font-bold z-10">
+            {brandName}
+          </div>
+        )} */}
+
+        {/* Bottom info bar */}
+        <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm px-3 py-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <p className="text-[11px] font-medium text-neutral-900 truncate mb-1">
+            {product.name}
+          </p>
+          <div className="flex items-center gap-2">
+            <PriceFormatter
+              amount={discountedPrice}
+              className="text-[12px] font-bold text-[#b8502e]"
+            />
+            {hasDiscount && (
+              <PriceFormatter
+                amount={product.price}
+                className="text-[11px] text-neutral-400 line-through"
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
