@@ -70,9 +70,7 @@ export default function BrandMarquee({
           <InfiniteMarquee items={marqueeItems} speed={speed} pauseOnHover={true} reverse={true} />
         </div>
 
-        <div className="overflow-hidden mt-5 [mask-image:linear-gradient(45deg,transparent_15%,black_50%,transparent_85%)]">
-          <InfiniteMarquee items={marqueeItems} speed={speed} pauseOnHover={true} />
-        </div>
+      
       </div>
     </section>
   );

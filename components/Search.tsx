@@ -356,7 +356,7 @@ export default function SearchBar({
                   {results.length} result{results.length !== 1 ? "s" : ""}
                 </span>
                 <Link
-                  href={`/search?q=${encodeURIComponent(query)}`}
+                  href={`/category/all?q=${encodeURIComponent(query)}`}
                   onClick={handleClose}
                   className="text-[9px] font-bold uppercase tracking-widest text-[#b8502e] hover:underline underline-offset-2"
                 >

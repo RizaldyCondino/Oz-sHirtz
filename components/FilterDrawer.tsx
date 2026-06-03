@@ -53,10 +53,7 @@ export default function FilterDrawer({
   const isShoesCategory = ["shoes", "sneakers", "footwear", "slides", "boots", "sandals"].some(
     (item) => lowerPath.includes(item)
   );
-  // const isAllCategory = lowerPath.includes("/all");
-  // const isMenAll = lowerPath.includes("/men/all");
-  // const isWomenAll = lowerPath.includes("/women/all");
-  // const showBoth = isAllCategory || isMenAll || isWomenAll;
+
   const showBoth = lowerPath.includes("/all");
 
   const apparelSizes = availableSizes
@@ -126,7 +123,10 @@ export default function FilterDrawer({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-md p-0 flex flex-col overflow-hidden"
+        // CHANGED: Removed 'w-full'. Added 'w-[85vw]' (85% of screen width) for mobile,
+        // and kept 'sm:max-w-md' for desktop to maintain original design.
+        // Also added 'h-full' to ensure the sheet takes full height but not full width.
+        className="w-[85vw] sm:max-w-md p-0 flex flex-col overflow-hidden h-full"
       >
         {/* Header */}
         <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex-shrink-0">
@@ -293,13 +293,12 @@ export default function FilterDrawer({
                         onKeyDown={(e) =>
                           e.key === "Enter" && applyPriceRange(minPriceInput, maxPriceInput)
                         }
-                        className="text-xs sm:text-sm w-26"
+                        className="text-xs sm:text-sm" // Removed fixed width w-26 to let flex-1 handle it
                       />
                     </div>
                     <span className="text-muted-foreground text-xs">-</span>
                     <div className="flex-1">
                       <Input
-                        
                         type="number"
                         placeholder="Max"
                         value={maxPriceInput}
@@ -308,7 +307,7 @@ export default function FilterDrawer({
                         onKeyDown={(e) =>
                           e.key === "Enter" && applyPriceRange(minPriceInput, maxPriceInput)
                         }
-                        className="text-xs sm:text-sm w-26"
+                        className="text-xs sm:text-sm" // Removed fixed width w-26 to let flex-1 handle it
                       />
                     </div>
                   </div>
@@ -319,7 +318,7 @@ export default function FilterDrawer({
         </div>
 
         {/* Sticky Footer */}
-        <div className="flex-shrink-0 border-t px-5 sm:px-6 py-4 bg-background">
+        <div className="flex-shrink-0  px-5 sm:px-6 py-4 bg-background">
           <SheetFooter>
             <Button 
               className="w-full text-sm sm:text-base font-medium cursor-pointer" 

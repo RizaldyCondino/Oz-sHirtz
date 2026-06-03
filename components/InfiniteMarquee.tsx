@@ -17,7 +17,7 @@ interface InfiniteMarqueeProps {
 
 export default function InfiniteMarquee({
   items,
-  speed = 25,
+  speed = 35,
   pauseOnHover = true,
   reverse = false,
   className = "",

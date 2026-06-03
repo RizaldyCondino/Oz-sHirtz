@@ -224,7 +224,7 @@ export async function getProductsForCategory(
   subSlug: string
 ): Promise<Product[]> {
   const isSale = mainSlug === "sale";
-  const isAll = mainSlug === "all";
+  const isAll = mainSlug === "" || mainSlug === "all"; 
 
   if (isAll) {
     return fetchAllProductsCached();

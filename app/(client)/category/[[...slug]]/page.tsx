@@ -1,6 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { getProductsForCategory, type Product } from "@/sanity/lib/queries/query";
+import {
+  getProductsForCategory,
+  type Product,
+} from "@/sanity/lib/queries/query";
 import FilterControl from "@/components/FilterControl";
 import PaginationWrapper from "@/components/PaginationWrapper";
 import ProductCard from "@/components/ProductCardProps";
@@ -25,7 +28,7 @@ function toArray(param: string | string[] | undefined): string[] {
 }
 
 function normalizeSlug(
-  slug: { _type?: string; current: string } | string | undefined | null
+  slug: { _type?: string; current: string } | string | undefined | null,
 ): string {
   if (!slug) return "";
   const raw = typeof slug === "object" ? (slug.current ?? "") : slug;
@@ -53,7 +56,10 @@ function getProductBrandSlug(product: Product): string {
   if (typeof product.brand === "object" && product.brand?.slug) {
     return normalizeSlug(product.brand.slug);
   }
-  return getProductBrandTitle(product).toLowerCase().trim().replaceAll(" ", "-");
+  return getProductBrandTitle(product)
+    .toLowerCase()
+    .trim()
+    .replaceAll(" ", "-");
 }
 
 function getProductCategories(product: Product): string[] {
@@ -61,7 +67,7 @@ function getProductCategories(product: Product): string[] {
     .map((cat) => {
       if (!cat?.slug) return "";
       return normalizeSlug(
-        typeof cat.slug === "object" ? cat.slug.current : cat.slug
+        typeof cat.slug === "object" ? cat.slug.current : cat.slug,
       );
     })
     .filter(Boolean);
@@ -98,7 +104,7 @@ function getCategoryAliases(audience: string, category: string): Set<string> {
 
 function hasCategoryMatch(
   productCategories: string[],
-  categoryAliases: Set<string>
+  categoryAliases: Set<string>,
 ): boolean {
   return productCategories.some((category) => categoryAliases.has(category));
 }
@@ -110,32 +116,49 @@ function getProductSizes(product: Product): Set<string> {
       if (s?.size && s.stock > 0) {
         sizes.add(s.size.toLowerCase().trim());
       }
-    })
+    }),
   );
   return sizes;
 }
 
 // ── Component ──────────────────────────────────────────────
-export default async function CategoryPage({ params, searchParams }: PageProps) {
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { slug: slugParam } = await params;
   const resolvedSearch = (await searchParams) ?? {};
+
+  const searchQuery =
+    typeof resolvedSearch.q === "string"
+      ? resolvedSearch.q.toLowerCase().trim()
+      : "";
 
   const slugArray = Array.isArray(slugParam)
     ? slugParam
     : slugParam
-    ? [slugParam]
-    : [];
+      ? [slugParam]
+      : [];
 
   const mainSlug = normalizeSlug(slugArray[0] || "all");
   const subSlug = normalizeSlug(slugArray[1] || "");
   const isSalePage = mainSlug === "sale";
   const isAllPage = mainSlug === "all";
 
-  const activeSizes = toArray(resolvedSearch.size).map((s) => s.toLowerCase().trim());
-  const activeGenders = toArray(resolvedSearch.gender).map((g) => g.toLowerCase().trim());
-  const activeBrands = toArray(resolvedSearch.brand).map((b) => b.toLowerCase().trim());
-  const activeTypes = toArray(resolvedSearch.type).map((t) => t.toLowerCase().trim());
-  const sortBy = typeof resolvedSearch.sort === "string" ? resolvedSearch.sort : "";
+  const activeSizes = toArray(resolvedSearch.size).map((s) =>
+    s.toLowerCase().trim(),
+  );
+  const activeGenders = toArray(resolvedSearch.gender).map((g) =>
+    g.toLowerCase().trim(),
+  );
+  const activeBrands = toArray(resolvedSearch.brand).map((b) =>
+    b.toLowerCase().trim(),
+  );
+  const activeTypes = toArray(resolvedSearch.type).map((t) =>
+    t.toLowerCase().trim(),
+  );
+  const sortBy =
+    typeof resolvedSearch.sort === "string" ? resolvedSearch.sort : "";
   const currentPage = Number(resolvedSearch.page || 1);
   const minPrice = Number(resolvedSearch.minPrice || 0);
   const maxPrice = Number(resolvedSearch.maxPrice || 999999999);
@@ -143,11 +166,16 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const isDebug = resolvedSearch.debug === "1";
 
   // ── Targeted fetch — only loads products relevant to this page ──
-  const products = await getProductsForCategory(mainSlug, subSlug);
+  const products = await getProductsForCategory(
+    isAllPage ? "" : mainSlug,
+    subSlug,
+  );
 
   // ── Available Filters ─────────────────────────────────────
   const availableBrands = Array.from(
-    new Set(products.map((p: Product) => getProductBrandSlug(p)).filter(Boolean))
+    new Set(
+      products.map((p: Product) => getProductBrandSlug(p)).filter(Boolean),
+    ),
   ).sort((a, b) => a.localeCompare(b));
 
   const availableSizesWithStock = Array.from(
@@ -156,12 +184,12 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         (product.colorways || []).flatMap((cw) =>
           (cw.sizes || [])
             .filter((s) => s?.size && s.stock > 0)
-            .map((s) => s.size.toUpperCase().trim())
-        )
-      )
-    )
+            .map((s) => s.size.toUpperCase().trim()),
+        ),
+      ),
+    ),
   ).sort((a, b) =>
-    a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
+    a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }),
   );
 
   // ── Client-side filters (brand, size, price, type, gender) ──
@@ -173,12 +201,11 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     if (activeGenders.length > 0 && !activeGenders.includes(audience))
       return false;
 
-    if (activeBrands.length > 0 && !activeBrands.includes(brand))
-      return false;
+    if (activeBrands.length > 0 && !activeBrands.includes(brand)) return false;
 
     if (activeTypes.length > 0) {
       const activeTypeAliases = activeTypes.flatMap((type) =>
-        Array.from(getCategoryAliases(audience, type))
+        Array.from(getCategoryAliases(audience, type)),
       );
       if (!categories.some((c) => activeTypeAliases.includes(c))) return false;
     }
@@ -190,6 +217,20 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
     const price = Number(product.price || 0);
     if (price < minPrice || price > maxPrice) return false;
+
+    // Remove the SEARCH_PRODUCTS_QUERY import entirely from the top
+    // Then in the filter:
+    if (searchQuery) {
+      const name = (product.name || "").toLowerCase();
+      const brand = getProductBrandTitle(product).toLowerCase();
+      const cats = getProductCategories(product).join(" ");
+      if (
+        !name.includes(searchQuery) &&
+        !brand.includes(searchQuery) &&
+        !cats.includes(searchQuery)
+      )
+        return false;
+    }
 
     return true;
   });
@@ -206,7 +247,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const safePage = Math.min(Math.max(currentPage, 1), totalPages || 1);
   const paginatedProducts = filteredProducts.slice(
     (safePage - 1) * PRODUCTS_PER_PAGE,
-    safePage * PRODUCTS_PER_PAGE
+    safePage * PRODUCTS_PER_PAGE,
   );
 
   const activeBadge =
@@ -216,14 +257,13 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
   return (
     <section className="bg-[#FAF8F4] min-h-screen">
-
       {/* ── Debug panel ────────── */}
       {isDebug && (
         <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-4 text-xs font-mono text-yellow-900 space-y-2">
           <p className="font-bold">
             DEBUG — mainSlug: <code>{mainSlug}</code> / subSlug:{" "}
-            <code>{subSlug}</code> / fetched: {products.length} / after
-            filters: {filteredProducts.length}
+            <code>{subSlug}</code> / fetched: {products.length} / after filters:{" "}
+            {filteredProducts.length}
           </p>
           <details>
             <summary className="cursor-pointer font-semibold">
@@ -247,15 +287,22 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         <StickyNavBar>
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 text-[9px] sm:text-[10px] uppercase tracking-[0.18em]">
-              <Link href="/category/sale" className="font-semibold mr-2 text-[#8C6227]">
+              <Link
+                href="/category/sale"
+                className="font-semibold mr-2 text-[#8C6227]"
+              >
                 SALE
               </Link>
               <Link href="/category/sale">
-                <Badge className={!subSlug ? activeBadge : inactiveBadge}>ALL</Badge>
+                <Badge className={!subSlug ? activeBadge : inactiveBadge}>
+                  ALL
+                </Badge>
               </Link>
               {saleSubCategories.map((cat) => (
                 <Link key={cat} href={`/category/sale/${cat}`}>
-                  <Badge className={subSlug === cat ? activeBadge : inactiveBadge}>
+                  <Badge
+                    className={subSlug === cat ? activeBadge : inactiveBadge}
+                  >
                     {cat.replace("-", " ").toUpperCase()}
                   </Badge>
                 </Link>
@@ -276,26 +323,35 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           if (mainSlug !== group.key) return null;
           return (
             <StickyNavBar key={group.key}>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2 text-[9px] sm:text-[10px] uppercase tracking-[0.18em]">
+              <div className="flex flex-col lg:flex-row lg:items-center  lg:justify-between gap-3">
+                <div className="flex  flex-wrap items-center gap-2 text-[9px] sm:text-[10px] uppercase tracking-[0.18em]  ">
                   <Link href={`/category/${group.key}`}>
                     <span className="font-semibold mr-2 text-[#b8502e] hover:text-[#111111]">
                       {group.label}
                     </span>
                   </Link>
                   <Link href={`/category/${group.key}`}>
-                    <Badge className={!subSlug ? activeBadge : inactiveBadge}>ALL</Badge>
+                    <Badge className={!subSlug ? activeBadge : inactiveBadge}>
+                      ALL
+                    </Badge>
                   </Link>
-                  {group.items.map((item) => {
-                    const itemSlug = normalizeSlug(item);
-                    return (
-                      <Link key={item} href={`/category/${group.key}/${itemSlug}`}>
-                        <Badge className={itemSlug === subSlug ? activeBadge : inactiveBadge}>
-                          {item.toUpperCase()}
-                        </Badge>
-                      </Link>
-                    );
-                  })}
+                  {group.items.map((item, index) => {
+  const itemSlug = normalizeSlug(item);
+  // 'hidden' by default on mobile (index > 3), 'flex' on lg screens
+  const visibilityClass = index > 3 ? "hidden lg:flex" : "flex";
+
+  return (
+    <Link
+      key={item}
+      href={`/category/${group.key}/${itemSlug}`}
+      className={visibilityClass} // Apply visibility logic here
+    >
+      <Badge className={itemSlug === subSlug ? activeBadge : inactiveBadge}>
+        {item.toUpperCase()}
+      </Badge>
+    </Link>
+  );
+})}
                 </div>
                 <FilterControl
                   availableBrands={availableBrands}
@@ -309,11 +365,30 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
       {/* ── All Products Nav ──────────────────────────────── */}
       {isAllPage && (
         <StickyNavBar>
-          <div className="flex justify-end">
-            <FilterControl
-              availableBrands={availableBrands}
-              availableSizes={availableSizesWithStock}
-            />
+          <div className="flex items-center justify-between w-full ">
+            {/* Search Results Section (Shows only when searching) */}
+            {searchQuery ? (
+              <div className="md:px-6 lg:px-1 ">
+                <h1 className="flex items-center gap-2 text-[12px] font-medium tracking-wider hoverEffect text-[#b8502e] uppercase border-none">
+                   "{searchQuery}"
+                  <span className="text-[9px] font-normal text-neutral-500 ml-2">
+                    {filteredProducts.length} product
+                    {filteredProducts.length !== 1 ? "s" : ""}
+                  </span>
+                </h1>
+              </div>
+            ) : (
+              /* Empty div to maintain spacing when not searching */
+              <div />
+            )}
+
+            {/* Filter Control Section (Always visible) */}
+            <div className="flex justify-end">
+              <FilterControl
+                availableBrands={availableBrands}
+                availableSizes={availableSizesWithStock}
+              />
+            </div>
           </div>
         </StickyNavBar>
       )}
@@ -345,12 +420,18 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
             {totalPages > 1 && (
               <div className="mt-16">
-                <PaginationWrapper currentPage={safePage} totalPages={totalPages} />
+                <PaginationWrapper
+                  currentPage={safePage}
+                  totalPages={totalPages}
+                />
               </div>
             )}
           </>
         ) : (
-          <NoProductAvailable selectedTab={subSlug || mainSlug} subSlug={subSlug} />
+          <NoProductAvailable
+            selectedTab={subSlug || mainSlug}
+            subSlug={subSlug}
+          />
         )}
       </div>
     </section>
