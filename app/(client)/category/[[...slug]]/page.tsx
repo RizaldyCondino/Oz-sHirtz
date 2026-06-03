@@ -394,10 +394,10 @@ export default async function CategoryPage({
       )}
 
       {/* ── Product Grid ──────────────────────────────────── */}
-      <div className="w-full px-4 md:px-6 lg:px-8 pt-3 pb-10">
+      <div className="w-full px-4 md:px-6 lg:px-8 pt-3 pb-4">
         {paginatedProducts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 sm:gap-x-6 gap-y-10 sm:gap-y-14">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-5 gap-y-10 sm:gap-y-14">
               {paginatedProducts.map((product: Product) => (
                 <ProductCard
                   isLoading={false}
@@ -419,7 +419,7 @@ export default async function CategoryPage({
             </div>
 
             {totalPages > 1 && (
-              <div className="mt-16">
+              <div className="mt-5">
                 <PaginationWrapper
                   currentPage={safePage}
                   totalPages={totalPages}

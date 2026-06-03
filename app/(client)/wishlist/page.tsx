@@ -73,7 +73,7 @@ const WishlistPage = () => {
     <div className="min-h-screen bg-[#F9F7F4]">
       {/* Header */}
       <div className="">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center gap-3 mb-2">
             <Heart className="w-6 h-6 text-[#b8502e] fill-[#b8502e]" />
             <h1 className="text-2xl font-bold tracking-tight text-[#231F20]">
@@ -90,7 +90,7 @@ const WishlistPage = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 ">
         {/* Back button */}
         <button
           onClick={() => router.back()}
@@ -102,7 +102,7 @@ const WishlistPage = () => {
 
         {/* Loading skeleton */}
         {loading && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
@@ -148,7 +148,7 @@ const WishlistPage = () => {
         {!loading && items.length > 0 && (
           <motion.div
             layout
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4"
           >
             <AnimatePresence mode="popLayout">
               {items.map((item) => {
@@ -185,7 +185,7 @@ const WishlistPage = () => {
                           src={item.image}
                           alt={item.name}
                           fill
-                          sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+                          sizes="(max-width:640px) 100vw, (max-width:1024px) 33vw, 25vw"
                           className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (

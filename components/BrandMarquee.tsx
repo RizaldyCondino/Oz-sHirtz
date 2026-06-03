@@ -23,7 +23,7 @@ interface BrandMarqueeProps {
 export default function BrandMarquee({
   title,
   brands = [],
-  speed = 25,
+  speed = 35,
   className = "",
 }: BrandMarqueeProps) {
   if (brands.length === 0) return null;
@@ -31,7 +31,7 @@ export default function BrandMarquee({
   const marqueeItems = brands.map((brand) => ({
     id: brand._id,
     content: (
-      <div className="mx-4 md:mx-8 grayscale hover:grayscale-0 transition-all duration-500 ease-in-out cursor-pointer opacity-70 hover:opacity-100">
+      <div className="mx-4 md:mx-8 grayscale hover:grayscale-0 transition-all duration-500 ease-in-out cursor-pointer  hover:opacity-100">
         {brand.logo ? (
           <img
             src={brand.logo}
@@ -51,24 +51,17 @@ export default function BrandMarquee({
     <section className={`py-12 bg-[#FAF8F4] ${className}`}>
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
+          {/* <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
             Brands
-          </h2>
-          {/* <Link
-            href="/brands"
-            className="text-[11px] uppercase tracking-widest font-semibold text-black  flex items-center gap-1 hover:text-[#111111] transition"
-          >
-            All Brands <ArrowRight size={14} />
-          </Link> */}
+          </h2> */}
+      
         </div>
 
-        <div className="overflow-hidden mb-5 [mask-image:linear-gradient(45deg,transparent_15%,black_50%,transparent_85%)]">
+        <div className="overflow-hidden mb-5 [mask-image:linear-gradient(10deg,transparent_15%,black_50%,transparent_85%)]">
           <InfiniteMarquee items={marqueeItems} speed={speed} pauseOnHover={true} />
         </div>
 
-        {/* <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
-          <InfiniteMarquee items={marqueeItems} speed={speed} pauseOnHover={true} reverse={true} />
-        </div> */}
+        
 
       
       </div>

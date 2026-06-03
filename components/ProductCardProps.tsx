@@ -106,7 +106,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`group relative w-full bg-white rounded-md border border-gray-100 overflow-hidden shadow-xs hover:shadow-md transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
+      className={`group relative w-full bg-[#FAF8F7] rounded-md border  border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
     >
       {/* Image Area - Updated background to white */}
       <div className="relative w-full aspect-[4/5] bg-white overflow-hidden">
@@ -131,7 +131,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       <div className="p-4 flex flex-col gap-3">
         <Link href={isGlobalSoldOut ? "#" : href} className="cursor-pointer">
-          <h3 className="text-[14px] tracking-wider font-semibold text-[#231F20] truncate">
+          <h3 className="text-[12px] tracking-wide uppercase font-medium text-[#231F20] truncate">
             {title}
           </h3>
         </Link>
@@ -155,7 +155,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           ) : (
             <PriceFormatter
               amount={activePrice}
-              className="text-[16px] text-[#b8502e] "
+              className="text-[14px] text-[#b8502e] "
             />
           )}
         </div>

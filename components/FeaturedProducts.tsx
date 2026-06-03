@@ -111,7 +111,7 @@ export default function FeaturedProducts({
                
 
                 {/* Price */}
-                <div className="mt-2 flex items-center gap-2">
+                {/* <div className="mt-2 flex items-center gap-2">
                   <PriceFormatter
                     amount={discountedPrice}
                     className="text-[12px] font-bold text-[#b8502e]"
@@ -123,7 +123,7 @@ export default function FeaturedProducts({
                       className="text-[11px] text-neutral-400 line-through"
                     />
                   )}
-                </div>
+                </div> */}
               </div>
             );
           })}
