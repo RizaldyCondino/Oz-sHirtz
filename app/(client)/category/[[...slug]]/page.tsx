@@ -369,8 +369,8 @@ export default async function CategoryPage({
             {/* Search Results Section (Shows only when searching) */}
             {searchQuery ? (
               <div className="md:px-6 lg:px-1 ">
-                <h1 className="flex items-center gap-2 text-[12px] font-medium tracking-wider hoverEffect text-[#b8502e] uppercase border-none">
-                   "{searchQuery}"
+                <h1 className="flex items-center gap-2 text-[12px] font-bold tracking-wider hoverEffect text-[#b8502e] uppercase border-none">
+                  <span className="text-[9px] text-black font-medium">search result:</span> "{searchQuery}"
                   <span className="text-[9px] font-normal text-neutral-500 ml-2">
                     {filteredProducts.length} product
                     {filteredProducts.length !== 1 ? "s" : ""}
