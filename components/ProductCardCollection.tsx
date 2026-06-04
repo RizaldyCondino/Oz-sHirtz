@@ -27,7 +27,7 @@ interface Colorway {
   sizes?: SanitySizeObject[];
 }
 
-type ProductCardProps = {
+type ProductCardCollection = {
   title: string;
   price: number;
   discount?: number;
@@ -40,7 +40,7 @@ type ProductCardProps = {
   isLoading?: boolean;
 };
 
-const ProductCard: React.FC<ProductCardProps> = ({
+const ProductCardCollection: React.FC<ProductCardCollection> = ({
   title,
   price,
   discount,
@@ -109,13 +109,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`group relative w-full bg-[#FAF8F7] rounded-md border border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
+      className={`group relative w-full h-[420px] bg-[#FAF8F7] rounded-md border border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
     >
       {/* Image Area */}
       <div 
        onContextMenu={(e) => e.preventDefault()}
               onDragStart={(e) => e.preventDefault()}
-      className="relative w-full aspect-[4/5] bg-white overflow-hidden">
+      className="relative w-full aspect-[4.5/5] bg-white overflow-hidden">
         <Link
           href={isGlobalSoldOut ? "#" : href}
           className="block w-full h-full relative cursor-pointer"
@@ -191,4 +191,4 @@ const ProductCard: React.FC<ProductCardProps> = ({
   );
 };
 
-export default ProductCard;
+export default ProductCardCollection;

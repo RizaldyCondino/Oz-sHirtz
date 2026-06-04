@@ -4,7 +4,9 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import ProductCardCollection from "./ProductCardCollection";
+
+// ← Import ProductCard
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -21,9 +23,15 @@ interface GalleryImage {
 }
 
 type TextPosition =
-  | "top-left"    | "top-center"    | "top-right"
-  | "middle-left" | "middle-center" | "middle-right"
-  | "bottom-left" | "bottom-center" | "bottom-right";
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "middle-left"
+  | "middle-center"
+  | "middle-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right";
 
 type TextAlign = "left" | "center" | "right";
 
@@ -43,36 +51,47 @@ interface CollectionData {
   textAlign?: TextAlign;
 }
 
+// Updated Props to accept products
 interface CollectionClientProps {
   collection: CollectionData;
-  products?: unknown[];
+  products?: any[]; // You can type this better later
 }
 
 // ─── Position → Tailwind map ──────────────────────────────────────────────────
 
 const POSITION_CLASSES: Record<TextPosition, string> = {
-  "top-left":      "justify-start  items-start  pt-24 pb-0  pl-6 sm:pl-10 md:pl-16 lg:pl-24 pr-6",
-  "top-center":    "justify-start  items-center pt-24 pb-0  px-6",
-  "top-right":     "justify-start  items-end    pt-24 pb-0  pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-6",
-  "middle-left":   "justify-center items-start  py-0        pl-6 sm:pl-10 md:pl-16 lg:pl-24 pr-6",
+  "top-left":
+    "justify-start  items-start  pt-24 pb-0  pl-6 sm:pl-10 md:pl-16 lg:pl-24 pr-6",
+  "top-center": "justify-start  items-center pt-24 pb-0  px-6",
+  "top-right":
+    "justify-start  items-end    pt-24 pb-0  pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-6",
+  "middle-left":
+    "justify-center items-start  py-0        pl-6 sm:pl-10 md:pl-16 lg:pl-24 pr-6",
   "middle-center": "justify-center items-center py-0        px-6",
-  "middle-right":  "justify-center items-end    py-0        pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-6",
-  "bottom-left":   "justify-end    items-start  pt-0 pb-16 md:pb-20 pl-6 sm:pl-10 md:pl-16 lg:pl-24 pr-6",
+  "middle-right":
+    "justify-center items-end    py-0        pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-6",
+  "bottom-left":
+    "justify-end    items-start  pt-0 pb-16 md:pb-20 pl-6 sm:pl-10 md:pl-16 lg:pl-24 pr-6",
   "bottom-center": "justify-end    items-center pt-0 pb-16 md:pb-20 px-6",
-  "bottom-right":  "justify-end    items-end    pt-0 pb-16 md:pb-20 pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-6",
+  "bottom-right":
+    "justify-end    items-end    pt-0 pb-16 md:pb-20 pr-6 sm:pr-10 md:pr-16 lg:pr-24 pl-6",
 };
 
 const ALIGN_CLASSES: Record<TextAlign, string> = {
-  left:   "text-left  items-start",
+  left: "text-left  items-start",
   center: "text-center items-center",
-  right:  "text-right  items-end",
+  right: "text-right  items-end",
 };
 
 // ─── Animations ───────────────────────────────────────────────────────────────
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
 const stagger = {
@@ -82,7 +101,10 @@ const stagger = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function CollectionClient({ collection }: CollectionClientProps) {
+export default function CollectionClient({
+  collection,
+  products = [],
+}: CollectionClientProps) {
   const coverUrl = collection.coverImage?.asset?.url ?? null;
 
   const gallery = collection.galleryImages ?? [];
@@ -90,19 +112,20 @@ export default function CollectionClient({ collection }: CollectionClientProps) 
   const textAlign: TextAlign = collection.textAlign ?? "left";
 
   const positionCls = POSITION_CLASSES[textPosition];
-  const alignCls    = ALIGN_CLASSES[textAlign];
+  const alignCls = ALIGN_CLASSES[textAlign];
 
   return (
     <main className="min-h-screen bg-[#080808] text-white font-sans selection:bg-white selection:text-black">
-
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <div className="relative h-[85vh] min-h-[520px] w-full overflow-hidden">
-
         {/* Background */}
         {coverUrl ? (
           <Image
             src={coverUrl}
-            alt={collection.coverImage?.alt || collection.title || "Collection cover"}
+            alt={
+              collection.coverImage?.alt ||
+              `${collection.title || "Collection"} cover image`
+            }
             fill
             priority
             className="object-cover object-center scale-[1.03] transition-transform duration-[8s] ease-out"
@@ -132,21 +155,22 @@ export default function CollectionClient({ collection }: CollectionClientProps) 
           }}
         />
 
-        {/* Text block — position driven by Sanity fields */}
+        {/* Text block */}
         <div className={`absolute inset-0 flex flex-col ${positionCls}`}>
           <div className={`flex flex-col max-w-3xl space-y-5 ${alignCls}`}>
-
-            {/* Title */}
             <motion.h1
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              transition={{
+                duration: 0.8,
+                delay: 0.1,
+                ease: [0.22, 1, 0.36, 1],
+              }}
               className="text-[clamp(3rem,8vw,7rem)] font-black tracking-[-0.03em] uppercase leading-[0.9] text-white"
             >
               {collection.title}
             </motion.h1>
 
-            {/* Description */}
             {collection.description && (
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
@@ -158,7 +182,6 @@ export default function CollectionClient({ collection }: CollectionClientProps) 
               </motion.p>
             )}
 
-            {/* Drop date meta */}
             {collection.dropDate && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -192,87 +215,93 @@ export default function CollectionClient({ collection }: CollectionClientProps) 
       </div>
 
       {/* ── Gallery ───────────────────────────────────────────────────────── */}
-      <section className="w-full">
+      <section className="w-full ">
         {gallery.length > 0 ? (
-          <>
-            <motion.div
-              variants={stagger}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-80px" }}
-              className="flex flex-col sm:flex-row w-full"
-            >
-              {gallery.map((item, i) => {
-                const href = item.link || "#";
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-80px" }}
+            className="grid grid-cols-1 sm:grid-cols-3 w-full"
+          >
+            {gallery.map((item, i) => {
+              const href = item.link || "#";
 
-                return (
-                  <motion.div
-                    key={i}
-                    variants={fadeUp}
-                    className="relative flex-1 overflow-hidden"
-                    style={{ minHeight: "clamp(260px, 45vw, 680px)" }}
+              return (
+                <motion.div
+                  key={i}
+                  variants={fadeUp}
+                  className="relative overflow-hidden" // ← Keep relative
+                  style={{ aspectRatio: "3/4" }}
+                >
+                  <Link
+                    href={href}
+                    className="group block w-full h-full absolute inset-0"
                   >
-                    <Link href={href} className="block w-full h-full absolute inset-0">
-                      {item.imageUrl ? (
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.alt || `Gallery image ${i + 1}`}
-                          fill
-                          sizes="(max-width: 640px) 100vw, 33vw"
-                          className="object-cover object-center transition-transform duration-700 ease-out hover:scale-[1.06]"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 bg-[#151515]" />
-                      )}
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.alt || `${collection.title} gallery ${i + 1}`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 33vw"
+                        className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-[#151515]" />
+                    )}
 
-                      {/* Bottom vignette */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-                      {/* Index */}
-                      <div className="absolute bottom-4 left-4 font-mono text-[10px] text-white/20 tracking-widest">
+                    {/* Bottom Info */}
+                    <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between">
+                      <div className="font-mono text-[10px] text-white/30 tracking-widest">
                         0{i + 1}
                       </div>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-
-            {/* See All Collections */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex justify-center py-14 border-t border-white/8"
-            >
-              <Link
-                href="/collections"
-                className="group inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.28em] text-[#111111] hover:text-[#111111]/80 transition-colors duration-200"
-              >
-                <span className="h-px w-8 bg-current transition-all duration-300 group-hover:w-14" />
-                See All Collections
-                <ArrowUpRight
-                  size={13}
-                  className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                />
-              </Link>
-            </motion.div>
-          </>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-32 text-center px-6 border-t border-white/8">
-            <p className="text-white/20 text-xs font-mono tracking-[0.2em] uppercase">
-              Gallery coming soon
-            </p>
-            <Link
-              href="/collections"
-              className="mt-8 inline-flex items-center gap-2 border border-white/15 hover:bg-white hover:text-black transition-all duration-200 text-[10px] uppercase tracking-[0.25em] px-6 py-3 font-bold text-white rounded-sm"
-            >
-              See All Collections <ArrowUpRight size={12} />
-            </Link>
-          </div>
+          /* Your empty state here */
+          <div className="flex flex-col items-center justify-center py-32 text-center px-6 border-t border-white/8"></div>
         )}
       </section>
+
+      {/* ── Products Section ───────────────────────────── */}
+      {products && products.length > 0 && (
+        <section className="w-full py-15 border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-5 gap-y-10 sm:gap-y-14">
+              {products.map((product, i) => {
+                const productTitle =
+                  product.title || product.name || "Untitled Product";
+
+                return (
+                  <ProductCardCollection
+                    key={product._id || i}
+                    title={productTitle}
+                    price={product.price}
+                    discount={product.discount}
+                    image={
+                      product.image?.asset?.url ||
+                      product.mainImage?.asset?.url ||
+                      "/placeholder.jpg"
+                    }
+                    colorways={product.colorways}
+                    sizes={product.sizes}
+                    href={`/product/${product.slug?.current || product._id}`}
+                    soldOut={product.soldOut}
+                    tag={product.tag}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
