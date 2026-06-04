@@ -477,10 +477,20 @@ export const FEATURED_COLLECTIONS_QUERY = groq`
 
 export const SINGLE_COLLECTION_QUERY = groq`
   *[_type == "collection" && slug.current == $slug][0] {
-    _id, title, slug, description, season, year, isFeatured, isSnkrs,
-    coverImage{ asset->{ url }, alt }
+    _id, title, slug, description, season, year,
+    isFeatured, isSnkrs, dropDate,
+    textPosition,
+    textAlign,
+    coverImage{ asset->{ url }, alt },
+    galleryImages[]{
+      alt,
+      link,
+      label,
+      "imageUrl": image.asset->url
+    }
   }
 `;
+ 
 
 export const SNKRS_COLLECTIONS_QUERY = groq`
   *[_type == "collection" && isSnkrs == true] | order(_createdAt desc) {

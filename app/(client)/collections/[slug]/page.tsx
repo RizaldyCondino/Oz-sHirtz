@@ -4,7 +4,7 @@ import {
   PRODUCTS_BY_COLLECTION_QUERY,
   SINGLE_COLLECTION_QUERY,
 } from "@/sanity/lib/queries/query";
-import CollectionClient from "@/Collectionclient";
+import CollectionClient from "@/components/Collectionclient"
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
@@ -33,4 +33,5 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
     console.error("[CollectionPage] Failed to fetch collection data:", error);
     return notFound();
   }
+  
 }
