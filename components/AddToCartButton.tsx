@@ -12,15 +12,18 @@ import QuantityButtons from "./QuantityButtons";
 interface Props {
   product: Product;
   className?: string;
+  disableCartOpen?: boolean;
 }
 
-const AddToCartButton = ({ product, className }: Props) => {
+const AddToCartButton = ({ product, className, disableCartOpen }: Props) => {
   const {
     addItem,
     getItemCount,
+    setCartOpen, 
     getStockForSelection,
     selectedColorway,
     selectedSize,
+    
   } = useStore();
 
   const colorway = selectedColorway ?? "";
@@ -39,11 +42,15 @@ const AddToCartButton = ({ product, className }: Props) => {
 
   const handleAddToCart = () => {
     if (!hasSelection) {
+     
       toast.error("Please select a color and size first");
       return;
     }
     if (currentStock > itemCount) {
       addItem(product);
+      if (!disableCartOpen) {
+      setCartOpen(true); // only opens if not disabled
+    }
       toast.success(`${product?.name?.substring(0, 12)}... added successfully!`);
     } else {
       toast.error("Cannot add more than available stock");

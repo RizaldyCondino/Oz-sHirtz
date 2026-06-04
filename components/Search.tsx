@@ -122,7 +122,7 @@ export default function SearchBar({
             exit={{ opacity: 0, scale: 0.95, y: -8 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             style={{ originX: align === "left" ? 0 : 1, originY: 0 }}
-            className={`absolute ${align === "left" ? "left-0" : "right-0"} top-8 w-[300px] lg:w-[450px] max-w-[calc(100vw-2rem)] bg-[#FAF8F4] border border-[#e5e1da] rounded-xl z-50 overflow-hidden shadow-sm`}
+            className={`absolute ${align === "left" ? "left-0" : "right-0"} top-8 w-[300px] lg:w-[420px] max-w-[calc(100vw-2rem)] bg-[#FAF8F4] border border-[#e5e1da] rounded-xl z-50 overflow-hidden shadow-sm`}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 lg:px-5 py-3 border-b border-[#e5e1da]">
@@ -339,7 +339,7 @@ export default function SearchBar({
                     Type to search products, brands, or categories
                   </p>
                   <div className="flex items-center justify-center gap-1.5 mt-3">
-                    <TbSparkles size={11} className="text-[#b8502e]" />
+                    {/* <TbSparkles size={11} className="text-[#b8502e]" /> */}
                     <span className="text-[9px] lg:text-[10px] text-neutral-400 uppercase tracking-widest font-medium">
                       AI-powered hybrid search
                     </span>

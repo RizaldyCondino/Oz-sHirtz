@@ -62,7 +62,7 @@ const CartIcon = () => {
             exit={{ opacity: 0, scale: 0.95, y: -8 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             style={{ originX: 1, originY: 0 }}
-            className="absolute right-0 top-8 w-[300px] bg-[#FAF8F4] border border-[#e5e1da] rounded-xl z-50 overflow-hidden shadow-sm"
+            className="absolute right-0 top-8 w-[320px] bg-[#FAF8F4] border border-[#e5e1da] rounded-xl z-50 overflow-hidden shadow-sm"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e1da]">
@@ -108,7 +108,7 @@ const CartIcon = () => {
                           <Link
                             href={`/product/${item.product.slug?.current ?? item.product._id}`}
                             onClick={() => setCartOpen(false)}
-                            className="relative w-[46px] h-[56px] flex-shrink-0 rounded-md overflow-hidden bg-neutral-100 block"
+                            className="relative w-[60px] h-[72px] lg:w-[60px] lg:h-[72px] flex-shrink-0 rounded-md overflow-hidden bg-neutral-100 block"
                           >
                             <Image
                               src={urlFor(displayImage).url()}

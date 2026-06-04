@@ -241,3 +241,10 @@ main {
 .rfm-marquee-container:hover .rfm-marquee {
   animation-play-state: var(--pause-on-hover, paused);
 }
+
+.no-save img {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
+}

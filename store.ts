@@ -69,7 +69,7 @@ const useStore = create<StoreState>()(
 
           if (existingItem) {
   return {
-    cartOpen: true,
+    // cartOpen: true,
     items: state.items.map((item) =>
       item.product._id === product._id &&
       item.selectedColorway === colorway &&
@@ -81,7 +81,7 @@ const useStore = create<StoreState>()(
 }
 
 return {
-  cartOpen: true,
+  // cartOpen: true,
   items: [
     ...state.items,
     { product, quantity: 1, selectedColorway: colorway, selectedSize: size },

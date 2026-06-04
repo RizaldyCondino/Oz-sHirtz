@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { ShoppingBag, ArrowLeft, Heart } from "lucide-react";
+import {  ArrowLeft,  ScanLine } from "lucide-react";
 import { PortableText } from "@portabletext/react";
 
 import ImageView from "@/components/ImageView";
@@ -15,6 +15,7 @@ import AddToCartButton from "./AddToCartButton";
 import useStore from "@/store"; // 👈 addedw
 import { urlFor } from "@/sanity/lib/image";
 import FavoriteButton from "./Favoritebutton";
+
 
 interface Size {
   size: string;
@@ -289,7 +290,10 @@ export default function ProductClient({ product }: Props) {
           {/* RIGHT SIDE IMAGES & CONTROLS */}
           <div>
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6 lg:gap-10">
-              <div className="h-[50vh] sm:h-[65vh] lg:h-[80vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide">
+              <div
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              className="h-[50vh] sm:h-[65vh] lg:h-[80vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide">
                 <div className="flex flex-col gap-6">
                   <ImageView
                     images={displayImages}
@@ -377,19 +381,21 @@ export default function ProductClient({ product }: Props) {
                 {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-3 max-w-xs">
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#b8502e]">
+                      <h3 className="text-[10px] cursor-pointer font-bold uppercase tracking-widest text-[#b8502e]">
                         Select Size
                       </h3>
                       <Button
                         variant="link"
                         onClick={() => setIsSizeGuideOpen(true)}
-                        className="h-auto p-0 underline text-xs font-medium text-muted-foreground hover:text-foreground"
+                        className="h-auto p-0 underline text-[10px] font-medium text-muted-foreground hover:text-foreground"
                       >
-                        Size Guide
+                      <ScanLine className="cursor-pointer"/> Size Guide
                       </Button>
                       <SizeGuideModal
+                        
                         isOpen={isSizeGuideOpen}
                         onClose={() => setIsSizeGuideOpen(false)}
+                        
                       />
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -435,9 +441,10 @@ export default function ProductClient({ product }: Props) {
                 {/* CTA BUTTONS */}
                 <div className="flex flex-row items-center mt-3 w-full max-w-[350px] px-2">
                   <AddToCartButton
-                    product={product}
-                    className="cursor-pointer w-36 rounded-full"
-                  />
+                      product={product}
+                      className="cursor-pointer w-36 rounded-full"
+                      disableCartOpen  // cart won't auto-open on this page
+                    />
                   <FavoriteButton
                     resolvedImage={resolvedImageUrl}
                     product={product}

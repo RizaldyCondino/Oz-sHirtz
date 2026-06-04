@@ -36,15 +36,18 @@ async function groqSearch(query: string): Promise<SearchResult[]> {
     const groqQuery = `
       *[
         _type == "product" &&
-        status != "sold-out" &&
-        (
-          name match $query ||
-          shortDescription match $query ||
-          materials match $query ||
-          brand->title match $query ||
-          categories[]->title match $query ||
-          audience->title match $query
-        )
+    status != "sold-out" &&
+    (
+      name match $query ||
+      shortDescription match $query ||
+      materials match $query ||
+      brand->title match $query ||
+      categories[]->title match $query ||
+      audience->title match $query ||
+      status match $query ||
+      (isOnSale == true && ($query match "*sale*" || $query match "*on sale*")) ||
+      (discount > 0 && ($query match "*sale*" || $query match "*discount*" || $query match "*off*"))
+    )
       ] | order(_score desc) [0...10] {
         _id,
         "name": name,
@@ -126,7 +129,7 @@ async function vectorSearch(query: string): Promise<SearchResult[]> {
 
 export async function hybridSearch(
   query: string,
-  mode: "groq" | "vector" | "hybrid" = "hybrid"
+  mode: "groq" | "vector" | "hybrid" = "hybrid",
 ): Promise<SearchResult[]> {
   try {
     if (mode === "groq") return await groqSearch(query);
@@ -155,7 +158,9 @@ export async function hybridSearch(
       }
     });
 
-    return Array.from(seen.values()).sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    return Array.from(seen.values()).sort(
+      (a, b) => (b.score ?? 0) - (a.score ?? 0),
+    );
   } catch (err) {
     console.error("[Hybrid Search Error]", err);
     throw new Error("Search failed");
@@ -195,7 +200,8 @@ export async function generateEmbeddingsForAllProducts() {
       const textToEmbed = [
         product.name,
         product.brand && `Brand: ${product.brand}`,
-        product.categories?.length && `Category: ${product.categories.join(", ")}`,
+        product.categories?.length &&
+          `Category: ${product.categories.join(", ")}`,
         product.audience && `Audience: ${product.audience}`,
         product.shortDescription,
         product.materials && `Materials: ${product.materials}`,

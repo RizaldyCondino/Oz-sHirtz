@@ -112,13 +112,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
       className={`group relative w-full bg-[#FAF8F7] rounded-md border border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
     >
       {/* Image Area */}
-      <div className="relative w-full aspect-[4/5] bg-white overflow-hidden">
+      <div 
+       onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+      className="relative w-full aspect-[4/5] bg-white overflow-hidden">
         <Link
           href={isGlobalSoldOut ? "#" : href}
           className="block w-full h-full relative cursor-pointer"
         >
           {/* Primary Image */}
           <Image
+          
             src={primaryImage}
             alt={title}
             fill

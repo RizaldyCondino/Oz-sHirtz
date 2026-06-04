@@ -37,12 +37,19 @@ async function run() {
     const text = [
       product.name,
       product.brand && `Brand: ${product.brand}`,
-      product.categories?.length && `Category: ${product.categories.join(", ")}`,
+      product.categories?.length &&
+        `Category: ${product.categories.join(", ")}`,
       product.audience && `Audience: ${product.audience}`,
       product.shortDescription,
       product.materials && `Materials: ${product.materials}`,
       product.price && `Price: ₱${product.price}`,
-    ].filter(Boolean).join(". ");
+
+      product.isOnSale && `On Sale`,
+      product.discount > 0 && `Discount: ${product.discount}% off`,
+      product.originalPrice && `Original Price: ₱${product.originalPrice}`,
+    ]
+      .filter(Boolean)
+      .join(". ");
 
     const response = await openai.embeddings.create({
       model: "text-embedding-3-small",
@@ -57,7 +64,9 @@ async function run() {
   console.log("Done!");
 }
 
-run().then(() => process.exit(0)).catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+run()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });

@@ -221,16 +221,31 @@ export default async function CategoryPage({
     // Remove the SEARCH_PRODUCTS_QUERY import entirely from the top
     // Then in the filter:
     if (searchQuery) {
-      const name = (product.name || "").toLowerCase();
-      const brand = getProductBrandTitle(product).toLowerCase();
-      const cats = getProductCategories(product).join(" ");
-      if (
-        !name.includes(searchQuery) &&
-        !brand.includes(searchQuery) &&
-        !cats.includes(searchQuery)
-      )
-        return false;
-    }
+  const name = (product.name || "").toLowerCase();
+  const brand = getProductBrandTitle(product).toLowerCase();
+  const cats = getProductCategories(product).join(" ");
+  const status = (product.status || "").toLowerCase();
+  const isOnSale = product.isOnSale === true;
+  const hasDiscount = Number(product.discount || 0) > 0;
+
+  const saleTerms = ["sale", "sales", "on sale", "discount", "discounts", "discounted", "off"];
+  const isSaleQuery = saleTerms.some((term) => searchQuery.includes(term));
+
+  // strip trailing 's' for plural matching
+  const singular = searchQuery.endsWith("s") ? searchQuery.slice(0, -1) : searchQuery;
+
+  if (
+    !name.includes(searchQuery) &&
+    !name.includes(singular) &&
+    !brand.includes(searchQuery) &&
+    !brand.includes(singular) &&
+    !cats.includes(searchQuery) &&
+    !cats.includes(singular) &&
+    !status.includes(searchQuery) &&
+    !(isSaleQuery && (isOnSale || hasDiscount || status === "sale"))
+  )
+    return false;
+}
 
     return true;
   });

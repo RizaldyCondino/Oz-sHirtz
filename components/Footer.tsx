@@ -1,11 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Logo from "./Logo";
 import Link from "next/link";
 import SocialMediaIcons from "./SocialMediaIcons";
+import SizeGuideModal from "./SizeGuideModal";
+import { Button } from "./ui/button";
+import { ScanLine } from "lucide-react";
 
 const Footer = () => {
+   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   return (
     <footer className="w-full bg-[#111111] text-white/70 py-8">
       <div className="max-w-6xl mx-auto px-4 md:px-8">
@@ -34,9 +38,19 @@ const Footer = () => {
               Returns
             </Link>
 
-            <Link href="/size-guide" className="hover:text-white transition">
-              Size Guide
-            </Link>
+                      <Button
+                        variant="link"
+                        onClick={() => setIsSizeGuideOpen(true)}
+                        className="h-auto p-0 text-[12px] font-medium text-white/70 cursor-pointer hover:text-white/80"
+                      > Size Guide
+                      </Button>
+                      
+                      <SizeGuideModal
+                      
+                        isOpen={isSizeGuideOpen}
+                        onClose={() => setIsSizeGuideOpen(false)}
+                        
+                      />
           </div>
         </div>
 
