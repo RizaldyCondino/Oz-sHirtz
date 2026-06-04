@@ -2,7 +2,8 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { client } from "@/sanity/lib/client";
 import ProductClient from "@/components/ProductClient";
-import { SINGLE_PRODUCT_QUERY } from "@/sanity/lib/queries/query";
+import YouMightLike from "@/components/YouMightLike";
+import { SINGLE_PRODUCT_QUERY, RELATED_PRODUCTS_QUERY, Product } from "@/sanity/lib/queries/query";
 
 interface PageProps {
   params: Promise<{
@@ -10,13 +11,8 @@ interface PageProps {
   }>;
 }
 
-// ======================================================
-// NEXT.JS 15+ DYNAMIC METADATA GENERATOR ENGINE
-// ======================================================
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  
-  // Fetch only the necessary fields for SEO to keep metadata generation fast
   const product = await client.fetch(SINGLE_PRODUCT_QUERY, { slug });
 
   if (!product) {
@@ -32,32 +28,37 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-// ======================================================
-// CORE SERVER RENDERING COMPONENT
-// ======================================================
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
 
-  // Fetch product data with revalidation
-  // Revalidate every 60 seconds to ensure stock/price accuracy
   const product = await client.fetch(
-    SINGLE_PRODUCT_QUERY, 
-    { slug }, 
+    SINGLE_PRODUCT_QUERY,
+    { slug },
     { next: { revalidate: 60 } }
   );
 
-  // If no product is found, trigger the standard Next.js 404 page
   if (!product) {
     notFound();
   }
 
+  // Fetch related products server-side
+  const categorySlug =
+    (product.categories?.[0]?.slug as any)?.current ??
+    product.categories?.[0]?.slug ??
+    "";
+
+  const relatedProducts = categorySlug
+    ? await client.fetch(
+        RELATED_PRODUCTS_QUERY,
+        { currentId: product._id, categorySlug },
+        { next: { revalidate: 60 } }
+      ) as Product[]
+    : [];
+
   return (
-    <main >
-      <div >
-        {/* className="bg-#FAF8F4" */}
-        <ProductClient product={product} />
-      </div>
-      
+    <main>
+      <ProductClient product={product} />
+      <YouMightLike products={relatedProducts} />
     </main>
   );
 }

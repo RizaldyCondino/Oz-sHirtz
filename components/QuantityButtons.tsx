@@ -71,7 +71,7 @@ const QuantityButtons = ({ product, className, colorwayOverride, sizeOverride }:
         <Minus size={11} className="cursor-pointer" />
       </Button>
 
-      <span className="font-semibold text-[13px] w-4 text-center text-black">
+      <span className="font-semibold text-[15px] w-4 text-center text-black">
         {itemCount}
       </span>
 

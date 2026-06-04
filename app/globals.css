@@ -215,16 +215,6 @@ main {
 }
 
 
-@keyframes scroll {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    /* Moves exactly one full track length out of the way */
-    transform: translateX(-50%); 
-  }
-}
-
 .rfm-marquee-container {
   display: flex;
   overflow: hidden;
@@ -234,8 +224,17 @@ main {
 .rfm-marquee {
   display: flex;
   width: fit-content;
-  animation: scroll var(--duration, 100s) linear infinite;
+  animation: scroll var(--duration, 500s) linear infinite;
   animation-direction: var(--direction, normal);
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-35%);
+  }
 }
 
 .rfm-marquee-container:hover .rfm-marquee {

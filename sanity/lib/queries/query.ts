@@ -416,7 +416,7 @@ export const RELATED_PRODUCTS_QUERY = groq`
     _type == "product" &&
     _id != $currentId &&
     $categorySlug in categories[]->slug.current
-  ] | order(publishedAt desc) [0...4] {
+  ] | order(publishedAt desc) [] {
     ${PRODUCT_CARD_FIELDS}
   }
 `;

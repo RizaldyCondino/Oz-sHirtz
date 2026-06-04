@@ -112,7 +112,7 @@ const AddressModal = ({
             <Button
               variant="outline"
               size="icon"
-              className="h-7 w-7 rounded-full cursor-pointer border-black text-black hover:bg-black hover:text-white shrink-0"
+              className="h-7 w-7 rounded-full cursor-pointer border-black/50 hoverEffect text-black hover:bg-black hover:text-white shrink-0"
               title="Add new address"
             >
               <Plus size={14} />

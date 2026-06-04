@@ -340,7 +340,7 @@ const CartPage = () => {
                   <Button
                     onClick={handleCheckout}
                     disabled={loading}
-                    className="w-full bg-[#111111] hover:bg-[#111111]/80 text-white font-medium hoverEffect lg:text-[14px] rounded-full py-4 sm:py-6 mt-4 text-sm sm:text-xs cursor-pointer"
+                    className="w-full bg-[#111111] hover:bg-[#111111]/80 text-white font-medium hoverEffect lg:text-[15px] rounded-full py-4 sm:py-6 mt-4 text-sm sm:text-xs cursor-pointer"
                   >
                     {loading
                       ? "Redirecting to checkout..."
@@ -358,9 +358,9 @@ const CartPage = () => {
               </Card>
 
               {isSignedIn && (
-                <Card className="border-[#8C6227]/10">
+                <Card className="border-black/10">
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-[#8C6227] uppercase tracking-wider text-sm">
+                    <CardTitle className="text-[#b8502e] uppercase tracking-wider text-sm">
                       Delivery Address
                     </CardTitle>
                     <AddressModal onAddressAdded={fetchAddresses} />
@@ -381,14 +381,14 @@ const CartPage = () => {
                             onClick={() => setSelectedAddress(addr)}
                             className={`p-4 rounded-xl cursor-pointer border transition-all ${
                               selectedAddress?.id === addr.id
-                                ? "border-[#8C6227] bg-[#8C6227]/5"
-                                : "border-transparent hover:bg-neutral-50"
+                                ? "shadow-md bg-white"
+                                : "border-white bg-white hover:bg-neutral-50"
                             }`}
                           >
                             <div className="flex items-start gap-3">
                               <RadioGroupItem
                                 value={addr.id}
-                                className="mt-1"
+                                className="mt-1 bg-black"
                               />
                               <div className="text-sm flex-1 min-w-0">
                                 <p className="font-semibold">{addr.name}</p>

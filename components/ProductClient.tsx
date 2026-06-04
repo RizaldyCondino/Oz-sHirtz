@@ -15,6 +15,7 @@ import AddToCartButton from "./AddToCartButton";
 import useStore from "@/store"; // 👈 addedw
 import { urlFor } from "@/sanity/lib/image";
 import FavoriteButton from "./Favoritebutton";
+import YouMightLike from "./YouMightLike";
 
 
 interface Size {
@@ -61,9 +62,10 @@ interface Product {
 
 interface Props {
   product: Product;
+  children?: React.ReactNode;
 }
 
-export default function ProductClient({ product }: Props) {
+export default function ProductClient({ product, children  }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -166,6 +168,11 @@ export default function ProductClient({ product }: Props) {
     ? urlFor(displayImage).url()
     : undefined; // ← add
 
+
+    const categorySlug =
+  (product.categories?.[0]?.slug as any)?.current ??
+  product.categories?.[0]?.slug ??
+  "";
   return (
     <section className="relative bg-[#FAF8F4] min-h-screen py-4 sm:py-6 lg:py-4">
       <div className="relative z-10 max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
@@ -467,9 +474,11 @@ export default function ProductClient({ product }: Props) {
                 </div>
               </div>
             </div>
+            
           </div>
         </div>
       </div>
+      {children}
     </section>
   );
 }
