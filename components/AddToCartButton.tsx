@@ -95,7 +95,7 @@ const AddToCartButton = ({ product, className, disableCartOpen }: Props) => {
           disabled={isOutOfStock || !hasSelection}
           className={cn(
             // base
-            "w-full h-9 rounded-full font-semibold text-[10px] uppercase tracking-wide shadow-none border transition-all duration-200",
+            "w-full h-11 rounded-full font-semibold text-[10px] uppercase tracking-wide shadow-none border transition-all duration-200",
             // enabled state — matches ProductClient's gold theme
             !isOutOfStock && hasSelection &&
               "bg-[#111111] border-[#111111] text-white hover:bg-[#111111] hover:border-[#1111111]",

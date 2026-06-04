@@ -120,7 +120,7 @@ const FavoriteButton = ({
         onClick={handleToggle}
         disabled={isPending}
         className={cn(
-          "text-xs uppercase font-semibold rounded-full h-9 cursor-pointer text-[#b8502e]/90 border-[#b8502e]/20 hover:border-[#b8502e] hoverEffect hover:text-[#b8502e] whitespace-nowrap transition-colors",
+          "text-xs uppercase font-semibold rounded-full h-11 cursor-pointer text-[#b8502e]/90 border-[#b8502e]/20 hover:border-[#b8502e] hoverEffect hover:text-[#b8502e] whitespace-nowrap transition-colors",
           favorited && "border-[#b8502e] text-[#b8502e] hover:border-[#b8502e]/80 hover:text-[#b8502e]/80",
           className
         )}
@@ -141,7 +141,7 @@ const FavoriteButton = ({
       onClick={handleToggle}
       disabled={isPending}
       className={cn(
-        "text-xs uppercase font-semibold rounded-full h-9 w-9 p-0 cursor-pointer border-neutral-300 hover:border-black/80 transition-colors",
+        "text-xs uppercase font-semibold rounded-full h-11 w-9 p-0 cursor-pointer border-neutral-300 hover:border-black/80 transition-colors",
         favorited && "border-[#b8502e] hover:border-[#b8502e]/80 text-[#b8502e]",
         className
       )}

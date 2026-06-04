@@ -22,7 +22,21 @@ export interface GroupedCartItems {
   sku?: string;
 }
 
+// ── Resolve colorway-aware discounted price ──────────────────────────────────
+function resolveItemPrice(item: GroupedCartItems): number {
+  const product = item.product as any;
+  const activeColorway = product.colorways?.find(
+    (c: any) => c.name === item.selectedColorway,
+  );
 
+  const price = activeColorway?.price ?? product.price ?? 0;
+  const discountPercent = activeColorway?.discount ?? product.discount ?? 0;
+  const discountedPrice =
+    discountPercent > 0 ? price * (1 - discountPercent / 100) : price;
+
+  return discountedPrice;
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 export async function createCheckoutSession(
   items: GroupedCartItems[],
@@ -51,30 +65,48 @@ export async function createCheckoutSession(
       },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}&orderNumber=${metadata.orderNumber}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/cart`,
-      line_items: items?.map((item) => ({
-        price_data: {
-          currency: "USD",
-          unit_amount: Math.round(item?.product?.price! * 100),
-          product_data: {
-            name: item?.product?.name || "Unknown Product",
-            description: [
-              item?.product?.sku ? `SKU: ${item.product.sku}` : null,
-              item?.selectedColorway ? `Color: ${item.selectedColorway}` : null,
-              item?.selectedSize ? `Size: ${item.selectedSize}` : null,
-              `Qty: ${item?.quantity}`,
-            ]
-              .filter(Boolean)
-              .join(" · "),
-            metadata: { id: item?.product?._id },
-            images: item?.selectedImage
-              ? [item.selectedImage]
-              : item?.product?.images && item?.product?.images?.length > 0
-                ? [urlFor(item.product.images[0]).url()]
-                : undefined,
+      line_items: items?.map((item) => {
+        const product = item.product as any;
+        const unitPrice = resolveItemPrice(item);
+        const originalPrice =
+          (product.colorways?.find((c: any) => c.name === item.selectedColorway)
+            ?.price ?? product.price ?? 0);
+        const hasDiscount = unitPrice < originalPrice;
+
+        return {
+          price_data: {
+            currency: "USD", // ← fixed from USD
+            unit_amount: Math.round(unitPrice * 100), // ← uses discounted price
+            product_data: {
+              name: item?.product?.name || "Unknown Product",
+              description: [
+                item?.product?.sku ? `SKU: ${item.product.sku}` : null,
+                item?.selectedColorway
+                  ? `Color: ${item.selectedColorway}`
+                  : null,
+                item?.selectedSize ? `Size: ${item.selectedSize}` : null,
+                hasDiscount
+                  ? `Was ₱${originalPrice.toLocaleString()} · ${
+                      product.colorways?.find(
+                        (c: any) => c.name === item.selectedColorway,
+                      )?.discount ?? product.discount
+                    }% off`
+                  : null,
+                `Qty: ${item?.quantity}`,
+              ]
+                .filter(Boolean)
+                .join(" · "),
+              metadata: { id: item?.product?._id },
+              images: item?.selectedImage
+                ? [item.selectedImage]
+                : item?.product?.images && item?.product?.images?.length > 0
+                  ? [urlFor(item.product.images[0]).url()]
+                  : undefined,
+            },
           },
-        },
-        quantity: item?.quantity,
-      })),
+          quantity: item?.quantity,
+        };
+      }),
     };
 
     if (customerId) {

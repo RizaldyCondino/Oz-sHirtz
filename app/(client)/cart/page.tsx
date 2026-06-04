@@ -30,8 +30,7 @@ const CartPage = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
 
-  const { getTotalPrice, getSubTotalPrice, getGroupedItems, getItemCount } =
-    useStore();
+  const { getGroupedItems, getItemCount } = useStore();
 
   const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
@@ -68,6 +67,51 @@ const CartPage = () => {
     }
   }, [isClient, isSignedIn, isLoaded]);
 
+  // ── Colorway-aware pricing helpers ──────────────────────────────────────────
+ const getColorwayPrice = (product: any, selectedColorway: string) => {
+  const activeColorway = product.colorways?.find(
+    (c: any) => c.name === selectedColorway,
+  );
+
+  // console.log("activeColorway data:", {
+  //   name: activeColorway?.name,
+  //   price: activeColorway?.price,
+  //   discount: activeColorway?.discount,
+  //   productPrice: product.price,
+  //   productDiscount: product.discount,
+  // });
+
+  const price = activeColorway?.price ?? product.price ?? 0;
+  const discountPercent = activeColorway?.discount ?? product.discount ?? 0;
+  const discountedPrice =
+    discountPercent > 0 ? price * (1 - discountPercent / 100) : price;
+
+  return { price, discountedPrice };
+};
+
+  const groupedItems = isClient ? getGroupedItems() : [];
+
+  const colorwaySubtotal = groupedItems.reduce(
+    (sum, { product, selectedColorway, selectedSize }) => {
+      const qty = getItemCount(product._id, selectedColorway, selectedSize);
+      const { price } = getColorwayPrice(product, selectedColorway);
+      return sum + price * qty;
+    },
+    0,
+  );
+
+  const colorwayTotal = groupedItems.reduce(
+    (sum, { product, selectedColorway, selectedSize }) => {
+      const qty = getItemCount(product._id, selectedColorway, selectedSize);
+      const { discountedPrice } = getColorwayPrice(product, selectedColorway);
+      return sum + discountedPrice * qty;
+    },
+    0,
+  );
+
+  const colorwayDiscount = colorwaySubtotal - colorwayTotal;
+  // ────────────────────────────────────────────────────────────────────────────
+
   const handleEditAddress = (addr: any) => {
     setEditingAddress(addr);
     setEditModalOpen(true);
@@ -101,9 +145,6 @@ const CartPage = () => {
     setLoading(true);
 
     try {
-      const groupedItems = getGroupedItems();
-
-      // Map grouped cart items to the shape createCheckoutSession expects
       const lineItems = groupedItems.map(
         ({ product, selectedColorway, selectedSize }) => {
           const quantity = getItemCount(
@@ -112,7 +153,6 @@ const CartPage = () => {
             selectedSize,
           );
 
-          // resolve colorway-specific image, fall back to product image
           const activeColorway = product.colorways?.find(
             (c: any) => c.name === selectedColorway,
           );
@@ -122,12 +162,21 @@ const CartPage = () => {
             ? urlFor(displayImage).url()
             : undefined;
 
-          return {
+          // Pass colorway-specific discounted price to Stripe
+          const { discountedPrice } = getColorwayPrice(
             product,
+            selectedColorway,
+          );
+
+          return {
+            product: {
+              ...product,
+              price: discountedPrice, // override with colorway price
+            },
             quantity,
             selectedColorway,
             selectedSize,
-            selectedImage, // ← add
+            selectedImage,
           };
         },
       );
@@ -139,7 +188,6 @@ const CartPage = () => {
         clerkUserId: user?.id,
         address: selectedAddress,
       });
-      console.log("Checkout URL:", url); // ← add this
 
       if (url) {
         window.location.href = url;
@@ -155,8 +203,6 @@ const CartPage = () => {
   };
 
   if (!isLoaded) return null;
-
-  const groupedItems = isClient ? getGroupedItems() : [];
 
   return (
     <div className="bg-[#FAF8F4] mt-10 pb-52 md:pb-10 min-h-screen">
@@ -181,6 +227,12 @@ const CartPage = () => {
                     const resolvedImageUrl = displayImage
                       ? urlFor(displayImage).url()
                       : undefined;
+
+                    const { price, discountedPrice } = getColorwayPrice(
+                      product,
+                      selectedColorway,
+                    );
+                    const hasDiscount = discountedPrice < price;
 
                     return (
                       <div
@@ -208,6 +260,7 @@ const CartPage = () => {
                               {product.name}
                             </h3>
                             <FavoriteButton
+                              className="h-8 w-8"
                               product={product}
                               resolvedImage={resolvedImageUrl}
                             />
@@ -232,10 +285,20 @@ const CartPage = () => {
                                 sizeOverride={selectedSize}
                               />
                             </div>
-                            <PriceFormatter
-                              amount={(product.price ?? 0) * quantity}
-                              className="font-bold text-[#b8502e] text-lg sm:text-xl"
-                            />
+
+                            {/* Per-item price with optional strikethrough */}
+                            <div className="flex flex-col items-end">
+                              {hasDiscount && (
+                                <PriceFormatter
+                                  amount={price * quantity}
+                                  className="text-sm text-neutral-400 line-through"
+                                />
+                              )}
+                              <PriceFormatter
+                                amount={discountedPrice * quantity}
+                                className="font-bold text-[#b8502e] text-lg sm:text-xl"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -256,12 +319,12 @@ const CartPage = () => {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal</span>
-                    <PriceFormatter amount={getSubTotalPrice()} />
+                    <PriceFormatter amount={colorwaySubtotal} />
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Discount</span>
                     <PriceFormatter
-                      amount={getSubTotalPrice() - getTotalPrice()}
+                      amount={colorwayDiscount}
                       className="text-red-600"
                     />
                   </div>
@@ -269,7 +332,7 @@ const CartPage = () => {
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>
                     <PriceFormatter
-                      amount={getTotalPrice()}
+                      amount={colorwayTotal}
                       className="text-[#b8502e]"
                     />
                   </div>

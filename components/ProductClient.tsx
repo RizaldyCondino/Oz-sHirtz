@@ -408,7 +408,7 @@ export default function ProductClient({ product }: Props) {
                           variant={
                             selectedSize === item.size ? "default" : "outline"
                           }
-                          className={`h-auto px-3 py-1.5 text-[11px] font-medium rounded-full shadow-sm min-w-[36px] cursor-pointer ${
+                          className={`h-auto px-3 py-1.5 text-[12px] font-medium rounded-full shadow-sm min-w-[36px] cursor-pointer ${
                             selectedSize === item.size
                               ? ""
                               : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200 cursor-pointer"
@@ -439,7 +439,7 @@ export default function ProductClient({ product }: Props) {
                 </div>
 
                 {/* CTA BUTTONS */}
-                <div className="flex flex-row items-center mt-3 w-full max-w-[350px] px-2">
+                <div className="flex flex-row text-2xl items-center mt-3 w-full max-w-[350px] px-2">
                   <AddToCartButton
                       product={product}
                       className="cursor-pointer w-full rounded-md hover:bg-black/80"
@@ -453,7 +453,7 @@ export default function ProductClient({ product }: Props) {
                     product={product}
                     variant="full"
                     size={12}
-                    className="flex-1  text-[10px]  dark:border-neutral-700 rounded-md"
+                    className="flex-1  text-[10px]   dark:border-neutral-700 rounded-md"
                   />
                 </div>
 
