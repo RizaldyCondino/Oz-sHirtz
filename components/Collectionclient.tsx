@@ -266,14 +266,16 @@ export default function CollectionClient({
           </motion.div>
         ) : (
           /* Your empty state here */
-          <div className="flex flex-col items-center justify-center py-32 text-center px-6 border-t border-white/8"></div>
+          <div className="flex flex-col items-center justify-center py-32 text-center px-6 border-t border-white/8">
+            
+          </div>
         )}
       </section>
 
       {/* ── Products Section ───────────────────────────── */}
       {products && products.length > 0 && (
-        <section className="w-full py-15 border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-6">
+        <section className="w-full py-15 border-t px-10 border-white/10">
+          <div className="max-w-8xl mx-auto px-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-5 gap-y-10 sm:gap-y-14">
               {products.map((product, i) => {
                 const productTitle =

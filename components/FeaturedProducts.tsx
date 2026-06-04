@@ -35,9 +35,9 @@ export default function FeaturedProducts({
   products: Product[];
 }) {
   return (
-    <section className="py-5 bg-[#FAF8F4] w-full">
+    <section className="pt-5 bg-[#FAF8F4] w-full">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 px-4 sm:px-6 lg:px-10">
+      <div className="flex items-center mb-5 justify-between  px-4 sm:px-6 lg:px-10">
         <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
           {title}
         </h2>
@@ -50,7 +50,7 @@ export default function FeaturedProducts({
       </div>
 
       {/* Full-width 3-column grid */}
-      <div className="grid grid-cols-2 gap-[2px]">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-[2px]">
         {products.slice(0, 3).map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}
@@ -114,12 +114,7 @@ function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        {/* Brand badge */}
-        {/* {brandName && (
-          <div className="absolute top-2 right-2 text-[#b8502e] text-[9px] uppercase tracking-widest font-bold z-10">
-            {brandName}
-          </div>
-        )} */}
+
 
         {/* Bottom info bar */}
         <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm px-3 py-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

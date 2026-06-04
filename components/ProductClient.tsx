@@ -442,15 +442,18 @@ export default function ProductClient({ product }: Props) {
                 <div className="flex flex-row items-center mt-3 w-full max-w-[350px] px-2">
                   <AddToCartButton
                       product={product}
-                      className="cursor-pointer w-36 rounded-full"
+                      className="cursor-pointer w-full rounded-md hover:bg-black/80"
                       disableCartOpen  // cart won't auto-open on this page
                     />
+             
+                </div>
+                 <div className="flex flex-row items-center mt-3 w-full max-w-[350px] px-2">
                   <FavoriteButton
                     resolvedImage={resolvedImageUrl}
                     product={product}
                     variant="full"
                     size={12}
-                    className="flex-1  text-[10px] ml-6 dark:border-neutral-700"
+                    className="flex-1  text-[10px]  dark:border-neutral-700 rounded-md"
                   />
                 </div>
 

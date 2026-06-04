@@ -50,7 +50,7 @@ export default function BrandMarquee({
                   <img
                     src={brand.logo}
                     alt={brand.title}
-                    className="h-10 md:h-14 w-auto max-w-[120px] md:max-w-[160px] object-contain
+                    className="h-10 md:h-14 w-auto max-w-[120px]  object-contain
                                group-hover:grayscale-0 group-hover:opacity-100
                                transition-all duration-500 ease-out"
                   />
@@ -78,11 +78,11 @@ export default function BrandMarquee({
   return (
     <section className={`relative py-14 bg-[#111111] overflow-hidden ${className}`}>
       {/* Top rule */}
-      <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
+      <div className="max-w-[1700px] mx-auto px-6 sm:px-6 lg:px-20">
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-neutral-100/20" />
           {title && (
-            <span className="text-[10px] tracking-[5px] font-semibold uppercase text-[#999]">
+            <span className="text-[18px] tracking-[5px] font-semibold uppercase text-[#999]">
               {title}
             </span>
           )}
@@ -101,6 +101,8 @@ export default function BrandMarquee({
           pauseOnHover={true}
         />
       </div>
+
+      
 
       {/* Bottom rule */}
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20 mt-10">

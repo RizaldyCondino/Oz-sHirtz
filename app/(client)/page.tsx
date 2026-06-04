@@ -4,11 +4,12 @@ import HeroBanner from "@/components/HeroBanner";
 import Divider from "@/components/Divider";
 import BrandMarquee from "@/components/BrandMarquee";
 import DriftClothingSection from "@/components/DriftClothingSection";
+import ProductCard from "@/components/ProductCardProps";
 
 async function getFeaturedProducts() {
   try {
     const query = `*[_type == "product" && isFeatured == true] 
-      | order(coalesce(publishedAt, _createdAt) desc)[0...2]{
+      | order(coalesce(publishedAt, _createdAt) desc)[0...3]{
       _id,
       name,
       slug,
@@ -31,7 +32,7 @@ async function getFeaturedProducts() {
 
 async function getFeaturedBrands() {
   try {
-    const query = `*[_type == "brand"][0...4]{
+    const query = `*[_type == "brand"][0...3]{
       _id,
       title,
       slug,
@@ -94,6 +95,9 @@ export default async function Home() {
       <div className="max-w-7xl mx-auto px-6 md:px-20">
         <Divider className="opacity-20" />
       </div>
+      
+      <DriftClothingSection/>
+      
     </div>
   );
 }

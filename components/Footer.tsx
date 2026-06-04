@@ -12,18 +12,18 @@ const Footer = () => {
    const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   return (
     <footer className="w-full bg-[#111111] text-white/70 py-8">
-      <div className="max-w-6xl mx-auto px-4 md:px-8">
+      <div className="max-w-8xl mx-auto px-4 md:px-8">
         
         {/* TOP */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           
           {/* BRAND */}
           <div className="flex flex-col gap-2">
-            <Logo className="text-white" />
+            
 
-            <p className="text-[11px] text-white/50 max-w-xs leading-relaxed">
-              Minimal streetwear for everyday luxury.
-            </p>
+            {/* <p className="text-[11px] text-white/50 max-w-xs leading-relaxed">
+              streetwear
+            </p> */}
 
             <SocialMediaIcons size={14} />
           </div>

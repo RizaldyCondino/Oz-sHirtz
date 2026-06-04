@@ -109,7 +109,7 @@ const ProductCardCollection: React.FC<ProductCardCollection> = ({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`group relative w-full h-[420px] bg-[#FAF8F7] rounded-md border border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
+      className={`group relative w-full h-full bg-[#FAF8F7] rounded-md border border-gray-100 overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${isGlobalSoldOut ? "opacity-60" : ""}`}
     >
       {/* Image Area */}
       <div 
