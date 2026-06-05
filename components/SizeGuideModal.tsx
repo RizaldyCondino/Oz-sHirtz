@@ -47,7 +47,7 @@ export default function SizeGuideModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-neutral-100 transition text-neutral-400 hover:text-black"
+            className="p-2 rounded-full hover:bg-neutral-100 transition text-neutral-400 hover:text-black cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -59,9 +59,9 @@ export default function SizeGuideModal({
             <button
               key={tab}
               onClick={() => handleTabChange(tab)}
-              className={`flex-1 py-3 text-sm font-medium transition rounded-t-xl capitalize ${
+              className={`flex-1 py-3 text-sm font-medium transition cursor-pointer rounded-t-xl capitalize  ${
                 activeTab === tab
-                  ? "bg-neutral-100 text-neutral-900"
+                  ? "bg-neutral-100 text-neutral-900 "
                   : "text-neutral-400 hover:text-neutral-600"
               }`}
             >
@@ -80,9 +80,9 @@ export default function SizeGuideModal({
               defaultCategory === "apparel") && (
               <button
                 onClick={() => setActiveCategory("apparel")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition border ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs  font-medium transition border ${
                   activeCategory === "apparel"
-                    ? "bg-neutral-900 text-white border-neutral-900"
+                    ? "bg-neutral-900 text-white border-neutral-900 "
                     : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50"
                 }`}
               >
@@ -94,7 +94,7 @@ export default function SizeGuideModal({
             {(defaultCategory === undefined || defaultCategory === "shoes") && (
               <button
                 onClick={() => setActiveCategory("shoes")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition border ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition border cursor-pointer ${
                   activeCategory === "shoes"
                     ? "bg-neutral-900 text-white border-neutral-900"
                     : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50"

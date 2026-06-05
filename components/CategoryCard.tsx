@@ -24,7 +24,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           src={image}
           alt={title}
           fill
-          priority={false}
+          priority={false}  
           className="object-cover scale-105 group-hover:scale-110 transition duration-500"
         />
 

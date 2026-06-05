@@ -421,7 +421,7 @@ export default function ProductClient({ product, children }: Props) {
                           variant={
                             selectedSize === item.size ? "default" : "outline"
                           }
-                          className={`h-auto px-3 py-1.5 text-[15px] font-medium rounded-sm w-12 shadow-xs min-w-[36px] cursor-pointer
+                          className={`h-auto px-3 py-1.5 text-[15px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer
                             ${
                               selectedSize === item.size
                                 ? ""

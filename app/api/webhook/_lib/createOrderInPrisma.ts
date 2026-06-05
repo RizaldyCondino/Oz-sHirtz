@@ -4,6 +4,7 @@ import { parseLineItems } from "./parseLineItems";
 import Stripe from "stripe";
 import stripe from "@/lib/stripe";
 import type { Address } from "@prisma/client";
+import { decrementSanityStock } from "@/actions/decrementSanityStock";
 
 export async function createOrderInPrisma(session: Stripe.Checkout.Session) {
   const { id, amount_total, metadata, total_details } = session;
@@ -67,6 +68,16 @@ export async function createOrderInPrisma(session: Stripe.Checkout.Session) {
     },
     include: { items: true },
   });
+
+  const lineItems = await parseLineItems(session.id);
+await decrementSanityStock(
+  lineItems.map((item) => ({
+    productId: item.productId, // must be the Sanity _id stored in stripe product metadata
+    colorway: item.colorway,
+    size: item.size,
+    quantity: item.quantity,
+  }))
+);
 
   return order;
 }
