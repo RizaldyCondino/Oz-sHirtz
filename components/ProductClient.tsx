@@ -12,7 +12,7 @@ import SizeGuideModal from "./SizeGuideModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AddToCartButton from "./AddToCartButton";
-import useStore from "@/store"; // 👈 addedw
+import useStore from "@/store";
 import { urlFor } from "@/sanity/lib/image";
 import FavoriteButton from "./Favoritebutton";
 import YouMightLike from "./YouMightLike";
@@ -70,20 +70,17 @@ export default function ProductClient({ product, children }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // ✅ Sync URL → Zustand
   const { setSelectedColorway, setSelectedSize, resetSelection } = useStore();
 
   const defaultColor = product.colorways?.[0]?.name;
   const selectedColorName = searchParams.get("color") || defaultColor || null;
   const selectedSize = searchParams.get("size");
 
-  // ✅ Keep store in sync with URL params
   useEffect(() => {
     if (selectedColorName) setSelectedColorway(selectedColorName);
     setSelectedSize(selectedSize ?? null);
   }, [selectedColorName, selectedSize]);
 
-  // ✅ Reset selection when leaving the product page
   useEffect(() => {
     return () => {
       resetSelection();
@@ -166,17 +163,21 @@ export default function ProductClient({ product, children }: Props) {
   const displayImage = activeColorway?.images?.[0] || product.images?.[0];
   const resolvedImageUrl = displayImage
     ? urlFor(displayImage).url()
-    : undefined; // ← add
+    : undefined;
 
   const categorySlug =
     (product.categories?.[0]?.slug as any)?.current ??
     product.categories?.[0]?.slug ??
     "";
+
   return (
     <section className="relative bg-[#FAF8F4] min-h-screen py-4 sm:py-6 lg:py-4">
       <div className="relative z-10 max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
-        <div className="grid lg:grid-cols-[0.75fr_1.25fr] gap-8 lg:gap-16 items-start">
-          {/* LEFT SIDE DETAILS */}
+
+        {/* ── DESKTOP layout (lg+): two-column side by side ── */}
+        <div className="hidden lg:grid lg:grid-cols-[0.75fr_1.25fr] gap-16 items-start">
+
+          {/* LEFT: breadcrumb + product details */}
           <div className="flex flex-col items-start text-left pt-2 lg:sticky lg:top-6">
             <nav
               aria-label="Breadcrumb"
@@ -191,16 +192,11 @@ export default function ProductClient({ product, children }: Props) {
                 <ArrowLeft size={12} /> Back
               </Button>
               <span>/</span>
-              <Link href="/" className="hover:text-foreground">
-                Home
-              </Link>
+              <Link href="/" className="hover:text-foreground">Home</Link>
               {audienceSlug && (
                 <>
                   <span>/</span>
-                  <Link
-                    href={`/category/${audienceSlug}`}
-                    className="hover:text-foreground"
-                  >
+                  <Link href={`/category/${audienceSlug}`} className="hover:text-foreground">
                     {product.audience?.title}
                   </Link>
                 </>
@@ -209,11 +205,7 @@ export default function ProductClient({ product, children }: Props) {
                 <>
                   <span>/</span>
                   <Link
-                    href={
-                      audienceSlug
-                        ? `/category/${audienceSlug}/${firstCategorySlug}`
-                        : `/category/${firstCategorySlug}`
-                    }
+                    href={audienceSlug ? `/category/${audienceSlug}/${firstCategorySlug}` : `/category/${firstCategorySlug}`}
                     className="hover:text-foreground"
                   >
                     {product.categories?.[0]?.title}
@@ -221,13 +213,10 @@ export default function ProductClient({ product, children }: Props) {
                 </>
               )}
               <span>/</span>
-              <span className="text-foreground font-medium truncate max-w-[150px]">
-                {product.name}
-              </span>
+              <span className="text-foreground font-medium truncate max-w-[150px]">{product.name}</span>
             </nav>
 
-            {/* DESKTOP PRODUCT DETAILS */}
-            <div className="hidden lg:flex flex-col items-start text-left">
+            <div className="flex flex-col items-start text-left">
               {product.collection && (
                 <Badge
                   variant="outline"
@@ -237,54 +226,35 @@ export default function ProductClient({ product, children }: Props) {
                   {product.collection.title}
                 </Badge>
               )}
-
               <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                {product.audience?.title} &bull;{" "}
-                {product.categories?.[0]?.title || "Apparel"}
+                {product.audience?.title} &bull; {product.categories?.[0]?.title || "Apparel"}
               </span>
-
-              <h1 className="text-2xl font-semibold leading-tight text-[#111111]">
-                {product.name}
-              </h1>
-
+              <h1 className="text-2xl font-semibold leading-tight text-[#111111]">{product.name}</h1>
               <div className="flex flex-col gap-0.5 mt-1.5">
                 {product.brand && (
                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">
                     {product.brand.title}
                   </p>
                 )}
-                <p className="text-[10px] text-muted-foreground tracking-wider font-mono">
-                  SKU: {displaySku}
-                </p>
+                <p className="text-[10px] text-muted-foreground tracking-wider font-mono">SKU: {displaySku}</p>
               </div>
-
               <div className="flex items-center gap-3 mt-4 flex-wrap">
                 {discountedPrice ? (
                   <>
                     <span className="font-bold text-[#8C6227]">
-                      <PriceFormatter
-                        amount={discountedPrice}
-                        className="text-2xl"
-                      />
+                      <PriceFormatter amount={discountedPrice} className="text-2xl" />
                     </span>
                     <div className="flex items-center gap-2">
-                      <PriceFormatter
-                        amount={effectivePrice}
-                        className="text-[11px] line-through text-muted-foreground"
-                      />
+                      <PriceFormatter amount={effectivePrice} className="text-[11px] line-through text-muted-foreground" />
                       <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[10px] px-2 py-0.5 font-medium rounded-full border-none shadow-none">
                         -{activeDiscount}%
                       </Badge>
                     </div>
                   </>
                 ) : (
-                  <PriceFormatter
-                    amount={effectivePrice}
-                    className="text-2xl font-semibold text-[#b8502e]"
-                  />
+                  <PriceFormatter amount={effectivePrice} className="text-2xl font-semibold text-[#b8502e]" />
                 )}
               </div>
-
               {product.description && (
                 <div className="mt-6 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-none border-t border-neutral-100 dark:border-neutral-800 pt-6 w-full">
                   <PortableText value={product.description} />
@@ -293,201 +263,341 @@ export default function ProductClient({ product, children }: Props) {
             </div>
           </div>
 
-          {/* RIGHT SIDE IMAGES & CONTROLS */}
-          <div>
-            <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6 lg:gap-10">
-              <div
-                onContextMenu={(e) => e.preventDefault()}
-                onDragStart={(e) => e.preventDefault()}
-                className="h-[50vh] sm:h-[65vh] lg:h-[80vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide"
-              >
-                <div className="flex flex-col gap-6">
-                  <ImageView
-                    images={displayImages}
-                    isStock={activeSizeObj?.stock ?? product.stock}
-                  />
-                </div>
+          {/* RIGHT: image + controls */}
+          <div className="grid grid-cols-[1.1fr_0.9fr] gap-10">
+            <div
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              className="h-[80vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide"
+            >
+              <div className="flex flex-col gap-6">
+                <ImageView images={displayImages} isStock={activeSizeObj?.stock ?? product.stock} />
               </div>
+            </div>
 
-              <div className="pt-2">
-                {/* MOBILE PRODUCT DETAILS */}
-                <div className="flex lg:hidden flex-col items-start text-left mb-5">
-                  <h1 className="text-xl font-semibold leading-tight text-foreground">
-                    {product.name}
-                  </h1>
-                  <div className="flex flex-col gap-0.5 mt-1">
-                    {product.brand && (
-                      <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono">
-                        {product.brand.title}
-                      </p>
-                    )}
-                    <p className="text-[9px]  text-muted-foreground tracking-wider font-mono">
-                      SKU: {displaySku}
+            <div className="pt-2">
+              {/* COLOR PICKER */}
+              {product.colorways && product.colorways.length > 0 && (
+                <div className="mb-6">
+                  <div className="mb-2.5">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">
+                      Color{product.colorways.length > 1 ? "s" : ""}
+                    </h3>
+                    <p className="text-[11px] font-medium text-foreground transition-all duration-150 mt-0.5">
+                      {displayColorName}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2.5 mt-3 flex-wrap">
-                    {discountedPrice ? (
-                      <>
-                        <span className="font-bold text-[#8C6227]">
-                          <PriceFormatter
-                            amount={discountedPrice}
-                            className="text-xl"
-                          />
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <PriceFormatter
-                            amount={effectivePrice}
-                            className="text-[10px] line-through text-muted-foreground"
-                          />
-                          <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[9px] px-1.5 py-0.5 font-medium rounded-full border-none shadow-none">
-                            -{activeDiscount}%
-                          </Badge>
-                        </div>
-                      </>
-                    ) : (
-                      <PriceFormatter
-                        amount={effectivePrice}
-                        className="text-xl font-semibold text-[#8C6227]"
+                  <div className="flex gap-2.5 flex-wrap">
+                    {product.colorways.map((color, idx) => (
+                      <Link
+                        key={idx}
+                        href={getVariantUrl(color.name)}
+                        aria-label={`Select color ${color.name}`}
+                        onMouseEnter={() => setHoveredColorName(color.name)}
+                        onMouseLeave={() => setHoveredColorName(null)}
+                        className={`w-6 h-6 rounded-full block transition duration-200 hover:scale-110 cursor-pointer ${
+                          selectedColorName === color.name
+                            ? "ring-1 ring-black/20 ring-offset-black/20 scale-105"
+                            : "border border-neutral-200"
+                        }`}
+                        style={{ backgroundColor: color.hex }}
                       />
-                    )}
+                    ))}
                   </div>
                 </div>
+              )}
 
-                {/* COLOR PICKER */}
-                {product.colorways && product.colorways.length > 0 && (
-                  <div className="mb-6">
-                    <div className="mb-2.5">
-                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">
-                        Colors
-                      </h3>
-                      <p className="text-[11px] font-medium text-foreground transition-all duration-150 mt-0.5">
-                        {displayColorName}
-                      </p>
-                    </div>
-                    <div className="flex gap-2.5 flex-wrap">
-                      {product.colorways.map((color, idx) => (
-                        <Link
-                          key={idx}
-                          href={getVariantUrl(color.name)}
-                          aria-label={`Select color ${color.name}`}
-                          onMouseEnter={() => setHoveredColorName(color.name)}
-                          onMouseLeave={() => setHoveredColorName(null)}
-                          className={`w-6 h-6 rounded-full block transition duration-200 hover:scale-110 cursor-pointer ${
-                            selectedColorName === color.name
-                              ? "ring-1 ring-black/20 ring-offset-black/20 scale-105"
-                              : "border border-neutral-200"
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                        />
-                      ))}
-                    </div>
+              {/* SIZE PICKER */}
+              {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3 max-w-xs">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">Select Size</h3>
+                    <Button
+                      variant="link"
+                      onClick={() => setIsSizeGuideOpen(true)}
+                      className="h-auto p-0 underline cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
+                    >
+                      <ScanLine className="cursor-pointer" /> Size Guide
+                    </Button>
+                    <SizeGuideModal
+                      isOpen={isSizeGuideOpen}
+                      onClose={() => setIsSizeGuideOpen(false)}
+                      defaultTab={(product.audience?.title?.toLowerCase() as Tab) ?? "men"}
+                      defaultCategory={
+                        product.categories?.some(
+                          (c) =>
+                            resolveSlug(c.slug).toLowerCase().includes("shoe") ||
+                            c.title?.toLowerCase().includes("shoe"),
+                        )
+                          ? "shoes"
+                          : "apparel"
+                      }
+                    />
                   </div>
-                )}
-
-                {/* SIZE PICKER */}
-                {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-3 max-w-xs">
-                      <h3 className="text-[11px]  font-bold uppercase tracking-widest text-[#b8502e]">
-                        Select Size
-                      </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {activeColorway.sizes.map((item, idx) => (
                       <Button
-                        variant="link"
-                        onClick={() => setIsSizeGuideOpen(true)}
-                        className="h-auto p-0 underline cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
+                        key={idx}
+                        type="button"
+                        disabled={item.stock <= 0}
+                        onClick={() => handleSizeSelect(item.size)}
+                        variant={selectedSize === item.size ? "default" : "outline"}
+                        className={`h-auto px-3 py-1.5 text-[14px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer
+                          ${selectedSize === item.size ? "" : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"}
+                          ${!selectedSize && item.stock > 0 ? "border-xs shadow-xs" : ""}
+                        `}
                       >
-                        <ScanLine className="cursor-pointer" /> Size Guide
+                        {item.size}
                       </Button>
-
-                     <SizeGuideModal
-                        isOpen={isSizeGuideOpen}
-                        onClose={() => setIsSizeGuideOpen(false)}
-                        defaultTab={(product.audience?.title?.toLowerCase() as Tab) ?? 'men'}
-                        defaultCategory={
-                          product.categories?.some(c =>
-                            resolveSlug(c.slug).toLowerCase().includes('shoe') ||
-                            c.title?.toLowerCase().includes('shoe')
-                          ) ? 'shoes' : 'apparel'
-                        }
-                      />
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {activeColorway.sizes.map((item, idx) => (
-                        <Button
-                          key={idx}
-                          type="button"
-                          disabled={item.stock <= 0}
-                          onClick={() => handleSizeSelect(item.size)}
-                          variant={
-                            selectedSize === item.size ? "default" : "outline"
-                          }
-                          className={`h-auto px-3 py-1.5 text-[15px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer
-                            ${
-                              selectedSize === item.size
-                                ? ""
-                                : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"
-                            }
-                            ${
-                              !selectedSize && item.stock > 0
-                                ? "border-xs shadow-xs  "
-                                : ""
-                            }
-                          `}
-                        >
-                          {item.size}
-                        </Button>
-                      ))}
-                    </div>
+                    ))}
                   </div>
+                </div>
+              )}
+
+              {/* STOCK STATUS */}
+              <div className="text-xs font-medium mb-5">
+                {!selectedSize ? (
+                  <span className="text-[#b8502e] font-mono text-[14px]">↑ Pick a size to check availability</span>
+                ) : isOutOfStock ? (
+                  <span className="text-destructive uppercase tracking-wider text-[10px] font-bold">Out of stock</span>
+                ) : (
+                  <span className="text-muted-foreground font-mono text-[14px]">[Status: {activeSizeObj?.stock} in stock]</span>
                 )}
-                {/* STOCK STATUS */}
-                <div className="text-xs font-medium mb-5">
-                  {!selectedSize ? (
-                    <span className="text-[#b8502e] font-mono text-[14px]">
-                      ↑ Pick a size to check availability
-                    </span>
-                  ) : isOutOfStock ? (
-                    <span className="text-destructive uppercase tracking-wider text-[10px] font-bold">
-                      Out of stock
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground font-mono text-[14px]">
-                      [Status: {activeSizeObj?.stock} in stock]
-                    </span>
-                  )}
-                </div>
+              </div>
 
-                {/* CTA BUTTONS */}
-                <div className="flex flex-row text-2xl items-center mt-3 w-full max-w-[350px] ">
-                  <AddToCartButton
-  product={product}
-  className="cursor-pointer w-full rounded-md hover:bg-black/80"
-  disableCartOpen
-  discountedUnitPrice={discountedPrice ?? undefined} // 👈 add this
-/>
-                </div>
-                <div className="flex flex-row items-center mt-3 w-full max-w-[350px] ">
-                  <FavoriteButton
-                    resolvedImage={resolvedImageUrl}
-                    product={product}
-                    variant="full"
-                    size={12}
-                    className="flex-1  text-[10px]   dark:border-neutral-700 rounded-md"
-                  />
-                </div>
-
-                {/* MOBILE DESCRIPTION */}
-                <div className="block lg:hidden">
-                  {product.description && (
-                    <div className="mt-6 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-none border-t border-neutral-100 dark:border-neutral-800 pt-6 w-full">
-                      <PortableText value={product.description} />
-                    </div>
-                  )}
-                </div>
+              {/* CTA BUTTONS */}
+              <div className="flex flex-row text-2xl items-center mt-3 w-full max-w-[350px]">
+                <AddToCartButton
+                  product={product}
+                  className="cursor-pointer w-full rounded-md hover:bg-black/80"
+                  disableCartOpen
+                  discountedUnitPrice={discountedPrice ?? undefined}
+                />
+              </div>
+              <div className="flex flex-row items-center mt-3 w-full max-w-[350px]">
+                <FavoriteButton
+                  resolvedImage={resolvedImageUrl}
+                  product={product}
+                  variant="full"
+                  size={12}
+                  className="flex-1 text-[11px] dark:border-neutral-700 rounded-md"
+                />
               </div>
             </div>
           </div>
         </div>
+
+        {/* ── MOBILE layout (below lg): single column, logical read order ── */}
+        <div className="flex lg:hidden flex-col gap-4">
+
+          {/* 1. Breadcrumb */}
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-2 text-[10px] text-muted-foreground flex-wrap uppercase tracking-wider"
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.back()}
+              className="h-auto p-0 flex items-center gap-1 hover:bg-transparent hover:text-foreground transition uppercase text-[10px] tracking-wider"
+            >
+              <ArrowLeft size={12} /> Back
+            </Button>
+            <span>/</span>
+            <Link href="/" className="hover:text-foreground">Home</Link>
+            {audienceSlug && (
+              <>
+                <span>/</span>
+                <Link href={`/category/${audienceSlug}`} className="hover:text-foreground">
+                  {product.audience?.title}
+                </Link>
+              </>
+            )}
+            {firstCategorySlug && (
+              <>
+                <span>/</span>
+                <Link
+                  href={audienceSlug ? `/category/${audienceSlug}/${firstCategorySlug}` : `/category/${firstCategorySlug}`}
+                  className="hover:text-foreground"
+                >
+                  {product.categories?.[0]?.title}
+                </Link>
+              </>
+            )}
+            <span>/</span>
+            <span className="text-foreground font-medium truncate max-w-[150px]">{product.name}</span>
+          </nav>
+
+          {/* 2. Name + brand + price */}
+          <div className="flex flex-col items-start">
+            {product.collection && (
+              <Badge
+                variant="outline"
+                className="mb-2 px-3 py-1 rounded-full bg-neutral-50 border-neutral-200/60 text-[#8C6227] text-[9px] uppercase tracking-[0.2em] font-medium pointer-events-none"
+              >
+                <span className="w-1 h-1 rounded-full bg-[#8C6227] mr-1.5" />
+                {product.collection.title}
+              </Badge>
+            )}
+            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
+              {product.audience?.title} &bull; {product.categories?.[0]?.title || "Apparel"}
+            </span>
+            <h1 className="text-xl font-semibold leading-tight text-foreground">{product.name}</h1>
+            <div className="flex flex-col gap-0.5 mt-1">
+              {product.brand && (
+                <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono">
+                  {product.brand.title}
+                </p>
+              )}
+              <p className="text-[9px] text-muted-foreground tracking-wider font-mono">SKU: {displaySku}</p>
+            </div>
+            <div className="flex items-center gap-2.5 mt-3 flex-wrap">
+              {discountedPrice ? (
+                <>
+                  <span className="font-bold text-[#8C6227]">
+                    <PriceFormatter amount={discountedPrice} className="text-xl" />
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <PriceFormatter amount={effectivePrice} className="text-[10px] line-through text-muted-foreground" />
+                    <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[9px] px-1.5 py-0.5 font-medium rounded-full border-none shadow-none">
+                      -{activeDiscount}%
+                    </Badge>
+                  </div>
+                </>
+              ) : (
+                <PriceFormatter amount={effectivePrice} className="text-xl font-semibold text-[#8C6227]" />
+              )}
+            </div>
+          </div>
+
+          {/* 3. Image */}
+          <div
+            onContextMenu={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
+            className="h-[60vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide"
+          >
+            <ImageView images={displayImages} isStock={activeSizeObj?.stock ?? product.stock} />
+          </div>
+
+          {/* 4. Controls: color, size, stock, CTAs */}
+          <div className="flex flex-col">
+            {/* COLOR PICKER */}
+            {product.colorways && product.colorways.length > 0 && (
+              <div className="mb-6">
+                <div className="mb-2.5">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">
+                    Color{product.colorways.length > 1 ? "s" : ""}
+                  </h3>
+                  <p className="text-[11px] font-medium text-foreground transition-all duration-150 mt-0.5">
+                    {displayColorName}
+                  </p>
+                </div>
+                <div className="flex gap-2.5 flex-wrap">
+                  {product.colorways.map((color, idx) => (
+                    <Link
+                      key={idx}
+                      href={getVariantUrl(color.name)}
+                      aria-label={`Select color ${color.name}`}
+                      onMouseEnter={() => setHoveredColorName(color.name)}
+                      onMouseLeave={() => setHoveredColorName(null)}
+                      className={`w-7 h-7 rounded-full block transition duration-200 hover:scale-110 cursor-pointer ${
+                        selectedColorName === color.name
+                          ? "ring-1 ring-black/20 ring-offset-black/20 scale-105"
+                          : "border border-neutral-200"
+                      }`}
+                      style={{ backgroundColor: color.hex }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* SIZE PICKER */}
+            {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">Select Size</h3>
+                  <Button
+                    variant="link"
+                    onClick={() => setIsSizeGuideOpen(true)}
+                    className="h-auto p-0 underline cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
+                  >
+                    <ScanLine className="cursor-pointer" /> Size Guide
+                  </Button>
+                  <SizeGuideModal
+                    isOpen={isSizeGuideOpen}
+                    onClose={() => setIsSizeGuideOpen(false)}
+                    defaultTab={(product.audience?.title?.toLowerCase() as Tab) ?? "men"}
+                    defaultCategory={
+                      product.categories?.some(
+                        (c) =>
+                          resolveSlug(c.slug).toLowerCase().includes("shoe") ||
+                          c.title?.toLowerCase().includes("shoe"),
+                      )
+                        ? "shoes"
+                        : "apparel"
+                    }
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {activeColorway.sizes.map((item, idx) => (
+                    <Button
+                      key={idx}
+                      type="button"
+                      disabled={item.stock <= 0}
+                      onClick={() => handleSizeSelect(item.size)}
+                      variant={selectedSize === item.size ? "default" : "outline"}
+                      className={`h-auto px-3 py-1.5 text-[14px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer
+                        ${selectedSize === item.size ? "" : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"}
+                        ${!selectedSize && item.stock > 0 ? "border-xs shadow-xs" : ""}
+                      `}
+                    >
+                      {item.size}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* STOCK STATUS */}
+            <div className="text-xs font-medium mb-5">
+              {!selectedSize ? (
+                <span className="text-[#b8502e] font-mono text-[14px]">↑ Pick a size to check availability</span>
+              ) : isOutOfStock ? (
+                <span className="text-destructive uppercase tracking-wider text-[10px] font-bold">Out of stock</span>
+              ) : (
+                <span className="text-muted-foreground font-mono text-[14px]">[Status: {activeSizeObj?.stock} in stock]</span>
+              )}
+            </div>
+
+            {/* CTA BUTTONS */}
+            <div className="flex flex-row text-2xl items-center mt-3 w-full">
+              <AddToCartButton
+                product={product}
+                className="cursor-pointer w-full rounded-md hover:bg-black/80"
+                disableCartOpen
+                discountedUnitPrice={discountedPrice ?? undefined}
+              />
+            </div>
+            <div className="flex flex-row items-center mt-3 w-full">
+              <FavoriteButton
+                resolvedImage={resolvedImageUrl}
+                product={product}
+                variant="full"
+                size={12}
+                className="flex-1 text-[11px] dark:border-neutral-700 rounded-md"
+              />
+            </div>
+          </div>
+
+          {/* 5. Description */}
+          {product.description && (
+            <div className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-100 dark:border-neutral-800 pt-6">
+              <PortableText value={product.description} />
+            </div>
+          )}
+        </div>
+
       </div>
       {children}
     </section>

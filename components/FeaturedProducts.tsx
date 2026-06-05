@@ -35,19 +35,35 @@ export default function FeaturedProducts({
   products: Product[];
 }) {
   return (
-    <section className="pt-5 bg-[#FAF8F4] w-full">
+    <section className="pt-8 bg-[#FAF8F4] w-full">
       {/* Header */}
       <div className="flex items-center mb-5 justify-between  px-4 sm:px-6 lg:px-10">
-        <h2 className="text-[15px] tracking-[3px] font-medium uppercase text-[#111111]">
+        <h2 className="text-[15px] tracking-[3px] font-bold uppercase text-[#111111]">
           {title}
         </h2>
         <Link
-          href="/category/all"
-          className="text-[11px] uppercase tracking-widest font-semibold text-black flex items-center gap-1 hover:text-[#b8502e]"
-        >
-          View All <ArrowRight size={12} />
-        </Link>
+              href="/category/all"
+              className="inline-flex items-center gap-3 group w-fit"
+            >
+              <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black border-b-2 border-black pb-0.5 group-hover:border-gray-400 group-hover:text-gray-400 transition-colors duration-200">
+                View All
+              </span>
+              <svg
+                className="w-4 h-4 text-black group-hover:text-gray-400 group-hover:translate-x-1 transition-all duration-200"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </Link>
       </div>
+      
 
       {/* Full-width 3-column grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-[2px]">

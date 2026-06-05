@@ -97,7 +97,7 @@ const FavoriteButton = ({
             image: resolvedImage ?? (product.images?.[0] ? urlFor(product.images[0]).url() : undefined),
             slug: product.slug?.current,
           });
-          toast.success("Added to wishlist ♥");
+          toast.success("Added to wishlist ");
         } else {
           await removeFromWishlist(product._id);
           toast.success("Removed from wishlist");
@@ -120,14 +120,14 @@ const FavoriteButton = ({
         onClick={handleToggle}
         disabled={isPending}
         className={cn(
-          "text-[12px] tracking-wider uppercase font-bold rounded-full h-11 cursor-pointer bg-white border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white whitespace-nowrap transition-colors",
-          favorited && "bg-[#111111] text-white border-[#111111] hover:bg-[#333333]",
+          "text-[12px] tracking-wider uppercase font-bold rounded-full h-11 cursor-pointer bg-white border-[#111111]/20 text-[#111111] hover:bg-[#111111] hover:text-white whitespace-nowrap transition-colors",
+          favorited && "bg-white font-bold  text-[#b8502e] border-none shadow-xs hover:bg-[#333333]",
           className
         )}
       >
         <Heart
           size={size}
-          className={cn("transition-all", favorited ? "fill-white text-white" : "text-[#111111]")}
+          className={cn("transition-all", favorited ? "fill-[#b8502e] text-[#b8502e]" : "text-[#111111]")}
         />
         <span className="ml-1">{favorited ? "Saved" : "Add to Favorite"}</span>
       </Button>
@@ -141,14 +141,14 @@ const FavoriteButton = ({
       onClick={handleToggle}
       disabled={isPending}
       className={cn(
-        "text-[12px] uppercase font-semibold rounded-full h-11 w-9 p-0 cursor-pointer border-neutral-300 hover:border-[#111111] hover:bg-[#111111] hover:text-white transition-colors",
-        favorited && "bg-[#111111] border-[#111111] text-white hover:bg-[#333333]",
+        "text-[12px] tracking-wider uppercase font-bold rounded-full h-11 cursor-pointer bg-white border-[#111111]/10 text-[#111111]  hover:text-white whitespace-nowrap transition-colors",
+          favorited && "bg-white font-bold  text-[#b8502e] border-none shadow-xs ",
         className
       )}
     >
       <Heart
         size={size}
-        className={cn("transition-all", favorited ? "fill-white text-white" : "text-[#111111]")}
+        className={cn("transition-all", favorited ? "fill-[#b8502e] text-[#b8502e]" : "text-[#111111]")}
       />
     </Button>
   );

@@ -63,7 +63,16 @@ export async function createOrderInPrisma(session: Stripe.Checkout.Session) {
       notes: orderNumber,
       stripeReceiptUrl, 
       items: {
-        create: orderItems,
+        create: orderItems.map((item) => ({  // ← change from array spread to map
+    productId: item.productId,
+    name: item.name,
+    price: item.price,
+    originalPrice: item.originalPrice ?? null, // ← add
+    image: item.image,
+    colorway: item.colorway,
+    size: item.size,
+    quantity: item.quantity,
+  })),
       },
     },
     include: { items: true },

@@ -1,16 +1,15 @@
 // actions/decrementSanityStock.ts
-"use server";
+
 
 import { createClient } from "@sanity/client";
 
 const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
-  token: process.env.SANITY_API_WRITE_TOKEN!, // needs write token
+  token: process.env.SANITY_API_WRITE_TOKEN!,
   apiVersion: "2024-01-01",
   useCdn: false,
 });
-
 interface StockItem {
   productId: string; // Sanity document _id
   colorway: string;
@@ -20,6 +19,7 @@ interface StockItem {
 
 export async function decrementSanityStock(items: StockItem[]) {
   for (const item of items) {
+    console.log("[Sanity] Decrementing:", items);
     // Fetch the product document
     const product = await sanityClient.fetch(
       `*[_type == "product" && _id == $id][0]{

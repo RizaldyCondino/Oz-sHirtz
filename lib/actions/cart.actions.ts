@@ -19,6 +19,7 @@ export async function addToCart(item: {
   productId: string;
   name: string;
   price: number;
+  originalPrice?: number; // ← add
   image?: string;
   colorway?: string;
   size?: string;
@@ -49,6 +50,7 @@ export async function addToCart(item: {
       productId: item.productId,
       name: item.name,
       price: item.price,
+      originalPrice: item.originalPrice ?? null, // ← add
       image: item.image,
       colorway: item.colorway ?? "",
       size: item.size ?? "",

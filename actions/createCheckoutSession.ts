@@ -11,6 +11,7 @@ export interface Metadata {
   customerEmail: string;
   clerkUserId?: string;
   address?: Address | null;
+  
 }
 
 export interface GroupedCartItems {
@@ -96,7 +97,7 @@ export async function createCheckoutSession(
               ]
                 .filter(Boolean)
                 .join(" · "),
-              metadata: { id: item?.product?._id },
+              metadata: { id: item?.product?._id, originalPrice: originalPrice.toString(), },
               images: item?.selectedImage
                 ? [item.selectedImage]
                 : item?.product?.images && item?.product?.images?.length > 0

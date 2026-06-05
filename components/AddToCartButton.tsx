@@ -114,7 +114,7 @@ const AddToCartButton = ({
           disabled={isButtonDisabled}
           aria-label={buttonLabel}
           className={cn(
-            "w-full h-11 rounded-full font-bold tracking-wider text-[11px] uppercase shadow-none border transition-all duration-200",
+            "w-full h-11 rounded-full font-bold tracking-wider text-[12px] uppercase shadow-none border transition-all duration-200",
             hasSelection &&
               !isOutOfStock &&
               !isAtStockLimit &&

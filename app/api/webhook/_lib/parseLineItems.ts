@@ -5,6 +5,7 @@ export interface ParsedLineItem {
   productId: string;
   name: string;
   price: number;
+    originalPrice: number | null;  // ← add
   image: string | null;
   colorway: string;
   size: string;
@@ -29,12 +30,17 @@ export async function parseLineItems(
       const color = description.match(/Color:\s*([^·]+)/)?.[1]?.trim() ?? "";
       const size = description.match(/Size:\s*([^·]+)/)?.[1]?.trim() ?? "";
       const price = (item.price?.unit_amount ?? 0) / 100;
+
+      const originalPrice = stripeProduct?.metadata?.originalPrice
+        ? parseFloat(stripeProduct.metadata.originalPrice)
+        : null; // ← add
+
       const name = stripeProduct?.name ?? "Unknown Product";
       const image = stripeProduct?.images?.[0] ?? null;
 
       if (!productId) return null;
 
-      return { productId, name, price, image, colorway: color, size, quantity };
+      return { productId, name, price, originalPrice, image, colorway: color, size, quantity };
     })
     .filter(Boolean) as ParsedLineItem[];
 }

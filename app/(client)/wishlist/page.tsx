@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Trash2, ShoppingBag, ArrowLeft, PackageOpen } from "lucide-react";
+import { Heart,  ShoppingBag, ArrowLeft,  } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -71,7 +71,7 @@ const WishlistPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F7F4]">
+    <div className="min-h-screen mb-5 bg-[#F9F7F4]">
       {/* Header */}
       <div className="">
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -127,8 +127,8 @@ const WishlistPage = () => {
             transition={{ duration: 0.5 }}
             className="flex flex-col items-center justify-center py-24 text-center"
           >
-            <div className="w-20 h-20 rounded-full bg-[#F0EAE0] flex items-center justify-center mb-6">
-              <PackageOpen className="w-9 h-9 text-[#B8A898]" />
+            <div className="w-20 h-20 rounded-full bg-white shadow-md flex items-center justify-center mb-6">
+              <Heart className="w-7 h-7 text-[#b8502e] fill-[#b8502e]" />
             </div>
             <h2 className="text-xl font-semibold text-[#231F20] mb-2">
               Your wishlist is empty
@@ -137,8 +137,8 @@ const WishlistPage = () => {
               Save items you love by tapping the heart icon on any product.
             </p>
             <Link href="/category/all">
-              <Button className="bg-[#231F20] text-white hover:bg-[#3D3635] cursor-pointer rounded-full px-8 py-2 text-sm font-medium transition-colors">
-                <ShoppingBag className="w-4 h-4 mr-2" />
+              <Button className="bg-[#231F20] text-white hover:bg-[#3D3635] cursor-pointer rounded-m px-8 py-7 text-sm font-medium transition-colors">
+                <ShoppingBag className="w-9 h-9 mr-2" />
                 Browse Products
               </Button>
             </Link>
@@ -172,11 +172,11 @@ const WishlistPage = () => {
                       disabled={isRemoving}
                       aria-label="Remove from wishlist"
                       className={cn(
-                        "absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm border border-[#EDE6DC] opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-50 hover:border-red-200",
+                        "absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm border border-[#EDE6DC] opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-white/80 hover:border-white/80",
                         isRemoving && "opacity-100 cursor-not-allowed"
                       )}
                     >
-                      <Trash2 className="w-3.5 h-3.5 text-[#9B6B6B] hover:text-red-500 transition-colors cursor-pointer" />
+                      <Heart fill="#b8502e" className="w-6 h-6 text-white hover:text-white transition-colors cursor-pointer" />
                     </button>
 
                     {/* Image Area with Secondary Image Support */}
@@ -230,7 +230,7 @@ const WishlistPage = () => {
                         <Link href={href}>
                           <Button
                             size="sm"
-                            className="h-7 text-[10px] px-3 rounded-full cursor-pointer bg-[#231F20] text-white hover:bg-[#3D3635] transition-colors font-medium"
+                            className="h-8 text-[11px] font-bold tracking-wider hoverEffect  px-3 rounded-full cursor-pointer bg-[#111111] text-white hover:bg-[#111111]/80 transition-colors "
                           >
                             View
                           </Button>

@@ -172,3 +172,22 @@ export const sizeGuideData: Record<Tab, Record<Category, SizeData>> = {
     },
   },
 };
+
+
+
+
+//orders
+
+export const STATUS_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
+  PENDING:   { label: "Pending",   color: "text-amber-600",   dot: "bg-amber-400"   },
+  CONFIRMED: { label: "Confirmed", color: "text-blue-600",    dot: "bg-blue-400"    },
+  SHIPPED:   { label: "Shipped",   color: "text-violet-600",  dot: "bg-violet-400"  },
+  DELIVERED: { label: "Delivered", color: "text-emerald-600", dot: "bg-emerald-400" },
+  CANCELLED: { label: "Cancelled", color: "text-red-500",     dot: "bg-red-400"     },
+};
+
+export const PAYMENT_CONFIG: Record<string, { label: string; color: string }> = {
+  PAID:    { label: "Paid",    color: "text-emerald-600" },
+  UNPAID:  { label: "Unpaid",  color: "text-red-500"     },
+  PARTIAL: { label: "Partial", color: "text-amber-600"   },
+};

@@ -19,6 +19,7 @@ export async function createOrder(data: {
     productId: string;
     name: string;
     price: number;
+    originalPrice?: number; // ← add
     image?: string;
     colorway?: string;
     size?: string;
@@ -45,6 +46,7 @@ export async function createOrder(data: {
             productId: item.productId,
             name: item.name,
             price: item.price,
+            originalPrice: item.originalPrice ?? null, // ← add
             image: item.image,
             colorway: item.colorway ?? "",
             size: item.size ?? "",

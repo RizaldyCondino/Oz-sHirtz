@@ -158,7 +158,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
       <div className="p-4 flex flex-col gap-3">
         <Link href={isGlobalSoldOut ? "#" : href} className="cursor-pointer">
-          <h3 className="text-[12px] tracking-wide uppercase font-medium text-[#231F20] truncate">
+          <h3 className="text-[12px] tracking-wide uppercase font-semibold text-[#231F20] truncate">
             {title}
           </h3>
         </Link>
@@ -169,7 +169,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <>
               <PriceFormatter
                 amount={discountedPrice}
-                className="text-base font-semibold text-[#8C6227]"
+                className="text-[14px] font-semibold text-[#b8502e]"
               />
               <PriceFormatter
                 amount={activePrice}
