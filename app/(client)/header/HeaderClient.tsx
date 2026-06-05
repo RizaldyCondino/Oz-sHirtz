@@ -115,7 +115,7 @@ export default function HeaderClient({
                   : "hover:text-black/70"
               }
             >
-              Featured
+              New & Featured 
             </Link>
 
             {menuCategories.map((group) => {

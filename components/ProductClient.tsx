@@ -335,22 +335,27 @@ export default function ProductClient({ product, children }: Props) {
                     />
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {activeColorway.sizes.map((item, idx) => (
-                      <Button
-                        key={idx}
-                        type="button"
-                        disabled={item.stock <= 0}
-                        onClick={() => handleSizeSelect(item.size)}
-                        variant={selectedSize === item.size ? "default" : "outline"}
-                        className={`h-auto px-3 py-1.5 text-[14px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer
-                          ${selectedSize === item.size ? "" : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"}
-                          ${!selectedSize && item.stock > 0 ? "border-xs shadow-xs" : ""}
-                        `}
-                      >
-                        {item.size}
-                      </Button>
-                    ))}
-                  </div>
+  {activeColorway.sizes.map((item, idx) => (
+    <Button
+      key={idx}
+      type="button"
+      disabled={item.stock <= 0}
+      onClick={() => handleSizeSelect(item.size)}
+      variant={selectedSize === item.size ? "default" : "outline"}
+      className={`h-auto px-3 py-1.5 text-[13px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer relative
+        ${selectedSize === item.size ? "" : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"}
+        ${item.stock <= 0 ? "opacity-50" : "border-xs shadow-xs"}
+      `}
+    >
+      {item.size}
+      {item.stock <= 0 && (
+        <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <span className="w-5 text-[#b8502e] h-px rotate-45  bg-current  absolute" />
+        </span>
+      )}
+    </Button>
+  ))}
+</div>
                 </div>
               )}
 
@@ -549,7 +554,7 @@ export default function ProductClient({ product, children }: Props) {
                       variant={selectedSize === item.size ? "default" : "outline"}
                       className={`h-auto px-3 py-1.5 text-[14px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer
                         ${selectedSize === item.size ? "" : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"}
-                        ${!selectedSize && item.stock > 0 ? "border-xs shadow-xs" : ""}
+                        ${!selectedSize && item.stock > 0 ? "border-xs shadow-xs " : ""}
                       `}
                     >
                       {item.size}
