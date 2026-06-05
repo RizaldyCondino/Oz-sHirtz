@@ -120,14 +120,14 @@ const FavoriteButton = ({
         onClick={handleToggle}
         disabled={isPending}
         className={cn(
-          "text-xs uppercase font-semibold rounded-full h-11 cursor-pointer text-[#b8502e]/90 border-[#b8502e]/20 hover:border-[#b8502e] hoverEffect hover:text-[#b8502e] whitespace-nowrap transition-colors",
-          favorited && "border-[#b8502e] text-[#b8502e] hover:border-[#b8502e]/80 hover:text-[#b8502e]/80",
+          "text-[12px] tracking-wider uppercase font-bold rounded-full h-11 cursor-pointer bg-white border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white whitespace-nowrap transition-colors",
+          favorited && "bg-[#111111] text-white border-[#111111] hover:bg-[#333333]",
           className
         )}
       >
         <Heart
           size={size}
-          className={cn("transition-all", favorited ? "fill-[#b8502e] text-[#b8502e]" : "text-[#b8502e]")}
+          className={cn("transition-all", favorited ? "fill-white text-white" : "text-[#111111]")}
         />
         <span className="ml-1">{favorited ? "Saved" : "Add to Favorite"}</span>
       </Button>
@@ -141,14 +141,14 @@ const FavoriteButton = ({
       onClick={handleToggle}
       disabled={isPending}
       className={cn(
-        "text-xs uppercase font-semibold rounded-full h-11 w-9 p-0 cursor-pointer border-neutral-300 hover:border-black/80 transition-colors",
-        favorited && "border-[#b8502e] hover:border-[#b8502e]/80 text-[#b8502e]",
+        "text-[12px] uppercase font-semibold rounded-full h-11 w-9 p-0 cursor-pointer border-neutral-300 hover:border-[#111111] hover:bg-[#111111] hover:text-white transition-colors",
+        favorited && "bg-[#111111] border-[#111111] text-white hover:bg-[#333333]",
         className
       )}
     >
       <Heart
         size={size}
-        className={cn("transition-all", favorited ? "fill-[#b8502e] text-[#b8502e]" : "text-black")}
+        className={cn("transition-all", favorited ? "fill-white text-white" : "text-[#111111]")}
       />
     </Button>
   );

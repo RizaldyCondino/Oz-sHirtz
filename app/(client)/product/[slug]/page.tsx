@@ -57,8 +57,9 @@ export default async function ProductPage({ params }: PageProps) {
 
   return (
     <main>
-      <ProductClient product={product} />
+       <ProductClient product={product}>
       <YouMightLike products={relatedProducts} />
+    </ProductClient>
     </main>
   );
 }

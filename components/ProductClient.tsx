@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import {  ArrowLeft,  ScanLine } from "lucide-react";
+import { ArrowLeft, ScanLine } from "lucide-react";
 import { PortableText } from "@portabletext/react";
 
 import ImageView from "@/components/ImageView";
@@ -16,7 +16,7 @@ import useStore from "@/store"; // 👈 addedw
 import { urlFor } from "@/sanity/lib/image";
 import FavoriteButton from "./Favoritebutton";
 import YouMightLike from "./YouMightLike";
-
+import { Tab } from "@/constants/data";
 
 interface Size {
   size: string;
@@ -65,7 +65,7 @@ interface Props {
   children?: React.ReactNode;
 }
 
-export default function ProductClient({ product, children  }: Props) {
+export default function ProductClient({ product, children }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -168,11 +168,10 @@ export default function ProductClient({ product, children  }: Props) {
     ? urlFor(displayImage).url()
     : undefined; // ← add
 
-
-    const categorySlug =
-  (product.categories?.[0]?.slug as any)?.current ??
-  product.categories?.[0]?.slug ??
-  "";
+  const categorySlug =
+    (product.categories?.[0]?.slug as any)?.current ??
+    product.categories?.[0]?.slug ??
+    "";
   return (
     <section className="relative bg-[#FAF8F4] min-h-screen py-4 sm:py-6 lg:py-4">
       <div className="relative z-10 max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
@@ -298,9 +297,10 @@ export default function ProductClient({ product, children  }: Props) {
           <div>
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6 lg:gap-10">
               <div
-              onContextMenu={(e) => e.preventDefault()}
-              onDragStart={(e) => e.preventDefault()}
-              className="h-[50vh] sm:h-[65vh] lg:h-[80vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide">
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                className="h-[50vh] sm:h-[65vh] lg:h-[80vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide"
+              >
                 <div className="flex flex-col gap-6">
                   <ImageView
                     images={displayImages}
@@ -357,7 +357,7 @@ export default function ProductClient({ product, children  }: Props) {
                 {product.colorways && product.colorways.length > 0 && (
                   <div className="mb-6">
                     <div className="mb-2.5">
-                      <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#b8502e]">
+                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">
                         Colors
                       </h3>
                       <p className="text-[11px] font-medium text-foreground transition-all duration-150 mt-0.5">
@@ -388,21 +388,27 @@ export default function ProductClient({ product, children  }: Props) {
                 {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-3 max-w-xs">
-                      <h3 className="text-[10px] cursor-pointer font-bold uppercase tracking-widest text-[#b8502e]">
+                      <h3 className="text-[11px]  font-bold uppercase tracking-widest text-[#b8502e]">
                         Select Size
                       </h3>
                       <Button
                         variant="link"
                         onClick={() => setIsSizeGuideOpen(true)}
-                        className="h-auto p-0 underline text-[10px] font-medium text-muted-foreground hover:text-foreground"
+                        className="h-auto p-0 underline cursor-pointer text-[11px] font-medium text-muted-foreground hover:text-foreground"
                       >
-                      <ScanLine className="cursor-pointer"/> Size Guide
+                        <ScanLine className="cursor-pointer" /> Size Guide
                       </Button>
-                      <SizeGuideModal
-                        
+
+                     <SizeGuideModal
                         isOpen={isSizeGuideOpen}
                         onClose={() => setIsSizeGuideOpen(false)}
-                        
+                        defaultTab={(product.audience?.title?.toLowerCase() as Tab) ?? 'men'}
+                        defaultCategory={
+                          product.categories?.some(c =>
+                            resolveSlug(c.slug).toLowerCase().includes('shoe') ||
+                            c.title?.toLowerCase().includes('shoe')
+                          ) ? 'shoes' : 'apparel'
+                        }
                       />
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -415,11 +421,18 @@ export default function ProductClient({ product, children  }: Props) {
                           variant={
                             selectedSize === item.size ? "default" : "outline"
                           }
-                          className={`h-auto px-3 py-1.5 text-[12px] font-medium rounded-full shadow-sm min-w-[36px] cursor-pointer ${
-                            selectedSize === item.size
-                              ? ""
-                              : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200 cursor-pointer"
-                          }`}
+                          className={`h-auto px-3 py-1.5 text-[15px] font-medium rounded-sm w-12 shadow-xs min-w-[36px] cursor-pointer
+                            ${
+                              selectedSize === item.size
+                                ? ""
+                                : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"
+                            }
+                            ${
+                              !selectedSize && item.stock > 0
+                                ? "border-xs shadow-xs  "
+                                : ""
+                            }
+                          `}
                         >
                           {item.size}
                         </Button>
@@ -427,34 +440,33 @@ export default function ProductClient({ product, children  }: Props) {
                     </div>
                   </div>
                 )}
-
                 {/* STOCK STATUS */}
                 <div className="text-xs font-medium mb-5">
                   {!selectedSize ? (
-                    <span className="text-muted-foreground font-mono text-[11px]">
-                      [Please select a size to check availability]
+                    <span className="text-[#b8502e] font-mono text-[14px]">
+                      ↑ Pick a size to check availability
                     </span>
                   ) : isOutOfStock ? (
                     <span className="text-destructive uppercase tracking-wider text-[10px] font-bold">
                       Out of stock
                     </span>
                   ) : (
-                    <span className="text-muted-foreground font-mono text-[11px]">
+                    <span className="text-muted-foreground font-mono text-[14px]">
                       [Status: {activeSizeObj?.stock} in stock]
                     </span>
                   )}
                 </div>
 
                 {/* CTA BUTTONS */}
-                <div className="flex flex-row text-2xl items-center mt-3 w-full max-w-[350px] px-2">
+                <div className="flex flex-row text-2xl items-center mt-3 w-full max-w-[350px] ">
                   <AddToCartButton
-                      product={product}
-                      className="cursor-pointer w-full rounded-md hover:bg-black/80"
-                      disableCartOpen  // cart won't auto-open on this page
-                    />
-             
+  product={product}
+  className="cursor-pointer w-full rounded-md hover:bg-black/80"
+  disableCartOpen
+  discountedUnitPrice={discountedPrice ?? undefined} // 👈 add this
+/>
                 </div>
-                 <div className="flex flex-row items-center mt-3 w-full max-w-[350px] px-2">
+                <div className="flex flex-row items-center mt-3 w-full max-w-[350px] ">
                   <FavoriteButton
                     resolvedImage={resolvedImageUrl}
                     product={product}
@@ -474,7 +486,6 @@ export default function ProductClient({ product, children  }: Props) {
                 </div>
               </div>
             </div>
-            
           </div>
         </div>
       </div>
