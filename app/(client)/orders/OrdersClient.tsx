@@ -139,7 +139,7 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                 onClick={() => setExpandedId(isExpanded ? null : order.id)}
               >
                 <div className="flex -space-x-2 shrink-0">
-                  {previewItems.map((item, idx) => (
+                 {previewItems.map((item: any, idx: number) => (
                     <div
                       key={item.id}
                       className="relative w-11 h-11 rounded-xl overflow-hidden border-2 border-white bg-neutral-100"
