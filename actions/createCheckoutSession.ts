@@ -2,8 +2,22 @@
 import { urlFor } from "@/sanity/lib/image";
 import stripe from "../lib/stripe";
 import { CartItem } from "./../store";
-import type { Address } from "@prisma/client";
 import Stripe from "stripe";
+
+type Address = {
+  id: string;
+  clerkId: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 
 export interface Metadata {
   orderNumber: string;

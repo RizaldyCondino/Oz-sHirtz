@@ -3,8 +3,21 @@ import { Metadata } from "@/actions/createCheckoutSession";
 import { parseLineItems } from "./parseLineItems";
 import Stripe from "stripe";
 import stripe from "@/lib/stripe";
-import type { Address } from "@prisma/client";
 import { decrementSanityStock } from "@/actions/decrementSanityStock";
+
+type Address = {
+  id: string;
+  clerkId: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export async function createOrderInPrisma(session: Stripe.Checkout.Session) {
   const { id, amount_total, metadata, total_details } = session;
