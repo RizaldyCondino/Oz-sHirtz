@@ -82,7 +82,7 @@ export default function SuccessClient() {
         <Separator className="mb-6" />
 
         {/* Order summary */}
-        <div className="bg-[#FAF8F4] rounded-xl p-4 mb-4 text-left space-y-2">
+        <div className="bg-white rounded-xl p-4 mb-4 text-left space-y-2 shadow-xs">
           <div className="flex justify-between text-sm">
             <span className="text-neutral-500">Order number</span>
             <span className="font-medium text-black">{orderNumber}</span>
@@ -161,7 +161,7 @@ export default function SuccessClient() {
           </div>
         )}
 
-        <div className="flex items-start gap-3 bg-[#8C6227]/5 rounded-xl p-4 mb-6 text-left">
+        <div className="flex items-start gap-3 bg-white shadow-xs rounded-xl p-4 mb-6 text-left">
           <Package className="text-[#8C6227] shrink-0 mt-0.5" size={18} />
           <p className="text-sm text-neutral-600">
             You will receive a confirmation email shortly. You can track your order status in your orders page.
