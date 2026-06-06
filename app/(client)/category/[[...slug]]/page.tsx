@@ -383,15 +383,16 @@ export default async function CategoryPage({
           <div className="flex items-center justify-between w-full ">
             {/* Search Results Section (Shows only when searching) */}
             {searchQuery ? (
-              <div className="md:px-6 lg:px-1 ">
-                <h1 className="flex items-center gap-2 text-[12px] font-bold tracking-wider hoverEffect text-[#b8502e] uppercase border-none">
-                  <span className="text-[9px] text-black font-medium">search result:</span> "{searchQuery}"
-                  <span className="text-[9px] font-normal text-neutral-500 ml-2">
-                    {filteredProducts.length} product
-                    {filteredProducts.length !== 1 ? "s" : ""}
-                  </span>
-                </h1>
-              </div>
+              <div className="md:px-6 lg:px-1">
+  <h1 className="flex flex-col md:flex-row md:items-center gap-0.5 md:gap-2 text-[12px] font-bold tracking-wider hoverEffect text-[#b8502e] uppercase border-none">
+    <span className="text-[9px] text-black font-medium whitespace-nowrap">search result:</span>
+    <span className="truncate">"{searchQuery}"</span>
+    <span className="text-[9px] font-semibold text-neutral-500 whitespace-nowrap">
+      {filteredProducts.length} product
+      {filteredProducts.length !== 1 ? "s" : ""}
+    </span>
+  </h1>
+</div>
             ) : (
               /* Empty div to maintain spacing when not searching */
               <div />

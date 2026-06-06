@@ -285,7 +285,7 @@ export default function ProductClient({ product, children }: Props) {
                 )}
               </div>
               {product.description && (
-                <div className="mt-6 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-none border-t border-neutral-100 dark:border-neutral-800 pt-6 w-full">
+                <div className=" text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-none border-t border-neutral-100 dark:border-neutral-800 pt-6 w-full">
                   <PortableText value={product.description} />
                 </div>
               )}
@@ -489,7 +489,7 @@ export default function ProductClient({ product, children }: Props) {
             </span>
           </nav>
 
-          {/* 2. Name + brand + price */}
+          {/* 2. Name + price (price aligned right) */}
           <div className="flex flex-col items-start">
             {product.collection && (
               <Badge
@@ -504,50 +504,27 @@ export default function ProductClient({ product, children }: Props) {
               {product.audience?.title} &bull;{" "}
               {product.categories?.[0]?.title || "Apparel"}
             </span>
-            <h1 className="text-xl font-semibold leading-tight text-foreground">
-              {product.name}
-            </h1>
-            <div className="flex flex-col gap-0.5 mt-1">
-              {product.brand && (
-                <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono">
-                  {product.brand.title}
-                </p>
-              )}
-              <p className="text-[9px] text-muted-foreground tracking-wider font-mono">
-                SKU: {displaySku}
-              </p>
 
-              {product.countryOfOrigin && (
-                <p className="text-[9px] text-muted-foreground tracking-wider font-mono">
-                  Made in: {product.countryOfOrigin}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-2.5 mt-3 flex-wrap">
-              {discountedPrice ? (
-                <>
-                  <span className="font-bold text-[#8C6227]">
-                    <PriceFormatter
-                      amount={discountedPrice}
-                      className="text-xl"
-                    />
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <PriceFormatter
-                      amount={effectivePrice}
-                      className="text-[10px] line-through text-muted-foreground"
-                    />
-                    <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[9px] px-1.5 py-0.5 font-medium rounded-full border-none shadow-none">
-                      -{activeDiscount}%
-                    </Badge>
-                  </div>
-                </>
-              ) : (
-                <PriceFormatter
-                  amount={effectivePrice}
-                  className="text-xl font-semibold text-[#8C6227]"
-                />
-              )}
+            <h1 className="text-xl mt-2 font-semibold leading-tight text-foreground flex-1">
+                {product.name}
+              </h1>
+            <div className="flex mt-2 items-start justify-between w-full gap-2">
+              
+              <div className="flex gap-3 items-end shrink-0">
+                {discountedPrice ? (
+                  <>
+                    <PriceFormatter amount={discountedPrice} className="text-xl font-bold text-[#8C6227]" />
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <PriceFormatter amount={effectivePrice} className="text-[10px] line-through text-muted-foreground" />
+                      <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[9px] px-1.5 py-0.5 font-medium rounded-full border-none shadow-none">
+                        -{activeDiscount}%
+                      </Badge>
+                    </div>
+                  </>
+                ) : (
+                  <PriceFormatter amount={effectivePrice} className="text-xl font-semibold text-[#8C6227]" />
+                )}
+              </div>
             </div>
           </div>
 
@@ -686,7 +663,24 @@ export default function ProductClient({ product, children }: Props) {
             </div>
           </div>
 
-          {/* 5. Description */}
+          {/* 5. Details: brand, SKU, country + description — all at the bottom */}
+          <div className="flex flex-col gap-0.5 border-t border-neutral-100 dark:border-neutral-800 pt-6 mt-2">
+            {product.brand && (
+              <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono">
+                {product.brand.title}
+              </p>
+            )}
+            <p className="text-[9px] text-muted-foreground tracking-wider font-mono">
+              SKU: {displaySku}
+            </p>
+            {product.countryOfOrigin && (
+              <p className="text-[9px] text-muted-foreground tracking-wider font-mono">
+                Made in: {product.countryOfOrigin}
+              </p>
+            )}
+          </div>
+
+          {/* 6. Description */}
           {product.description && (
             <div className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-100 dark:border-neutral-800 pt-6">
               <PortableText value={product.description} />
