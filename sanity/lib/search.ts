@@ -44,46 +44,46 @@ async function groqSearch(query: string): Promise<SearchResult[]> {
     const groqQuery = `
       *[
         _type == "product" &&
-    status != "sold-out" &&
-    (
-      name match $query ||
-      shortDescription match $query ||
-      materials match $query ||
-      brand->title match $query ||
-      categories[]->title match $query ||
-      audience->title match $query ||
-      status match $query ||
-      (isOnSale == true && ($query match "*sale*" || $query match "*on sale*")) ||
-      (discount > 0 && ($query match "*sale*" || $query match "*discount*" || $query match "*off*"))
-    )
+        status != "sold-out" &&
+        (
+          name match $searchQuery ||
+          shortDescription match $searchQuery ||
+          materials match $searchQuery ||
+          brand->title match $searchQuery ||
+          categories[]->title match $searchQuery ||
+          audience->title match $searchQuery ||
+          status match $searchQuery ||
+          (isOnSale == true && ("sale" match $searchQuery || "on sale" match $searchQuery)) ||
+          (discount > 0 && ("sale" match $searchQuery || "discount" match $searchQuery || "off" match $searchQuery))
+        )
       ] | order(_score desc) [0...10] {
         _id,
-  "name": name,
-  "slug": slug.current,
-  price,
-  originalPrice,
-  discount,
-  status,
-  isOnSale,
-  isNew,
-  "brand": brand->title,
-  "category": categories[0]->title,
-  "audience": audience->title,
-  "image": images[0],
-  "colorwayImage": colorways[0].images[0],
-  "colorways": colorways[]{
-    name,
-    hex,
-    price,
-    discount,
-    sizes[]{ size, stock, price }
-  }
+        "name": name,
+        "slug": slug.current,
+        price,
+        originalPrice,
+        discount,
+        status,
+        isOnSale,
+        isNew,
+        "brand": brand->title,
+        "category": categories[0]->title,
+        "audience": audience->title,
+        "image": images[0],
+        "colorwayImage": colorways[0].images[0],
+        "colorways": colorways[]{
+          name,
+          hex,
+          price,
+          discount,
+          sizes[]{ size, stock, price }
+        }
       }
     `;
 
- const results = await client.fetch<SearchResult[]>(groqQuery, {
-  searchTerm: `*${query}*`,
-});
+    const results = await client.fetch<SearchResult[]>(groqQuery, {
+      searchQuery: `*${query}*`,
+    });
 
     return results.map((r: SearchResult) => ({ ...r, score: 1 }));
   } catch (err) {
@@ -106,26 +106,26 @@ async function vectorSearch(query: string): Promise<SearchResult[]> {
     const products = await client.fetch(`
       *[_type == "product" && defined(embedding) && status != "sold-out"] {
         _id,
-  "name": name,
-  "slug": slug.current,
-  price,
-  originalPrice,
-  discount,
-  status,
-  isOnSale,
-  isNew,
-  "brand": brand->title,
-  "category": categories[0]->title,
-  "audience": audience->title,
-  "image": images[0],
-  "colorwayImage": colorways[0].images[0],
-  "colorways": colorways[]{
-    name,
-    hex,
-    price,
-    discount,
-    sizes[]{ size, stock, price }
-  }
+        "name": name,
+        "slug": slug.current,
+        price,
+        originalPrice,
+        discount,
+        status,
+        isOnSale,
+        isNew,
+        "brand": brand->title,
+        "category": categories[0]->title,
+        "audience": audience->title,
+        "image": images[0],
+        "colorwayImage": colorways[0].images[0],
+        "colorways": colorways[]{
+          name,
+          hex,
+          price,
+          discount,
+          sizes[]{ size, stock, price }
+        },
         embedding
       }
     `);
@@ -205,26 +205,26 @@ export async function generateEmbeddingsForAllProducts() {
     const products = await client.fetch(`
       *[_type == "product" && !defined(embedding)] {
         _id,
-  "name": name,
-  "slug": slug.current,
-  price,
-  originalPrice,
-  discount,
-  status,
-  isOnSale,
-  isNew,
-  "brand": brand->title,
-  "category": categories[0]->title,
-  "audience": audience->title,
-  "image": images[0],
-  "colorwayImage": colorways[0].images[0],
-  "colorways": colorways[]{
-    name,
-    hex,
-    price,
-    discount,
-    sizes[]{ size, stock, price }
-  }
+        "name": name,
+        "slug": slug.current,
+        price,
+        originalPrice,
+        discount,
+        status,
+        isOnSale,
+        isNew,
+        "brand": brand->title,
+        "category": categories[0]->title,
+        "audience": audience->title,
+        "image": images[0],
+        "colorwayImage": colorways[0].images[0],
+        "colorways": colorways[]{
+          name,
+          hex,
+          price,
+          discount,
+          sizes[]{ size, stock, price }
+        }
       }
     `);
 
