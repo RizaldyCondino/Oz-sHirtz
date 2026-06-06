@@ -14,9 +14,11 @@ const MobileMenu = () => {
       </button>
       <div className="md:hidden">
         <SideMenu
-          isOpen={isSidebarOpen}
-          onClose={() => setSideBarOpen(false)}
-        />
+  isOpen={isSidebarOpen}
+  onClose={() => setSideBarOpen(false)}
+  navCategories={[]}
+  collections={[]}
+/>
       </div>
     </>
   );

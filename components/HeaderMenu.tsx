@@ -6,7 +6,6 @@ import { X, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useOutsideClick } from "@/hooks";
-import { collections } from "@/constants/data";
 import type { NavCategory } from "@/sanity/lib/queries/query";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -105,16 +104,7 @@ const HeaderMenu: FC<SidebarProps> = ({ isOpen, onClose, navCategories = [] }) =
                       style={{ overflow: "hidden" }}
                       className="ml-3 mt-2 flex flex-col gap-3 text-xs"
                     >
-                      {collections.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={onClose}
-                          className="text-white/60 hover:text-white transition"
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
+                   
                     </motion.div>
                   )}
                 </AnimatePresence>

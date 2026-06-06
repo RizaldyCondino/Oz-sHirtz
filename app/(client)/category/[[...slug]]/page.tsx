@@ -429,7 +429,7 @@ export default async function CategoryPage({
                   }))}
                   sizes={(product.sizes || []).map((size) => ({ size }))}
                   href={`/product/${product.slug?.current || ""}`}
-                  brands={getProductBrandTitle(product)}
+                  // brands={getProductBrandTitle(product)}
                 />
               ))}
             </div>
@@ -446,7 +446,7 @@ export default async function CategoryPage({
         ) : (
           <NoProductAvailable
             selectedTab={subSlug || mainSlug}
-            subSlug={subSlug}
+            // subSlug={subSlug}
           />
         )}
       </div>

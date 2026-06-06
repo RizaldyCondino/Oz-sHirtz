@@ -28,9 +28,9 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   }),
 ]);
 
-const collection = collectionResponse?.data ?? null;
-const products = productsResponse?.data ?? [];
-const totalProducts = countResponse?.data ?? products.length; // ✅ real total
+const collection = (collectionResponse?.data ?? null) as any;
+const products = (productsResponse?.data ?? []) as any[];
+const totalProducts = (countResponse?.data ?? products?.length) as number;
 
     if (!collection) return notFound();
 

@@ -81,9 +81,9 @@ async function groqSearch(query: string): Promise<SearchResult[]> {
       }
     `;
 
-    const results = await client.fetch(groqQuery, {
-      query: `*${query}*`,
-    });
+ const results = await client.fetch<SearchResult[]>(groqQuery, {
+  searchTerm: `*${query}*`,
+});
 
     return results.map((r: SearchResult) => ({ ...r, score: 1 }));
   } catch (err) {

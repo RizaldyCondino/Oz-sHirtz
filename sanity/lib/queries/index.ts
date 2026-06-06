@@ -94,7 +94,7 @@ const getProducts = async (start = 0, end = 24): Promise<Product[]> => {
       params: { start, end },
     });
 
-    return data ?? [];
+    return (data as Product[]) ?? [];
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
@@ -113,7 +113,7 @@ const getSingleProduct = async (
       params: { slug },
     });
 
-    return data ?? null;
+    return (data as Product) ?? null;
   } catch (error) {
     console.error("Error fetching single product:", error);
     return null;

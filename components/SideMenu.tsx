@@ -3,21 +3,24 @@
 import React, { FC, useEffect, useState } from "react";
 import Logo from "./Logo";
 import { X, ChevronDown } from "lucide-react";
-import { menuCategories, collections } from "@/constants/data";
+import { menuCategories } from "@/constants/data";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useOutsideClick } from "@/hooks";
+import { NavCategory } from "@/sanity/lib/queries/query";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  navCategories: NavCategory[];
+  collections: { label: string; href: string; description?: string }[];
 }
 
 function normalizeSlug(value: string): string {
   return value.toLowerCase().trim().replaceAll(" ", "-").replaceAll("_", "-");
 }
 
-const SideMenu: FC<SidebarProps> = ({ isOpen, onClose }) => {
+const SideMenu: FC<SidebarProps> = ({ isOpen, onClose, navCategories = [], collections = [] }) => {
   const pathname = usePathname();
   const sidebarRef = useOutsideClick<HTMLDivElement>(onClose);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
@@ -27,7 +30,6 @@ const SideMenu: FC<SidebarProps> = ({ isOpen, onClose }) => {
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  // Auto-open the active group when menu opens
   useEffect(() => {
     if (!isOpen) return;
     const active = menuCategories.find((g) => pathname.startsWith(`/category/${g.key}`));
@@ -56,7 +58,7 @@ const SideMenu: FC<SidebarProps> = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 shrink-0 border-b border-white/10">
-          <Logo className="text-white" spanDesign="group-hover:text-white" />
+          <Logo className="text-white" />
           <button
             onClick={onClose}
             aria-label="Close Menu"
@@ -90,25 +92,29 @@ const SideMenu: FC<SidebarProps> = ({ isOpen, onClose }) => {
 
             {openGroup === "collections" && (
               <div className="flex flex-col pb-1">
-                {collections.map((col) => (
-                  <Link
-                    key={col.href}
-                    href={col.href}
-                    onClick={onClose}
-                    className={`px-8 py-2.5 text-[9px] uppercase tracking-[0.15em] transition ${
-                      pathname === col.href
-                        ? "text-white font-semibold"
-                        : "text-white/50 hover:text-white"
-                    }`}
-                  >
-                    {col.label}
-                    {"description" in col && col.description && (
-                      <span className="block text-white/30 text-[8px] normal-case mt-0.5">
-                        {col.description}
-                      </span>
-                    )}
-                  </Link>
-                ))}
+                {collections.length > 0 ? (
+                  collections.map((col) => (
+                    <Link
+                      key={col.href}
+                      href={col.href}
+                      onClick={onClose}
+                      className={`px-8 py-2.5 text-[9px] uppercase tracking-[0.15em] transition ${
+                        pathname === col.href
+                          ? "text-white font-semibold"
+                          : "text-white/50 hover:text-white"
+                      }`}
+                    >
+                      {col.label}
+                      {col.description && (
+                        <span className="block text-white/30 text-[8px] normal-case mt-0.5">
+                          {col.description}
+                        </span>
+                      )}
+                    </Link>
+                  ))
+                ) : (
+                  <p className="px-8 py-2 text-[9px] text-white/30">No collections</p>
+                )}
               </div>
             )}
           </div>

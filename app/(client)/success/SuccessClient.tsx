@@ -124,7 +124,7 @@ export default function SuccessClient() {
             {order.items.map((item) => {
               const isDiscounted = item.originalPrice && item.originalPrice > item.price;
               return (
-                <div key={item.id} className="flex justify-between items-start bg-[#FAF8F4] rounded-xl px-4 py-3">
+                <div key={item.id} className="flex justify-between items-start bg-bg-white rounded-xl px-4 py-3">
                   <div className="space-y-0.5">
                     <p className="text-sm font-medium text-black leading-tight">{item.name}</p>
                     <div className="flex items-center gap-2 flex-wrap">

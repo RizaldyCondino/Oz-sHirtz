@@ -214,6 +214,8 @@ export default function HeaderClient({
       <SideMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
+        navCategories={navCategories}
+        collections={collections}
       />
     </>
   );

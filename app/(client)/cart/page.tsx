@@ -167,11 +167,11 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = async () => {
-    if (!isSignedIn) {
-      openSignIn({ redirectUrl: "/cart" });
-      return;
-    }
+const handleCheckout = async () => {
+  if (!isSignedIn) {
+    openSignIn({ forceRedirectUrl: "/cart" });
+    return;
+  }
     if (!selectedAddress) {
       toast.error("Please select a delivery address");
       return;
@@ -271,7 +271,7 @@ const CartPage = () => {
                           >
                             <div className="relative w-[130px] h-[170px] sm:w-[140px] sm:h-[160px]">
                               <Image
-                                src={urlFor(displayImage).url()}
+                                src={displayImage ? urlFor(displayImage).url() : "/placeholder.png"}
                                 alt={product.name ?? "Product"}
                                 fill
                                 sizes="(max-width: 640px) 100px, 140px"
