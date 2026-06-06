@@ -123,9 +123,9 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
           const previewItems = order.items.slice(0, 3);
 
           const subtotal = order.items.reduce(
-            (sum, item) => sum + ((item as any).originalPrice ?? item.price) * item.quantity,
-            0
-          );
+  (sum: number, item) => sum + ((item as any).originalPrice ?? item.price) * item.quantity,
+  0
+);
           const hasDiscount = order.discountAmount > 0 || subtotal > order.totalAmount;
           const discountDisplay = hasDiscount ? subtotal - order.totalAmount : 0;
 
