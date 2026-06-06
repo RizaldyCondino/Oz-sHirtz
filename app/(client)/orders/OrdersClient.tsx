@@ -212,7 +212,7 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
               {isExpanded && (
                 <div className="border-t border-[#111]/6 px-6 py-5 space-y-5 bg-[#FAFAF9]">
                   <div className="space-y-4">
-                    {order.items.map((item) => {
+                    {order.items.map((item: any) => {
                       const originalPrice = (item as any).originalPrice as number | null;
                       const isDiscounted = originalPrice && originalPrice > item.price;
 

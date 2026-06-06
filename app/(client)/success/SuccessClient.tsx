@@ -121,7 +121,7 @@ export default function SuccessClient() {
         {order && order.items.length > 0 && (
           <div className="mb-6 text-left space-y-2">
             <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">Items</p>
-            {order.items.map((item) => {
+            {order.items.map((item: any) => {
               const isDiscounted = item.originalPrice && item.originalPrice > item.price;
               return (
                 <div key={item.id} className="flex justify-between items-start bg-bg-white rounded-xl px-4 py-3">
