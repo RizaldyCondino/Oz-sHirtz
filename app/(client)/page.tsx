@@ -117,7 +117,7 @@ export default async function Home() {
   ]);
 
    const collectionProducts = featuredCollection?.slug?.current
-  ? await client.fetch(
+  ? await client.fetch(         
       `*[_type == "product" && collection->slug.current == $slug] | order(publishedAt desc)[0...8] {
         _id, name, slug, price, discount,
         "image": images[0]{ asset->{ url } },
@@ -137,21 +137,24 @@ export default async function Home() {
 
   return (
     <div>
-      {homePage?.hero && <HeroBanner data={homePage.hero} />}  {/* 👈 safe check */}
+      
+      {homePage?.hero && <HeroBanner  data={homePage.hero}/>}  {/* 👈 safe check */}
 
       <BrandMarquee title="Shop By Brand" brands={brands} />
+
+      {featuredCollection && (
+        <CollectionClient
+          collection={featuredCollection}
+          products={collectionProducts}
+        />
+      )}
 
       <FeaturedProducts title="Featured Products" products={products} />
 
       <div className="max-w-7xl mx-auto px-6 md:px-20">
         <Divider className="opacity-20" />
       </div>
-       {featuredCollection && (
-        <CollectionClient
-          collection={featuredCollection}
-          products={collectionProducts}
-        />
-      )}
+       
       <DriftClothingSection/>
       
     </div>

@@ -58,29 +58,7 @@ export const saleSubCategories = [
 ];
 
 export const collections = [
-  {
-    label: "Core Essentials",
-    href: "/collections/core-essentials",
-    description: "Timeless everyday pieces",
-  },
-  {
-    label: "Seasonal Drop",
-    href: "/collections/seasonal",
-    description: "Latest season trends",
-  },
-  {
-    label: "Limited Edition",
-    href: "/collections/limited",
-    description: "Exclusive & low stock",
-  },
-  {
-    label: "New Arrivals",
-    href: "/collections/new-arrivals",
-  },
-  {
-    label: "Best Sellers",
-    href: "/collections/best-sellers",
-  },
+ 
 ];
 
 export type Tab = 'men' | 'women' | 'kids';

@@ -1,12 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react"; // ✅ add useState
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react"; // ✅ add Loader2
 import ProductCardCollection from "./ProductCardCollection";
-
-// ← Import ProductCard
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,10 +50,10 @@ interface CollectionData {
   textAlign?: TextAlign;
 }
 
-// Updated Props to accept products
 interface CollectionClientProps {
   collection: CollectionData;
-  products?: any[]; // You can type this better later
+  products?: any[];
+  totalProducts?: number; // ✅ pass this from the server page
 }
 
 // ─── Position → Tailwind map ──────────────────────────────────────────────────
@@ -103,22 +102,48 @@ const stagger = {
 
 export default function CollectionClient({
   collection,
-  products = [],
+  products: initialProducts = [],
+  totalProducts = 0, // ✅ receive total count from server
 }: CollectionClientProps) {
   const coverUrl = collection.coverImage?.asset?.url ?? null;
-
   const gallery = collection.galleryImages ?? [];
   const textPosition: TextPosition = collection.textPosition ?? "bottom-left";
   const textAlign: TextAlign = collection.textAlign ?? "left";
-
   const positionCls = POSITION_CLASSES[textPosition];
   const alignCls = ALIGN_CLASSES[textAlign];
 
+  // ✅ Pagination state
+  const [products, setProducts] = useState(initialProducts);
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const ITEMS_PER_PAGE = 12;
+  const hasMore = products.length < totalProducts;
+
+  // ✅ Fetch next page from your Sanity API route
+  const handleLoadMore = async () => {
+    setIsLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+      const offset = page * ITEMS_PER_PAGE;
+
+      const res = await fetch(
+        `/api/products?collectionSlug=${collection.slug?.current}&offset=${offset}&limit=${ITEMS_PER_PAGE}`
+      );
+      const data = await res.json();
+
+      setProducts((prev) => [...prev, ...data.products]);
+      setPage(nextPage);
+    } catch (err) {
+      console.error("Failed to load more products:", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-[#080808] text-white font-sans selection:bg-white selection:text-black">
+    <main className="min-h-screen bg-[#080808] text-white  font-sans selection:bg-white selection:text-black">
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <div className="relative h-[85vh] min-h-[520px] w-full overflow-hidden">
-        {/* Background */}
+      <div className="  relative  h-[110vh] min-h-[520px] w-full overflow-hidden">
         {coverUrl ? (
           <Image
             src={coverUrl}
@@ -144,7 +169,6 @@ export default function CollectionClient({
           </div>
         )}
 
-        {/* Overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/30 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#080808]/60 via-transparent to-transparent" />
         <div
@@ -155,17 +179,12 @@ export default function CollectionClient({
           }}
         />
 
-        {/* Text block */}
         <div className={`absolute inset-0 flex flex-col ${positionCls}`}>
           <div className={`flex flex-col max-w-3xl space-y-5 ${alignCls}`}>
             <motion.h1
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.8,
-                delay: 0.1,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="text-[clamp(3rem,8vw,7rem)] font-black tracking-[-0.03em] uppercase leading-[0.9] text-white"
             >
               {collection.title}
@@ -203,7 +222,6 @@ export default function CollectionClient({
           </div>
         </div>
 
-        {/* Scroll hint */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -215,7 +233,7 @@ export default function CollectionClient({
       </div>
 
       {/* ── Gallery ───────────────────────────────────────────────────────── */}
-      <section className="w-full ">
+      <section className="w-full">
         {gallery.length > 0 ? (
           <motion.div
             variants={stagger}
@@ -226,18 +244,14 @@ export default function CollectionClient({
           >
             {gallery.map((item, i) => {
               const href = item.link || "#";
-
               return (
                 <motion.div
                   key={i}
                   variants={fadeUp}
-                  className="relative overflow-hidden" // ← Keep relative
+                  className="relative overflow-hidden"
                   style={{ aspectRatio: "3/4" }}
                 >
-                  <Link
-                    href={href}
-                    className="group block w-full h-full absolute inset-0"
-                  >
+                  <Link href={href} className="group block w-full h-full absolute inset-0">
                     {item.imageUrl ? (
                       <Image
                         src={item.imageUrl}
@@ -249,11 +263,7 @@ export default function CollectionClient({
                     ) : (
                       <div className="absolute inset-0 bg-[#151515]" />
                     )}
-
-                    {/* Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-                    {/* Bottom Info */}
                     <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between">
                       <div className="font-mono text-[10px] text-white/30 tracking-widest">
                         0{i + 1}
@@ -265,22 +275,17 @@ export default function CollectionClient({
             })}
           </motion.div>
         ) : (
-          /* Your empty state here */
-          <div className="flex flex-col items-center justify-center py-32 text-center px-6 border-t border-white/8">
-            
-          </div>
+          <div className="flex flex-col items-center justify-center py-32 text-center px-6 border-t border-white/8" />
         )}
       </section>
 
       {/* ── Products Section ───────────────────────────── */}
-      {products && products.length > 0 && (
+      {products.length > 0 && (
         <section className="w-full py-15 border-t px-10 border-white/10">
           <div className="max-w-8xl mx-auto px-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 sm:gap-x-5 gap-y-10 sm:gap-y-14">
               {products.map((product, i) => {
-                const productTitle =
-                  product.title || product.name || "Untitled Product";
-
+                const productTitle = product.title || product.name || "Untitled Product";
                 return (
                   <ProductCardCollection
                     key={product._id || i}
@@ -301,6 +306,40 @@ export default function CollectionClient({
                 );
               })}
             </div>
+
+            {/* ✅ Load More UI — right here, inside the section, after the grid */}
+            {(hasMore || isLoadingMore) && (
+              <div className="flex flex-col items-center gap-4 mt-16">
+                {/* Progress bar */}
+                <div className="w-48 h-[2px] bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-white/60 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min((products.length / totalProducts) * 100, 100)}%`,
+                    }}
+                  />
+                </div>
+
+                <p className="text-[11px] text-white/30 tracking-widest font-mono uppercase">
+                  {products.length} of {totalProducts} products
+                </p>
+
+                <button
+                  onClick={handleLoadMore}
+                  disabled={isLoadingMore}
+                  className="flex items-center gap-2 px-10 py-3 border border-white/20 text-white/70 text-[11px] tracking-[0.2em] uppercase font-mono hover:border-white/50 hover:text-white transition-all duration-200 disabled:opacity-30"
+                >
+                  {isLoadingMore ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Loading
+                    </>
+                  ) : (
+                    "Load more"
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </section>
       )}

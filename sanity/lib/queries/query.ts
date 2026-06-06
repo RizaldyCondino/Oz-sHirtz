@@ -257,6 +257,13 @@ export async function getProductsForCategory(
   });
   return (result?.data ?? []) as Product[];
 }
+export const PRODUCTS_COUNT_BY_COLLECTION_QUERY = groq`
+  count(*[
+    _type == "product" &&
+    collection->slug.current == $collectionSlug
+  ])
+`;
+
 
 // query.ts — add these
 
@@ -378,7 +385,7 @@ export const PRODUCTS_BY_COLLECTION_QUERY = groq`
   *[
     _type == "product" &&
     collection->slug.current == $collectionSlug
-  ] | order(publishedAt desc) {
+  ] | order(publishedAt desc) [$offset...$limit] {
     ${PRODUCT_CARD_FIELDS}
   }
 `;
