@@ -146,7 +146,7 @@ export const sizeGuideData: Record<Tab, Record<Category, SizeData>> = {
         ['6Y', '5.5', '38.5', '24'],
         ['7Y', '6.5', '40', '25'],
       ],
-      note: 'Y = Youth sizing. Trace foot on paper for best fit.',
+      note: 'Y = Youth sizing. Trace foot on paper for best.',
     },
   },
 };
