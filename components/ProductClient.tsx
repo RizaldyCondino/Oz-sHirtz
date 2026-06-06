@@ -58,6 +58,7 @@ interface Product {
   audience?: { title: string; slug: any };
   categories?: { title: string; slug: any }[];
   collection?: { title: string; slug: any; description?: string };
+  countryOfOrigin?: string;
 }
 
 interface Props {
@@ -173,10 +174,8 @@ export default function ProductClient({ product, children }: Props) {
   return (
     <section className="relative bg-[#FAF8F4] min-h-screen py-4 sm:py-6 lg:py-4">
       <div className="relative z-10 max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-20">
-
         {/* ── DESKTOP layout (lg+): two-column side by side ── */}
         <div className="hidden lg:grid lg:grid-cols-[0.75fr_1.25fr] gap-16 items-start">
-
           {/* LEFT: breadcrumb + product details */}
           <div className="flex flex-col items-start text-left pt-2 lg:sticky lg:top-6">
             <nav
@@ -192,11 +191,16 @@ export default function ProductClient({ product, children }: Props) {
                 <ArrowLeft size={12} /> Back
               </Button>
               <span>/</span>
-              <Link href="/" className="hover:text-foreground">Home</Link>
+              <Link href="/" className="hover:text-foreground">
+                Home
+              </Link>
               {audienceSlug && (
                 <>
                   <span>/</span>
-                  <Link href={`/category/${audienceSlug}`} className="hover:text-foreground">
+                  <Link
+                    href={`/category/${audienceSlug}`}
+                    className="hover:text-foreground"
+                  >
                     {product.audience?.title}
                   </Link>
                 </>
@@ -205,7 +209,11 @@ export default function ProductClient({ product, children }: Props) {
                 <>
                   <span>/</span>
                   <Link
-                    href={audienceSlug ? `/category/${audienceSlug}/${firstCategorySlug}` : `/category/${firstCategorySlug}`}
+                    href={
+                      audienceSlug
+                        ? `/category/${audienceSlug}/${firstCategorySlug}`
+                        : `/category/${firstCategorySlug}`
+                    }
                     className="hover:text-foreground"
                   >
                     {product.categories?.[0]?.title}
@@ -213,7 +221,9 @@ export default function ProductClient({ product, children }: Props) {
                 </>
               )}
               <span>/</span>
-              <span className="text-foreground font-medium truncate max-w-[150px]">{product.name}</span>
+              <span className="text-foreground font-medium truncate max-w-[150px]">
+                {product.name}
+              </span>
             </nav>
 
             <div className="flex flex-col items-start text-left">
@@ -227,32 +237,51 @@ export default function ProductClient({ product, children }: Props) {
                 </Badge>
               )}
               <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
-                {product.audience?.title} &bull; {product.categories?.[0]?.title || "Apparel"}
+                {product.audience?.title} &bull;{" "}
+                {product.categories?.[0]?.title || "Apparel"}
               </span>
-              <h1 className="text-2xl font-semibold leading-tight text-[#111111]">{product.name}</h1>
+              <h1 className="text-2xl font-semibold leading-tight text-[#111111]">
+                {product.name}
+              </h1>
               <div className="flex flex-col gap-0.5 mt-1.5">
                 {product.brand && (
                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">
                     {product.brand.title}
                   </p>
                 )}
-                <p className="text-[10px] text-muted-foreground tracking-wider font-mono">SKU: {displaySku}</p>
+                <p className="text-[10px] text-muted-foreground tracking-wider font-mono">
+                  SKU: {displaySku}
+                </p>
+                {product.countryOfOrigin && (
+                  <p className="text-[10px] text-muted-foreground tracking-wider font-mono">
+                    Made in: {product.countryOfOrigin}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-3 mt-4 flex-wrap">
                 {discountedPrice ? (
                   <>
                     <span className="font-bold text-[#8C6227]">
-                      <PriceFormatter amount={discountedPrice} className="text-2xl" />
+                      <PriceFormatter
+                        amount={discountedPrice}
+                        className="text-2xl"
+                      />
                     </span>
                     <div className="flex items-center gap-2">
-                      <PriceFormatter amount={effectivePrice} className="text-[11px] line-through text-muted-foreground" />
+                      <PriceFormatter
+                        amount={effectivePrice}
+                        className="text-[11px] line-through text-muted-foreground"
+                      />
                       <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[10px] px-2 py-0.5 font-medium rounded-full border-none shadow-none">
                         -{activeDiscount}%
                       </Badge>
                     </div>
                   </>
                 ) : (
-                  <PriceFormatter amount={effectivePrice} className="text-2xl font-semibold text-[#b8502e]" />
+                  <PriceFormatter
+                    amount={effectivePrice}
+                    className="text-2xl font-semibold text-[#b8502e]"
+                  />
                 )}
               </div>
               {product.description && (
@@ -271,7 +300,10 @@ export default function ProductClient({ product, children }: Props) {
               className="h-[80vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide"
             >
               <div className="flex flex-col gap-6">
-                <ImageView images={displayImages} isStock={activeSizeObj?.stock ?? product.stock} />
+                <ImageView
+                  images={displayImages}
+                  isStock={activeSizeObj?.stock ?? product.stock}
+                />
               </div>
             </div>
 
@@ -311,7 +343,9 @@ export default function ProductClient({ product, children }: Props) {
               {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-3 max-w-xs">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">Select Size</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">
+                      Select Size
+                    </h3>
                     <Button
                       variant="link"
                       onClick={() => setIsSizeGuideOpen(true)}
@@ -322,11 +356,15 @@ export default function ProductClient({ product, children }: Props) {
                     <SizeGuideModal
                       isOpen={isSizeGuideOpen}
                       onClose={() => setIsSizeGuideOpen(false)}
-                      defaultTab={(product.audience?.title?.toLowerCase() as Tab) ?? "men"}
+                      defaultTab={
+                        (product.audience?.title?.toLowerCase() as Tab) ?? "men"
+                      }
                       defaultCategory={
                         product.categories?.some(
                           (c) =>
-                            resolveSlug(c.slug).toLowerCase().includes("shoe") ||
+                            resolveSlug(c.slug)
+                              .toLowerCase()
+                              .includes("shoe") ||
                             c.title?.toLowerCase().includes("shoe"),
                         )
                           ? "shoes"
@@ -335,38 +373,46 @@ export default function ProductClient({ product, children }: Props) {
                     />
                   </div>
                   <div className="flex flex-wrap gap-2">
-  {activeColorway.sizes.map((item, idx) => (
-    <Button
-      key={idx}
-      type="button"
-      disabled={item.stock <= 0}
-      onClick={() => handleSizeSelect(item.size)}
-      variant={selectedSize === item.size ? "default" : "outline"}
-      className={`h-auto px-3 py-1.5 text-[13px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer relative
+                    {activeColorway.sizes.map((item, idx) => (
+                      <Button
+                        key={idx}
+                        type="button"
+                        disabled={item.stock <= 0}
+                        onClick={() => handleSizeSelect(item.size)}
+                        variant={
+                          selectedSize === item.size ? "default" : "outline"
+                        }
+                        className={`h-auto px-3 py-1.5 text-[13px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer relative
         ${selectedSize === item.size ? "" : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"}
         ${item.stock <= 0 ? "opacity-50" : "border-xs shadow-xs"}
       `}
-    >
-      {item.size}
-      {item.stock <= 0 && (
-        <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="w-5 text-[#b8502e] h-px rotate-45  bg-current  absolute" />
-        </span>
-      )}
-    </Button>
-  ))}
-</div>
+                      >
+                        {item.size}
+                        {item.stock <= 0 && (
+                          <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span className="w-5 text-[#b8502e] h-px rotate-45  bg-current  absolute" />
+                          </span>
+                        )}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* STOCK STATUS */}
               <div className="text-xs font-medium mb-5">
                 {!selectedSize ? (
-                  <span className="text-[#b8502e] font-mono text-[14px]">↑ Pick a size to check availability</span>
+                  <span className="text-[#b8502e] font-mono text-[14px]">
+                    ↑ Pick a size to check availability
+                  </span>
                 ) : isOutOfStock ? (
-                  <span className="text-destructive uppercase tracking-wider text-[10px] font-bold">Out of stock</span>
+                  <span className="text-destructive uppercase tracking-wider text-[10px] font-bold">
+                    Out of stock
+                  </span>
                 ) : (
-                  <span className="text-muted-foreground font-mono text-[14px]">[Status: {activeSizeObj?.stock} in stock]</span>
+                  <span className="text-muted-foreground font-mono text-[14px]">
+                    [Status: {activeSizeObj?.stock} in stock]
+                  </span>
                 )}
               </div>
 
@@ -394,7 +440,6 @@ export default function ProductClient({ product, children }: Props) {
 
         {/* ── MOBILE layout (below lg): single column, logical read order ── */}
         <div className="flex lg:hidden flex-col gap-4">
-
           {/* 1. Breadcrumb */}
           <nav
             aria-label="Breadcrumb"
@@ -409,11 +454,16 @@ export default function ProductClient({ product, children }: Props) {
               <ArrowLeft size={12} /> Back
             </Button>
             <span>/</span>
-            <Link href="/" className="hover:text-foreground">Home</Link>
+            <Link href="/" className="hover:text-foreground">
+              Home
+            </Link>
             {audienceSlug && (
               <>
                 <span>/</span>
-                <Link href={`/category/${audienceSlug}`} className="hover:text-foreground">
+                <Link
+                  href={`/category/${audienceSlug}`}
+                  className="hover:text-foreground"
+                >
                   {product.audience?.title}
                 </Link>
               </>
@@ -422,7 +472,11 @@ export default function ProductClient({ product, children }: Props) {
               <>
                 <span>/</span>
                 <Link
-                  href={audienceSlug ? `/category/${audienceSlug}/${firstCategorySlug}` : `/category/${firstCategorySlug}`}
+                  href={
+                    audienceSlug
+                      ? `/category/${audienceSlug}/${firstCategorySlug}`
+                      : `/category/${firstCategorySlug}`
+                  }
                   className="hover:text-foreground"
                 >
                   {product.categories?.[0]?.title}
@@ -430,7 +484,9 @@ export default function ProductClient({ product, children }: Props) {
               </>
             )}
             <span>/</span>
-            <span className="text-foreground font-medium truncate max-w-[150px]">{product.name}</span>
+            <span className="text-foreground font-medium truncate max-w-[150px]">
+              {product.name}
+            </span>
           </nav>
 
           {/* 2. Name + brand + price */}
@@ -445,32 +501,52 @@ export default function ProductClient({ product, children }: Props) {
               </Badge>
             )}
             <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
-              {product.audience?.title} &bull; {product.categories?.[0]?.title || "Apparel"}
+              {product.audience?.title} &bull;{" "}
+              {product.categories?.[0]?.title || "Apparel"}
             </span>
-            <h1 className="text-xl font-semibold leading-tight text-foreground">{product.name}</h1>
+            <h1 className="text-xl font-semibold leading-tight text-foreground">
+              {product.name}
+            </h1>
             <div className="flex flex-col gap-0.5 mt-1">
               {product.brand && (
                 <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono">
                   {product.brand.title}
                 </p>
               )}
-              <p className="text-[9px] text-muted-foreground tracking-wider font-mono">SKU: {displaySku}</p>
+              <p className="text-[9px] text-muted-foreground tracking-wider font-mono">
+                SKU: {displaySku}
+              </p>
+
+              {product.countryOfOrigin && (
+                <p className="text-[9px] text-muted-foreground tracking-wider font-mono">
+                  Made in: {product.countryOfOrigin}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2.5 mt-3 flex-wrap">
               {discountedPrice ? (
                 <>
                   <span className="font-bold text-[#8C6227]">
-                    <PriceFormatter amount={discountedPrice} className="text-xl" />
+                    <PriceFormatter
+                      amount={discountedPrice}
+                      className="text-xl"
+                    />
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <PriceFormatter amount={effectivePrice} className="text-[10px] line-through text-muted-foreground" />
+                    <PriceFormatter
+                      amount={effectivePrice}
+                      className="text-[10px] line-through text-muted-foreground"
+                    />
                     <Badge className="bg-[#8C6227]/10 text-[#8C6227] hover:bg-[#8C6227]/10 text-[9px] px-1.5 py-0.5 font-medium rounded-full border-none shadow-none">
                       -{activeDiscount}%
                     </Badge>
                   </div>
                 </>
               ) : (
-                <PriceFormatter amount={effectivePrice} className="text-xl font-semibold text-[#8C6227]" />
+                <PriceFormatter
+                  amount={effectivePrice}
+                  className="text-xl font-semibold text-[#8C6227]"
+                />
               )}
             </div>
           </div>
@@ -481,7 +557,10 @@ export default function ProductClient({ product, children }: Props) {
             onDragStart={(e) => e.preventDefault()}
             className="h-[60vh] bg-background rounded-sm overflow-y-auto overflow-x-hidden scrollbar-hide"
           >
-            <ImageView images={displayImages} isStock={activeSizeObj?.stock ?? product.stock} />
+            <ImageView
+              images={displayImages}
+              isStock={activeSizeObj?.stock ?? product.stock}
+            />
           </div>
 
           {/* 4. Controls: color, size, stock, CTAs */}
@@ -521,7 +600,9 @@ export default function ProductClient({ product, children }: Props) {
             {activeColorway?.sizes && activeColorway.sizes.length > 0 && (
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">Select Size</h3>
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#b8502e]">
+                    Select Size
+                  </h3>
                   <Button
                     variant="link"
                     onClick={() => setIsSizeGuideOpen(true)}
@@ -532,7 +613,9 @@ export default function ProductClient({ product, children }: Props) {
                   <SizeGuideModal
                     isOpen={isSizeGuideOpen}
                     onClose={() => setIsSizeGuideOpen(false)}
-                    defaultTab={(product.audience?.title?.toLowerCase() as Tab) ?? "men"}
+                    defaultTab={
+                      (product.audience?.title?.toLowerCase() as Tab) ?? "men"
+                    }
                     defaultCategory={
                       product.categories?.some(
                         (c) =>
@@ -551,7 +634,9 @@ export default function ProductClient({ product, children }: Props) {
                       type="button"
                       disabled={item.stock <= 0}
                       onClick={() => handleSizeSelect(item.size)}
-                      variant={selectedSize === item.size ? "default" : "outline"}
+                      variant={
+                        selectedSize === item.size ? "default" : "outline"
+                      }
                       className={`h-auto px-3 py-1.5 text-[14px] font-medium rounded-full w-12 shadow-xs min-w-[36px] cursor-pointer
                         ${selectedSize === item.size ? "" : "text-neutral-800 bg-background hover:bg-neutral-50 dark:text-neutral-200"}
                         ${!selectedSize && item.stock > 0 ? "border-xs shadow-xs " : ""}
@@ -567,11 +652,17 @@ export default function ProductClient({ product, children }: Props) {
             {/* STOCK STATUS */}
             <div className="text-xs font-medium mb-5">
               {!selectedSize ? (
-                <span className="text-[#b8502e] font-mono text-[14px]">↑ Pick a size to check availability</span>
+                <span className="text-[#b8502e] font-mono text-[14px]">
+                  ↑ Pick a size to check availability
+                </span>
               ) : isOutOfStock ? (
-                <span className="text-destructive uppercase tracking-wider text-[10px] font-bold">Out of stock</span>
+                <span className="text-destructive uppercase tracking-wider text-[10px] font-bold">
+                  Out of stock
+                </span>
               ) : (
-                <span className="text-muted-foreground font-mono text-[14px]">[Status: {activeSizeObj?.stock} in stock]</span>
+                <span className="text-muted-foreground font-mono text-[14px]">
+                  [Status: {activeSizeObj?.stock} in stock]
+                </span>
               )}
             </div>
 
@@ -602,7 +693,6 @@ export default function ProductClient({ product, children }: Props) {
             </div>
           )}
         </div>
-
       </div>
       {children}
     </section>

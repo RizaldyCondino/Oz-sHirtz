@@ -24,9 +24,17 @@ export type SearchResult = {
   isNew?: boolean;
   brand?: string;
   category?: string;
-  audience?: string; // ← added
+  audience?: string;
   image?: any;
+  colorwayImage?: any;
   score?: number;
+  colorways?: {
+    name: string;
+    hex?: string;
+    price?: number;
+    discount?: number;
+    sizes?: { size: string; stock?: number; price?: number }[];
+  }[];
 };
 
 // ─── Step 1: GROQ Keyword Search ─────────────────────────────────────────────
@@ -50,19 +58,26 @@ async function groqSearch(query: string): Promise<SearchResult[]> {
     )
       ] | order(_score desc) [0...10] {
         _id,
-        "name": name,
-        "slug": slug.current,
-        price,
-        originalPrice,
-        discount,
-        status,
-        isOnSale,
-        isNew,
-        "brand": brand->title,
-        "category": categories[0]->title,
-        "audience": audience->title,
-        "image": images[0],
-        "colorwayImage": colorways[0].images[0]
+  "name": name,
+  "slug": slug.current,
+  price,
+  originalPrice,
+  discount,
+  status,
+  isOnSale,
+  isNew,
+  "brand": brand->title,
+  "category": categories[0]->title,
+  "audience": audience->title,
+  "image": images[0],
+  "colorwayImage": colorways[0].images[0],
+  "colorways": colorways[]{
+    name,
+    hex,
+    price,
+    discount,
+    sizes[]{ size, stock, price }
+  }
       }
     `;
 
@@ -91,19 +106,26 @@ async function vectorSearch(query: string): Promise<SearchResult[]> {
     const products = await client.fetch(`
       *[_type == "product" && defined(embedding) && status != "sold-out"] {
         _id,
-        "name": name,
-        "slug": slug.current,
-        price,
-        originalPrice,
-        discount,
-        status,
-        isOnSale,
-        isNew,
-        "brand": brand->title,
-        "category": categories[0]->title,
-        "audience": audience->title,
-        "image": images[0],
-        "colorwayImage": colorways[0].images[0],
+  "name": name,
+  "slug": slug.current,
+  price,
+  originalPrice,
+  discount,
+  status,
+  isOnSale,
+  isNew,
+  "brand": brand->title,
+  "category": categories[0]->title,
+  "audience": audience->title,
+  "image": images[0],
+  "colorwayImage": colorways[0].images[0],
+  "colorways": colorways[]{
+    name,
+    hex,
+    price,
+    discount,
+    sizes[]{ size, stock, price }
+  }
         embedding
       }
     `);
@@ -183,14 +205,26 @@ export async function generateEmbeddingsForAllProducts() {
     const products = await client.fetch(`
       *[_type == "product" && !defined(embedding)] {
         _id,
-        name,
-        "brand": brand->title,
-        "categories": categories[]->title,
-        "audience": audience->title,
-        shortDescription,
-        materials,
-        price,
-        status
+  "name": name,
+  "slug": slug.current,
+  price,
+  originalPrice,
+  discount,
+  status,
+  isOnSale,
+  isNew,
+  "brand": brand->title,
+  "category": categories[0]->title,
+  "audience": audience->title,
+  "image": images[0],
+  "colorwayImage": colorways[0].images[0],
+  "colorways": colorways[]{
+    name,
+    hex,
+    price,
+    discount,
+    sizes[]{ size, stock, price }
+  }
       }
     `);
 

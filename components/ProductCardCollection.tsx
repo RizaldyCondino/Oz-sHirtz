@@ -87,7 +87,9 @@ const ProductCardCollection: React.FC<ProductCardCollection> = ({
 
   const activePrice = activeColorway?.price ?? price;
   const activeDiscount = activeColorway?.discount ?? discount;
-  const activeSizes = activeColorway?.sizes ?? sizes;
+  const activeSizes = (activeColorway?.sizes ?? sizes ?? []).filter(
+  (s): s is SanitySizeObject => typeof s === "object" && s !== null
+);
 
   const primaryImage =
     activeColorway?.images?.[0]?.asset?.url ?? image ?? "/placeholder.jpg";

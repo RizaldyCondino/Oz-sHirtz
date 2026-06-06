@@ -5,6 +5,7 @@ import Divider from "@/components/Divider";
 import BrandMarquee from "@/components/BrandMarquee";
 import DriftClothingSection from "@/components/DriftClothingSection";
 import ProductCard from "@/components/ProductCardProps";
+import CollectionClient from "@/components/Collectionclient";
 
 async function getFeaturedProducts() {
   try {
@@ -77,12 +78,62 @@ async function getHomePage() {       // 👈 add this
   }
 }
 
+async function getFeaturedCollection() {
+  try {
+    const query = `*[_type == "collection" && isFeatured == true] | order(_createdAt desc)[0] {
+      _id,
+      title,
+      slug,
+      description,
+      season,
+      year,
+      isFeatured,
+      isSnkrs,
+      dropDate,
+      textPosition,
+      textAlign,
+      coverImage{ asset->{ url }, alt },
+      galleryImages[]{
+        alt,
+        link,
+        label,
+        "imageUrl": image.asset->url
+      }
+    }`;
+    return await client.fetch(query);
+  } catch (error) {
+    console.error("Error fetching featured collection:", error);
+    return null;
+  }
+}
+
+
 export default async function Home() {
-  const [products, brands, homePage] = await Promise.all([  // 👈 add homePage
+  const [products, brands, homePage,featuredCollection] = await Promise.all([  // 👈 add homePage
     getFeaturedProducts(),
     getFeaturedBrands(),
     getHomePage(),
+    getFeaturedCollection(),
   ]);
+
+   const collectionProducts = featuredCollection?.slug?.current
+  ? await client.fetch(
+      `*[_type == "product" && collection->slug.current == $slug] | order(publishedAt desc)[0...8] {
+        _id, name, slug, price, discount,
+        "image": images[0]{ asset->{ url } },
+        colorways[]{
+          name,
+          hex,
+          images[]{ asset->{ url }, alt },
+          sizes[]{ size, stock, sku, price }
+        },
+        sizes[]{ size, stock, sku, price },
+        soldOut,
+        tag
+      }`,
+      { slug: featuredCollection.slug.current }
+    )
+  : [];
 
   return (
     <div>
@@ -95,7 +146,12 @@ export default async function Home() {
       <div className="max-w-7xl mx-auto px-6 md:px-20">
         <Divider className="opacity-20" />
       </div>
-      
+       {featuredCollection && (
+        <CollectionClient
+          collection={featuredCollection}
+          products={collectionProducts}
+        />
+      )}
       <DriftClothingSection/>
       
     </div>

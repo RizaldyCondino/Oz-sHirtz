@@ -42,7 +42,7 @@ export default function FeaturedProducts({
           {title}
         </h2>
         <Link
-              href="/category/all"
+              href="/category/all?q=Featured"
               className="inline-flex items-center gap-3 group w-fit"
             >
               <span className="text-[11px] font-black tracking-[0.2em] uppercase text-black border-b-2 border-black pb-0.5 group-hover:border-gray-400 group-hover:text-gray-400 transition-colors duration-200">

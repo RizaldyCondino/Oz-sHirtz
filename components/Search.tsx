@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { FiSearch, FiX, FiLoader } from "react-icons/fi";
-import { TbSparkles } from "react-icons/tb";
 import Image from "next/image";
 import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
@@ -30,7 +29,6 @@ export default function SearchBar({
     setMounted(true);
   }, []);
 
-  // close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (
@@ -44,12 +42,10 @@ export default function SearchBar({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // focus input when opened
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 50);
   }, [open]);
 
-  // debounced search
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -89,6 +85,29 @@ export default function SearchBar({
     setError(null);
   };
 
+  // Resolve the effective price + discount for a search result.
+  // Priority: colorway discount → product discount, colorway price → product price
+  const resolvePrice = (product: SearchResult) => {
+  const firstColorway = product.colorways?.[0];
+  const firstSize = firstColorway?.sizes?.[0];
+
+  const base =
+    firstSize?.price ??
+    firstColorway?.price ??
+    product.price ??
+    0;
+
+  const discount =
+    firstColorway?.discount ??
+    product.discount ??
+    0;
+
+  const discounted =
+    discount > 0 ? base - (base * discount) / 100 : null;
+
+  return { base, discount, discounted };
+};
+
   if (!mounted) {
     return (
       <div
@@ -127,7 +146,6 @@ export default function SearchBar({
             {/* Header */}
             <div className="flex items-center justify-between px-4 lg:px-5 py-3 border-b border-[#e5e1da]">
               <span className="text-[10px] lg:text-[11px] font-bold uppercase tracking-widest text-[#b8502e] flex items-center gap-1.5">
-                {/* <TbSparkles size={11} /> */}
                 Search
               </span>
               <button onClick={handleClose} aria-label="Close search">
@@ -207,7 +225,9 @@ export default function SearchBar({
                   >
                     <FiLoader size={14} />
                   </motion.div>
-                  <span className="text-[11px] lg:text-[12px]">Searching...</span>
+                  <span className="text-[11px] lg:text-[12px]">
+                    Searching...
+                  </span>
                 </div>
               )}
 
@@ -242,92 +262,108 @@ export default function SearchBar({
               {!isPending && !error && results.length > 0 && (
                 <AnimatePresence initial={false}>
                   <div className="divide-y divide-[#f0ece4]">
-                    {results.map((product, i) => (
-                      <motion.div
-                        key={product._id}
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 12 }}
-                        transition={{ duration: 0.15, delay: i * 0.03 }}
-                      >
-                        <Link
-                          href={`/product/${product.slug}`}
-                          onClick={handleClose}
-                          className="flex gap-3 lg:gap-4 px-4 lg:px-5 py-3 lg:py-4 hover:bg-[#f0ece4] transition-colors group"
-                        >
-                          {/* Image */}
-                          <div className="relative w-[46px] h-[56px] lg:w-[60px] lg:h-[72px] flex-shrink-0 rounded-md overflow-hidden bg-neutral-100">
-                            {(() => {
-                              const resolvedImage =
-                                product.colorwayImage ?? product.image ?? null;
-                              return resolvedImage ? (
-                                <Image
-                                  src={urlFor(resolvedImage)
-                                    .width(120)
-                                    .height(144)
-                                    .url()}
-                                  alt={product.name}
-                                  fill
-                                  className="object-cover group-hover:scale-105 transition-transform duration-200"
-                                  sizes="(min-width: 1024px) 60px, 46px"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-neutral-200 flex items-center justify-center">
-                                  <FiSearch
-                                    size={14}
-                                    className="text-neutral-400"
-                                  />
-                                </div>
-                              );
-                            })()}
-                          </div>
+                    {results.map((product, i) => {
+                      const { base, discount, discounted } =
+                        resolvePrice(product);
 
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[11px] lg:text-[13px] font-medium text-[#111] truncate group-hover:text-[#b8502e] transition-colors">
-                              {product.name}
-                            </p>
-                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                              {product.brand && (
-                                <span className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                                  {product.brand}
-                                </span>
-                              )}
-                              {product.brand && product.category && (
-                                <span className="text-[9px] lg:text-[10px] text-neutral-300">
-                                  ·
-                                </span>
-                              )}
-                              {product.category && (
-                                <span className="text-[9px] lg:text-[10px] text-neutral-400">
-                                  {product.category}
-                                </span>
-                              )}
+                      return (
+                        <motion.div
+                          key={product._id}
+                          initial={{ opacity: 0, x: -12 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 12 }}
+                          transition={{ duration: 0.15, delay: i * 0.03 }}
+                        >
+                          <Link
+                            href={`/product/${product.slug}`}
+                            onClick={handleClose}
+                            className="flex gap-3 lg:gap-4 px-4 lg:px-5 py-3 lg:py-4 hover:bg-[#f0ece4] transition-colors group"
+                          >
+                            {/* Image */}
+                            <div className="relative w-[46px] h-[56px] lg:w-[60px] lg:h-[72px] flex-shrink-0 rounded-md overflow-hidden bg-neutral-100">
+                              {(() => {
+                                const resolvedImage =
+                                  product.colorwayImage ??
+                                  product.image ??
+                                  null;
+                                return resolvedImage ? (
+                                  <Image
+                                    src={urlFor(resolvedImage)
+                                      .width(120)
+                                      .height(144)
+                                      .url()}
+                                    alt={product.name}
+                                    fill
+                                    className="object-cover group-hover:scale-105 transition-transform duration-200"
+                                    sizes="(min-width: 1024px) 60px, 46px"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-neutral-200 flex items-center justify-center">
+                                    <FiSearch
+                                      size={14}
+                                      className="text-neutral-400"
+                                    />
+                                  </div>
+                                );
+                              })()}
                             </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[11px] lg:text-[13px] font-semibold text-[#b8502e]">
-                                ₱{product.price?.toLocaleString()}
-                              </span>
-                              {product.originalPrice &&
-                                product.originalPrice > product.price && (
-                                  <span className="text-[10px] lg:text-[11px] text-neutral-400 line-through">
-                                    ₱{product.originalPrice?.toLocaleString()}
+
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[11px] lg:text-[13px] font-medium text-[#111] truncate group-hover:text-[#b8502e] transition-colors">
+                                {product.name}
+                              </p>
+                              <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                {product.brand && (
+                                  <span className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                                    {product.brand}
                                   </span>
                                 )}
-                              {product.status === "sale" || product.isOnSale ? (
-                                <span className="text-[8px] lg:text-[9px] font-bold uppercase tracking-widest bg-[#b8502e] text-white px-1.5 py-0.5 rounded-full">
-                                  Sale
+                                {product.brand && product.category && (
+                                  <span className="text-[9px] lg:text-[10px] text-neutral-300">
+                                    ·
+                                  </span>
+                                )}
+                                {product.category && (
+                                  <span className="text-[9px] lg:text-[10px] text-neutral-400">
+                                    {product.category}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Price row with discount */}
+                              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                <span className="text-[11px] lg:text-[13px] font-semibold text-[#b8502e]">
+                                  ${(discounted ?? base).toLocaleString()}
                                 </span>
-                              ) : product.status === "new" || product.isNew ? (
-                                <span className="text-[8px] lg:text-[9px] font-bold uppercase tracking-widest bg-[#111] text-white px-1.5 py-0.5 rounded-full">
-                                  New
-                                </span>
-                              ) : null}
+                                {discounted && (
+                                  <span className="text-[10px] lg:text-[11px] text-neutral-400 line-through">
+                                    ${base.toLocaleString()}
+                                  </span>
+                                )}
+                                {discount > 0 && (
+                                  <span className="text-[8px] lg:text-[9px] font-bold uppercase tracking-widest bg-[#b8502e] text-white px-1.5 py-0.5 rounded-full">
+                                    -{discount}%
+                                  </span>
+                                )}
+                                {!discount &&
+                                  (product.status === "sale" ||
+                                    product.isOnSale) && (
+                                    <span className="text-[8px] lg:text-[9px] font-bold uppercase tracking-widest bg-[#b8502e] text-white px-1.5 py-0.5 rounded-full">
+                                      Sale
+                                    </span>
+                                  )}
+                                {product.status === "new" || product.isNew ? (
+                                  <span className="text-[8px] lg:text-[9px] font-bold uppercase tracking-widest bg-[#111] text-white px-1.5 py-0.5 rounded-full">
+                                    New
+                                  </span>
+                                ) : null}
+                              </div>
                             </div>
-                          </div>
-                        </Link>
-                      </motion.div>
-                    ))}
+                          </Link>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 </AnimatePresence>
               )}
@@ -339,7 +375,6 @@ export default function SearchBar({
                     Type to search products, brands, or categories
                   </p>
                   <div className="flex items-center justify-center gap-1.5 mt-3">
-                    {/* <TbSparkles size={11} className="text-[#b8502e]" /> */}
                     <span className="text-[9px] lg:text-[10px] text-neutral-400 uppercase tracking-widest font-medium">
                       AI-powered hybrid search
                     </span>

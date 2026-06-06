@@ -18,7 +18,6 @@ const CartIcon = () => {
   const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const isCartPage = pathname === "/cart";
 
-  // close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -29,10 +28,23 @@ const CartIcon = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const discountedTotal = items.reduce((sum, item) => {
+    const cw = item.product.colorways?.find(
+      (c) => c.name === item.selectedColorway
+    );
+    const sz = cw?.sizes?.find((s) => s.size === item.selectedSize);
+    const base = sz?.price ?? cw?.price ?? item.product.price ?? 0;
+    const disc = cw?.discount ?? item.product.discount ?? 0;
+    const unit = disc > 0 ? base - (base * disc) / 100 : base;
+    return sum + unit * item.quantity;
+  }, 0);
+
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => { if (!isCartPage) setCartOpen(!cartOpen); }}
+        onClick={() => {
+          if (!isCartPage) setCartOpen(!cartOpen);
+        }}
         className="relative group"
         aria-label="Cart"
       >
@@ -90,17 +102,45 @@ const CartIcon = () => {
                 <AnimatePresence initial={false}>
                   {items.slice(0, 3).map((item) => {
                     const activeColorway = item.product.colorways?.find(
-                      (c) => c.name === item.selectedColorway,
+                      (c) => c.name === item.selectedColorway
                     );
                     const displayImage =
                       activeColorway?.images?.[0] || item.product.images?.[0];
+
+                    const activeSize = activeColorway?.sizes?.find(
+                      (s) => s.size === item.selectedSize
+                    );
+
+                    const basePrice =
+                      activeSize?.price ??
+                      activeColorway?.price ??
+                      item.product.price ??
+                      0;
+
+                    const activeDiscount =
+                      activeColorway?.discount ??
+                      item.product.discount ??
+                      0;
+
+                    const unitPrice =
+                      activeDiscount > 0
+                        ? basePrice - (basePrice * activeDiscount) / 100
+                        : basePrice;
+
+                    const lineTotal = unitPrice * item.quantity;
 
                     return (
                       <motion.div
                         key={`${item.product._id}-${item.selectedColorway}-${item.selectedSize}`}
                         initial={{ opacity: 0, x: -12 }}
                         animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 12, height: 0, paddingTop: 0, paddingBottom: 0 }}
+                        exit={{
+                          opacity: 0,
+                          x: 12,
+                          height: 0,
+                          paddingTop: 0,
+                          paddingBottom: 0,
+                        }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
                         className="flex gap-3 px-4 py-3"
                       >
@@ -126,10 +166,28 @@ const CartIcon = () => {
                           <p className="text-[10px] text-neutral-500 mt-0.5">
                             {item.selectedColorway} / {item.selectedSize}
                           </p>
-                          <PriceFormatter
-                            amount={(item.product.price ?? 0) * item.quantity}
-                            className="text-[11px] font-semibold text-[#b8502e] mt-1 block"
-                          />
+
+                          {activeDiscount > 0 ? (
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <PriceFormatter
+                                amount={lineTotal}
+                                className="text-[11px] font-semibold text-[#b8502e] block"
+                              />
+                              <PriceFormatter
+                                amount={basePrice * item.quantity}
+                                className="text-[10px] line-through text-neutral-400 block"
+                              />
+                              <span className="text-[9px] font-bold text-[#b8502e]/70">
+                                -{activeDiscount}%
+                              </span>
+                            </div>
+                          ) : (
+                            <PriceFormatter
+                              amount={lineTotal}
+                              className="text-[11px] font-semibold text-[#b8502e] mt-1 block"
+                            />
+                          )}
+
                           <div className="mt-1.5">
                             <QuantityButtons
                               product={item.product}
@@ -148,9 +206,9 @@ const CartIcon = () => {
             {/* Footer */}
             {items.length > 0 && (
               <div className="px-4 py-3 border-t border-[#e5e1da]">
-                {items.length > 5 && (
+                {items.length > 3 && (
                   <p className="text-[10px] text-neutral-400 text-center mb-2">
-                    +{items.length - 5} more item{items.length - 5 > 1 ? "s" : ""}{" "}
+                    +{items.length - 3} more item{items.length - 3 > 1 ? "s" : ""}{" "}
                     in your bag
                   </p>
                 )}
@@ -159,7 +217,7 @@ const CartIcon = () => {
                     Total
                   </span>
                   <PriceFormatter
-                    amount={getTotalPrice()}
+                    amount={discountedTotal}
                     className="text-sm font-semibold text-[#b8502e]"
                   />
                 </div>
