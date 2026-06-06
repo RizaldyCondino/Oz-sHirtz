@@ -338,7 +338,7 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
           totalPages={totalPages}
           onPageChange={(page) => {
             setCurrentPage(page);
-            setExpandedId(null); // collapse any open order when changing page
+            setExpandedId(null); // collapse any open order when changing pages
           }}
         />
       </div>
