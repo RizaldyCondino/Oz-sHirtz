@@ -361,7 +361,7 @@ const handleCheckout = async () => {
                     <Button
                       onClick={handleCheckout}
                       disabled={loading}
-                      className="w-full bg-[#111111] hover:bg-[#111111]/80 text-white font-medium hoverEffect lg:text-[15px] rounded-full py-4 sm:py-6 mt-4 text-sm sm:text-xs cursor-pointer"
+                      className="w-full bg-[#111111] hover:bg-[#111111]/80 text-white font-medium hoverEffect lg:text-[15px] rounded-full py-6 sm:py-6 mt-4 text-sm sm:text-xs cursor-pointer"
                     >
                       {loading
                         ? "Redirecting to checkout..."
@@ -408,7 +408,7 @@ const handleCheckout = async () => {
                               <div className="flex items-start gap-3">
                                 <RadioGroupItem
                                   value={addr.id}
-                                  className="mt-1 bg-black"
+                                  className="mt-1"
                                 />
                                 <div className="text-sm flex-1 min-w-0">
                                   <p className="font-semibold">{addr.name}</p>
