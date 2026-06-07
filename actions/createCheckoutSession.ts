@@ -58,6 +58,10 @@ export async function createCheckoutSession(
   metadata: Metadata,
 ) {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("Stripe is not configured");
+  }
+
     const customers = await stripe.customers.list({
       email: metadata.customerEmail,
       limit: 1,

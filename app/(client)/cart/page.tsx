@@ -167,15 +167,26 @@ const CartPage = () => {
     }
   };
 
-const handleCheckout = async () => {
-  if (!isSignedIn) {
-    openSignIn({ forceRedirectUrl: "/cart" });
-    return;
-  }
+  const handleCheckout = async () => {
+    if (!isSignedIn) {
+      openSignIn({ forceRedirectUrl: "/cart" });
+      return;
+    }
     if (!selectedAddress) {
       toast.error("Please select a delivery address");
       return;
     }
+
+    // Demo guard
+    const isLive =
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_live_");
+    if (!isLive) {
+      toast("This is a demo store — payments are disabled 🛍️", {
+        duration: 4000,
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const lineItems = groupedItems.map(
@@ -271,7 +282,11 @@ const handleCheckout = async () => {
                           >
                             <div className="relative w-[130px] h-[170px] sm:w-[140px] sm:h-[160px]">
                               <Image
-                                src={displayImage ? urlFor(displayImage).url() : "/placeholder.png"}
+                                src={
+                                  displayImage
+                                    ? urlFor(displayImage).url()
+                                    : "/placeholder.png"
+                                }
                                 alt={product.name ?? "Product"}
                                 fill
                                 sizes="(max-width: 640px) 100px, 140px"
@@ -299,7 +314,9 @@ const handleCheckout = async () => {
                             </p>
                             <p className="text-sm text-neutral-600 mt-0.5">
                               Size:{" "}
-                              <span className="font-medium">{selectedSize}</span>
+                              <span className="font-medium">
+                                {selectedSize}
+                              </span>
                             </p>
                             <div className="mt-auto pt-4 flex flex-col sm:flex-row sm:items-center gap-4">
                               <div className="flex-1">
@@ -441,9 +458,7 @@ const handleCheckout = async () => {
                                     size="icon"
                                     className="h-7 w-7 text-neutral-400 hover:text-red-500 hover:bg-red-50"
                                     disabled={deletingId === addr.id}
-                                    onClick={() =>
-                                      handleDeleteAddress(addr.id)
-                                    }
+                                    onClick={() => handleDeleteAddress(addr.id)}
                                   >
                                     <Trash2 size={13} />
                                   </Button>
@@ -460,19 +475,15 @@ const handleCheckout = async () => {
                     </CardContent>
                   </Card>
                 )}
-
-                
               </div>
-          
             </div>
           </div>
-    {/* ── You Might Like ───────────────────────────────────────────── */}
+          {/* ── You Might Like ───────────────────────────────────────────── */}
           <div className="w-full ">
             {suggestedProducts.length > 0 && (
-            <YouMightLike products={suggestedProducts} />
-          )}
+              <YouMightLike products={suggestedProducts} />
+            )}
           </div>
-          
         </>
       ) : (
         <EmptyCart />
